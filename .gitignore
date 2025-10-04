@@ -44,5 +44,6 @@ packages/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-# Keep the PICS data file (this is the main output we want to commit)
-!PicsDataCollector/pics_depot_mappings.json
+# Keep the output folder with PICS data
+!output/
+!output/pics_depot_mappings.json

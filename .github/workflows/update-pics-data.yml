@@ -54,7 +54,7 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet PicsDataCollector/pics_depot_mappings.json; then
+          if git diff --quiet output/pics_depot_mappings.json; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes detected in PICS data"
           else
@@ -67,11 +67,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add PicsDataCollector/pics_depot_mappings.json
+          git add output/pics_depot_mappings.json
 
           # Get metadata from JSON for commit message
-          TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' PicsDataCollector/pics_depot_mappings.json)
-          LAST_UPDATED=$(jq -r '.metadata.lastUpdated' PicsDataCollector/pics_depot_mappings.json)
+          TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' output/pics_depot_mappings.json)
+          LAST_UPDATED=$(jq -r '.metadata.lastUpdated' output/pics_depot_mappings.json)
 
           git commit -m "Update PICS depot mappings - $TOTAL_MAPPINGS mappings" \
                      -m "Last updated: $LAST_UPDATED" \
@@ -86,9 +86,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # Get metadata from JSON
-          TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' PicsDataCollector/pics_depot_mappings.json)
-          LAST_UPDATED=$(jq -r '.metadata.lastUpdated' PicsDataCollector/pics_depot_mappings.json)
-          LAST_CHANGE=$(jq -r '.metadata.lastChangeNumber' PicsDataCollector/pics_depot_mappings.json)
+          TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' output/pics_depot_mappings.json)
+          LAST_UPDATED=$(jq -r '.metadata.lastUpdated' output/pics_depot_mappings.json)
+          LAST_CHANGE=$(jq -r '.metadata.lastChangeNumber' output/pics_depot_mappings.json)
 
           # Create release tag with timestamp
           RELEASE_TAG="v$(date +'%Y.%m.%d-%H%M%S')"
@@ -121,7 +121,7 @@ jobs:
           gh release create "$RELEASE_TAG" \
             --title "$RELEASE_NAME" \
             --notes-file release_notes.md \
-            PicsDataCollector/pics_depot_mappings.json
+            output/pics_depot_mappings.json
 
           echo "Created release: $RELEASE_TAG"
 
@@ -131,10 +131,10 @@ jobs:
           echo "## PICS Data Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [ -f PicsDataCollector/pics_depot_mappings.json ]; then
-            TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' PicsDataCollector/pics_depot_mappings.json)
-            LAST_UPDATED=$(jq -r '.metadata.lastUpdated' PicsDataCollector/pics_depot_mappings.json)
-            LAST_CHANGE=$(jq -r '.metadata.lastChangeNumber' PicsDataCollector/pics_depot_mappings.json)
+          if [ -f output/pics_depot_mappings.json ]; then
+            TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' output/pics_depot_mappings.json)
+            LAST_UPDATED=$(jq -r '.metadata.lastUpdated' output/pics_depot_mappings.json)
+            LAST_CHANGE=$(jq -r '.metadata.lastChangeNumber' output/pics_depot_mappings.json)
 
             echo "- **Total Mappings**: $TOTAL_MAPPINGS" >> $GITHUB_STEP_SUMMARY
             echo "- **Last Updated**: $LAST_UPDATED" >> $GITHUB_STEP_SUMMARY

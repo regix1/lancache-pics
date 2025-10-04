@@ -82,14 +82,14 @@ Or visit the [Releases page](https://github.com/regix1/lancache-pics/releases/la
 **Option 2: Download from Repository**
 
 ```bash
-curl -O https://raw.githubusercontent.com/regix1/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json
+curl -O https://raw.githubusercontent.com/regix1/lancache-pics/main/output/pics_depot_mappings.json
 ```
 
 **Option 3: Clone the Repository**
 
 ```bash
 git clone https://github.com/regix1/lancache-pics.git
-cd lancache-pics/PicsDataCollector
+cd lancache-pics/output
 cat pics_depot_mappings.json
 ```
 

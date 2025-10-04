@@ -9,10 +9,11 @@ public class DataPersistenceService
 
     public DataPersistenceService()
     {
-        // Save to PicsDataCollector directory regardless of where app runs from
+        // Save to output directory in repository root
         var baseDir = AppContext.BaseDirectory;
         var projectDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", ".."));
-        _outputFilePath = Path.Combine(projectDir, "PicsDataCollector", "pics_depot_mappings.json");
+        var outputDir = Path.Combine(projectDir, "output");
+        _outputFilePath = Path.Combine(outputDir, "pics_depot_mappings.json");
     }
 
     public async Task<(PicsJsonData? data, uint lastChangeNumber)> LoadExistingDataAsync()
