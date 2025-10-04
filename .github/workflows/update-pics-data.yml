@@ -1,0 +1,100 @@
+name: Update PICS Depot Mappings
+
+on:
+  # Run every 2 days at 3 AM UTC
+  schedule:
+    - cron: '0 3 */2 * *'
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Update mode'
+        required: true
+        default: 'incremental'
+        type: choice
+        options:
+          - incremental
+          - full
+
+permissions:
+  contents: write
+
+jobs:
+  update-pics-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore PicsDataCollector/PicsDataCollector.csproj
+
+      - name: Build project
+        run: dotnet build PicsDataCollector/PicsDataCollector.csproj --configuration Release --no-restore
+
+      - name: Run PICS data collector (Incremental)
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'incremental')
+        run: dotnet run --project PicsDataCollector/PicsDataCollector.csproj --configuration Release -- --incremental
+        timeout-minutes: 60
+
+      - name: Run PICS data collector (Full)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'full'
+        run: dotnet run --project PicsDataCollector/PicsDataCollector.csproj --configuration Release -- --full
+        timeout-minutes: 120
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet PicsDataCollector/pics_depot_mappings.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected in PICS data"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected in PICS data"
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add PicsDataCollector/pics_depot_mappings.json
+
+          # Get metadata from JSON for commit message
+          TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' PicsDataCollector/pics_depot_mappings.json)
+          LAST_UPDATED=$(jq -r '.metadata.lastUpdated' PicsDataCollector/pics_depot_mappings.json)
+
+          git commit -m "Update PICS depot mappings - $TOTAL_MAPPINGS mappings" \
+                     -m "Last updated: $LAST_UPDATED" \
+                     -m "" \
+                     -m "Automated update via GitHub Actions"
+
+          git push
+
+      - name: Create update summary
+        if: always()
+        run: |
+          echo "## PICS Data Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f PicsDataCollector/pics_depot_mappings.json ]; then
+            TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' PicsDataCollector/pics_depot_mappings.json)
+            LAST_UPDATED=$(jq -r '.metadata.lastUpdated' PicsDataCollector/pics_depot_mappings.json)
+            LAST_CHANGE=$(jq -r '.metadata.lastChangeNumber' PicsDataCollector/pics_depot_mappings.json)
+
+            echo "- **Total Mappings**: $TOTAL_MAPPINGS" >> $GITHUB_STEP_SUMMARY
+            echo "- **Last Updated**: $LAST_UPDATED" >> $GITHUB_STEP_SUMMARY
+            echo "- **Last Change Number**: $LAST_CHANGE" >> $GITHUB_STEP_SUMMARY
+            echo "- **Changes Committed**: ${{ steps.check_changes.outputs.changed }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ PICS data file not found" >> $GITHUB_STEP_SUMMARY
+          fi

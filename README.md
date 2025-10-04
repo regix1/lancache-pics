@@ -1,0 +1,181 @@
+# Steam PICS Depot Mappings
+
+Automated collection of Steam depot-to-app mappings using the Product Information and Content System (PICS).
+
+This repository uses GitHub Actions to automatically download and update Steam depot mappings every 2 days, providing a publicly accessible dataset for developers working with Steam content delivery.
+
+## What is this?
+
+Steam organizes game content into "depots" (content packages) and "apps" (games/applications). This project maintains an up-to-date mapping between depot IDs and their associated app IDs, which is essential for:
+
+- Building lancache management tools
+- Analyzing Steam content distribution
+- Tracking game updates and changes
+- Understanding Steam's content delivery network
+
+## Data Format
+
+The data is stored in `PicsDataCollector/pics_depot_mappings.json` with the following structure:
+
+```json
+{
+  "metadata": {
+    "lastUpdated": "2025-10-04T03:00:22.590218Z",
+    "totalMappings": 294314,
+    "version": "1.0",
+    "nextUpdateDue": "2025-10-05T03:00:22.5965417Z",
+    "lastChangeNumber": 31475616
+  },
+  "depotMappings": {
+    "1": {
+      "appIds": [70],
+      "appNames": ["Half-Life"],
+      "source": "SteamKit2-PICS",
+      "discoveredAt": "2025-10-04T03:00:22.4805394Z"
+    }
+  }
+}
+```
+
+### Fields
+
+- **metadata.totalMappings**: Total number of depot-to-app relationships
+- **metadata.lastChangeNumber**: Steam PICS change number (used for incremental updates)
+- **depotMappings**: Dictionary of depot IDs to app information
+  - **appIds**: Array of app IDs that use this depot
+  - **appNames**: Corresponding names for the apps
+  - **source**: Data collection method (SteamKit2-PICS)
+  - **discoveredAt**: When this mapping was discovered
+
+## How It Works
+
+### Automated Updates
+
+GitHub Actions runs every 2 days (configurable in `.github/workflows/update-pics-data.yml`):
+
+1. Connects to Steam anonymously using SteamKit2
+2. Queries PICS for app changes since last update (incremental mode)
+3. Downloads depot information for changed apps
+4. Merges with existing data
+5. Commits changes to the repository
+
+### Update Modes
+
+- **Incremental** (default for scheduled runs): Only downloads changes since last update
+- **Full**: Downloads all data from scratch (manual trigger only)
+
+## Usage
+
+### Accessing the Data
+
+Download the latest mappings directly from GitHub:
+
+```bash
+curl -O https://raw.githubusercontent.com/YOUR_USERNAME/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json
+```
+
+Or clone the repository:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/lancache-pics.git
+cd lancache-pics/PicsDataCollector
+cat pics_depot_mappings.json
+```
+
+### Running Locally
+
+Prerequisites:
+- .NET 8.0 SDK or later
+
+```bash
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/lancache-pics.git
+cd lancache-pics/PicsDataCollector
+
+# Restore dependencies
+dotnet restore
+
+# Run incremental update (default if file exists)
+dotnet run
+
+# Force full update
+dotnet run -- --full
+
+# Force incremental update
+dotnet run -- --incremental
+```
+
+### Triggering Manual Updates
+
+You can manually trigger an update via GitHub Actions:
+
+1. Go to the **Actions** tab in your repository
+2. Select **Update PICS Depot Mappings** workflow
+3. Click **Run workflow**
+4. Choose update mode (incremental/full)
+
+## Configuration
+
+### Changing Update Frequency
+
+Edit `.github/workflows/update-pics-data.yml`:
+
+```yaml
+schedule:
+  - cron: '0 3 */2 * *'  # Every 2 days at 3 AM UTC
+```
+
+Cron syntax examples:
+- `0 3 * * *` - Daily at 3 AM UTC
+- `0 3 */3 * *` - Every 3 days at 3 AM UTC
+- `0 3 * * 0` - Weekly on Sundays at 3 AM UTC
+
+### Timeout Adjustments
+
+The workflow has timeouts to prevent hanging:
+- Incremental updates: 60 minutes
+- Full updates: 120 minutes
+
+Adjust in the workflow file if needed.
+
+## Technical Details
+
+### Dependencies
+
+- **SteamKit2**: .NET library for Steam network interaction
+- **System.Text.Json**: JSON serialization
+
+### Rate Limiting
+
+The collector includes rate limiting to be respectful of Steam's API:
+- 150ms delay between app batches
+- 100ms delay between PICS changelist queries
+- 200 apps per batch (prevents timeout issues)
+
+### Incremental Updates
+
+The system tracks Steam's PICS change number (`lastChangeNumber`) to enable efficient incremental updates. Only apps that changed since the last update are processed.
+
+## Contributing
+
+Contributions are welcome! Feel free to:
+
+- Report issues with the data
+- Suggest improvements to the collection process
+- Submit pull requests
+
+## License
+
+This project is provided as-is for use by the community. The Steam data belongs to Valve Corporation.
+
+## Related Projects
+
+- **SteamKit2**: https://github.com/SteamRE/SteamKit
+- **SteamDatabase**: https://steamdb.info/
+- **Lancache**: https://lancache.net/
+
+## Acknowledgments
+
+- Built using [SteamKit2](https://github.com/SteamRE/SteamKit) by the SteamRE team
+- Inspired by SteamDatabase's data collection efforts
+- Created for the Lancache community
