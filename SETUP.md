@@ -11,7 +11,7 @@
 2. **Push your local repository**
    ```bash
    cd H:\_git\lancache-pics
-   git remote add origin https://github.com/YOUR_USERNAME/lancache-pics.git
+   git remote add origin https://github.com/regix1/lancache-pics.git
    git branch -M main
    git push -u origin main
    ```
@@ -125,27 +125,27 @@ await Task.Delay(150); // Delay between batches in ms
 
 ### Raw JSON URL
 ```
-https://raw.githubusercontent.com/YOUR_USERNAME/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json
+https://raw.githubusercontent.com/regix1/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json
 ```
 
 ### Using in Your Application
 
 C# example:
 ```csharp
-var json = await httpClient.GetStringAsync("https://raw.githubusercontent.com/YOUR_USERNAME/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json");
+var json = await httpClient.GetStringAsync("https://raw.githubusercontent.com/regix1/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json");
 var data = JsonSerializer.Deserialize<PicsJsonData>(json);
 ```
 
 Python example:
 ```python
 import requests
-url = "https://raw.githubusercontent.com/YOUR_USERNAME/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json"
+url = "https://raw.githubusercontent.com/regix1/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json"
 data = requests.get(url).json()
 ```
 
 JavaScript example:
 ```javascript
-const response = await fetch('https://raw.githubusercontent.com/YOUR_USERNAME/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json');
+const response = await fetch('https://raw.githubusercontent.com/regix1/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json');
 const data = await response.json();
 ```
 

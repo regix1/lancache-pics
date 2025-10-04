@@ -100,7 +100,7 @@ Prerequisites:
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/lancache-pics.git
+git clone https://github.com/regix1/lancache-pics.git
 cd lancache-pics/PicsDataCollector
 
 # Restore dependencies
