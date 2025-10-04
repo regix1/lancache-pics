@@ -5,19 +5,27 @@ namespace PicsDataCollector.Services;
 
 public class DataPersistenceService
 {
-    private const string OutputFileName = "pics_depot_mappings.json";
+    private readonly string _outputFilePath;
+
+    public DataPersistenceService()
+    {
+        // Save to PicsDataCollector directory regardless of where app runs from
+        var baseDir = AppContext.BaseDirectory;
+        var projectDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", ".."));
+        _outputFilePath = Path.Combine(projectDir, "PicsDataCollector", "pics_depot_mappings.json");
+    }
 
     public async Task<(PicsJsonData? data, uint lastChangeNumber)> LoadExistingDataAsync()
     {
         try
         {
-            if (!File.Exists(OutputFileName))
+            if (!File.Exists(_outputFilePath))
             {
-                Console.WriteLine("No existing data file found.");
+                Console.WriteLine($"No existing data file found at: {_outputFilePath}");
                 return (null, 0);
             }
 
-            var json = await File.ReadAllTextAsync(OutputFileName);
+            var json = await File.ReadAllTextAsync(_outputFilePath);
             var data = JsonSerializer.Deserialize<PicsJsonData>(json, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -27,7 +35,7 @@ public class DataPersistenceService
 
             if (data?.DepotMappings != null)
             {
-                Console.WriteLine($"Loaded {data.Metadata?.TotalMappings ?? 0} existing mappings from {OutputFileName}");
+                Console.WriteLine($"Loaded {data.Metadata?.TotalMappings ?? 0} existing mappings from {_outputFilePath}");
                 Console.WriteLine($"Last change number: {lastChangeNumber}");
             }
 
@@ -84,9 +92,17 @@ public class DataPersistenceService
         };
 
         var jsonContent = JsonSerializer.Serialize(picsData, jsonOptions);
-        await File.WriteAllTextAsync(OutputFileName, jsonContent);
 
-        Console.WriteLine($"Saved to {OutputFileName}");
+        // Ensure directory exists
+        var directory = Path.GetDirectoryName(_outputFilePath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        await File.WriteAllTextAsync(_outputFilePath, jsonContent);
+
+        Console.WriteLine($"Saved to {_outputFilePath}");
         Console.WriteLine($"Total mappings: {picsData.Metadata.TotalMappings}");
     }
 
