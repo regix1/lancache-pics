@@ -80,6 +80,51 @@ jobs:
 
           git push
 
+      - name: Create release with data file
+        if: steps.check_changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Get metadata from JSON
+          TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' PicsDataCollector/pics_depot_mappings.json)
+          LAST_UPDATED=$(jq -r '.metadata.lastUpdated' PicsDataCollector/pics_depot_mappings.json)
+          LAST_CHANGE=$(jq -r '.metadata.lastChangeNumber' PicsDataCollector/pics_depot_mappings.json)
+
+          # Create release tag with timestamp
+          RELEASE_TAG="v$(date +'%Y.%m.%d-%H%M%S')"
+          RELEASE_NAME="PICS Data Update - $(date +'%Y-%m-%d')"
+
+          # Create release notes
+          cat << EOF > release_notes.md
+          ## Steam PICS Depot Mappings Update
+
+          **Total Mappings:** $TOTAL_MAPPINGS
+          **Last Updated:** $LAST_UPDATED
+          **Change Number:** $LAST_CHANGE
+
+          ### Download
+
+          Download the \`pics_depot_mappings.json\` file attached to this release.
+
+          ### Direct URL
+
+          \`\`\`
+          https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/pics_depot_mappings.json
+          \`\`\`
+
+          ### Changes
+
+          This release contains updated Steam depot-to-app mappings collected via PICS (Product Information and Content System).
+          EOF
+
+          # Create release and upload JSON file
+          gh release create "$RELEASE_TAG" \
+            --title "$RELEASE_NAME" \
+            --notes-file release_notes.md \
+            PicsDataCollector/pics_depot_mappings.json
+
+          echo "Created release: $RELEASE_TAG"
+
       - name: Create update summary
         if: always()
         run: |

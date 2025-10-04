@@ -68,16 +68,27 @@ GitHub Actions runs every 2 days (configurable in `.github/workflows/update-pics
 
 ### Accessing the Data
 
-Download the latest mappings directly from GitHub:
+**Option 1: Download from Latest Release (Recommended)**
+
+Every time the data updates, a new release is automatically created:
 
 ```bash
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json
+# Get the latest release download URL
+curl -s https://api.github.com/repos/regix1/lancache-pics/releases/latest | jq -r '.assets[0].browser_download_url' | xargs curl -LO
 ```
 
-Or clone the repository:
+Or visit the [Releases page](https://github.com/regix1/lancache-pics/releases/latest) to download manually.
+
+**Option 2: Download from Repository**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/lancache-pics.git
+curl -O https://raw.githubusercontent.com/regix1/lancache-pics/main/PicsDataCollector/pics_depot_mappings.json
+```
+
+**Option 3: Clone the Repository**
+
+```bash
+git clone https://github.com/regix1/lancache-pics.git
 cd lancache-pics/PicsDataCollector
 cat pics_depot_mappings.json
 ```
@@ -109,10 +120,21 @@ dotnet run -- --incremental
 
 You can manually trigger an update via GitHub Actions:
 
-1. Go to the **Actions** tab in your repository
+1. Go to the [Actions tab](https://github.com/regix1/lancache-pics/actions)
 2. Select **Update PICS Depot Mappings** workflow
 3. Click **Run workflow**
-4. Choose update mode (incremental/full)
+4. Choose update mode:
+   - **incremental**: Only process changes since last update (fast)
+   - **full**: Complete re-download of all data (slow, ~60 minutes)
+
+### Releases
+
+Every time the data changes, the workflow automatically:
+- Creates a new release with timestamp tag (e.g., `v2025.10.04-150030`)
+- Attaches the `pics_depot_mappings.json` file to the release
+- Provides download URL and metadata in release notes
+
+Browse all releases: [github.com/regix1/lancache-pics/releases](https://github.com/regix1/lancache-pics/releases)
 
 ## Configuration
 
