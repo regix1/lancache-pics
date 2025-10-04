@@ -67,12 +67,59 @@ public class DepotMappingService
                 var productJob = _connectionService.Apps.PICSGetProductInfo(appRequests, Enumerable.Empty<SteamApps.PICSRequest>());
                 var productCallbacks = await WaitForAllProductInfoAsync(productJob);
 
-                // Process apps
+                // Process apps and collect DLC apps to scan
+                var dlcAppsToScan = new List<uint>();
                 foreach (var cb in productCallbacks)
                 {
                     foreach (var app in cb.Apps.Values)
                     {
-                        ProcessAppDepots(app);
+                        var dlcList = ProcessAppDepots(app);
+                        dlcAppsToScan.AddRange(dlcList);
+                    }
+                }
+
+                // Process DLC apps found in this batch
+                if (dlcAppsToScan.Count > 0)
+                {
+                    Console.WriteLine($"  Found {dlcAppsToScan.Count} DLC apps to scan in batch {processedBatches + 1}");
+
+                    // Process DLC apps in smaller sub-batches
+                    var dlcBatches = dlcAppsToScan.Distinct().Chunk(50).ToList();
+                    foreach (var dlcBatch in dlcBatches)
+                    {
+                        try
+                        {
+                            var dlcTokensJob = _connectionService.Apps.PICSGetAccessTokens(dlcBatch, Enumerable.Empty<uint>());
+                            var dlcTokens = await WaitForCallbackAsync(dlcTokensJob);
+
+                            var dlcAppRequests = new List<SteamApps.PICSRequest>();
+                            foreach (var dlcAppId in dlcBatch)
+                            {
+                                var request = new SteamApps.PICSRequest(dlcAppId);
+                                if (dlcTokens.AppTokens.TryGetValue(dlcAppId, out var token))
+                                {
+                                    request.AccessToken = token;
+                                }
+                                dlcAppRequests.Add(request);
+                            }
+
+                            var dlcProductJob = _connectionService.Apps.PICSGetProductInfo(dlcAppRequests, Enumerable.Empty<SteamApps.PICSRequest>());
+                            var dlcProductCallbacks = await WaitForAllProductInfoAsync(dlcProductJob);
+
+                            foreach (var dlcCb in dlcProductCallbacks)
+                            {
+                                foreach (var dlcApp in dlcCb.Apps.Values)
+                                {
+                                    ProcessAppDepots(dlcApp);  // Don't need to scan DLC's DLCs recursively
+                                }
+                            }
+
+                            await Task.Delay(100);  // Small delay between DLC batches
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"  Warning: Failed to process DLC batch: {ex.Message}");
+                        }
                     }
                 }
 
@@ -94,8 +141,10 @@ public class DepotMappingService
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
     }
 
-    private void ProcessAppDepots(SteamApps.PICSProductInfoCallback.PICSProductInfo app)
+    private List<uint> ProcessAppDepots(SteamApps.PICSProductInfoCallback.PICSProductInfo app)
     {
+        var dlcAppIdsToScan = new List<uint>();
+
         try
         {
             var appId = app.ID;
@@ -106,11 +155,29 @@ public class DepotMappingService
             var depots = appinfo != KeyValue.Invalid ? appinfo["depots"] : kv["depots"];
 
             var appName = common?["name"]?.AsString() ?? $"App {appId}";
+            var appType = common?["type"]?.AsString()?.ToLower() ?? "unknown";
             _appNames[appId] = appName;
+
+            // Extract DLC list for DLC depot discovery
+            var listofdlc = common?["listofdlc"];
+            if (listofdlc != KeyValue.Invalid && listofdlc?.Children != null)
+            {
+                foreach (var dlcChild in listofdlc.Children)
+                {
+                    if (uint.TryParse(dlcChild.AsString(), out var dlcAppId))
+                    {
+                        // Add DLC to scan list if not already processed
+                        if (!_appNames.ContainsKey(dlcAppId))
+                        {
+                            dlcAppIdsToScan.Add(dlcAppId);
+                        }
+                    }
+                }
+            }
 
             if (depots == KeyValue.Invalid)
             {
-                return;
+                return dlcAppIdsToScan;
             }
 
             foreach (var child in depots.Children)
@@ -121,9 +188,18 @@ public class DepotMappingService
                 var ownerFromPics = AsUInt(child["depotfromapp"]);
                 var ownerAppId = ownerFromPics ?? appId;
 
-                // Skip suspicious self-mappings
-                if (depotId == ownerAppId)
+                // FIXED: DLC depots use their App ID as Depot ID - this is normal Steam behavior
+                // Only skip if it's a base game/app (not DLC) with self-referencing depot
+                if (depotId == ownerAppId && appType != "dlc" && !ownerFromPics.HasValue)
+                {
                     continue;
+                }
+
+                // For DLCs, depot ID == app ID is expected and valid
+                if (depotId == ownerAppId && appType == "dlc")
+                {
+                    Console.WriteLine($"  Found DLC depot {depotId} for DLC app {appId} ({appName})");
+                }
 
                 var set = _depotToAppMappings.GetOrAdd(depotId, _ => new HashSet<uint>());
                 set.Add(ownerAppId);
@@ -139,6 +215,8 @@ public class DepotMappingService
         {
             Console.WriteLine($"Warning: Error processing app {app.ID}: {ex.Message}");
         }
+
+        return dlcAppIdsToScan;
     }
 
     private static uint? AsUInt(KeyValue kv)
