@@ -51,18 +51,24 @@ The data is stored in `PicsDataCollector/pics_depot_mappings.json` with the foll
 
 ### Automated Updates
 
-GitHub Actions runs every 2 days (configurable in `.github/workflows/update-pics-data.yml`):
+GitHub Actions runs on two schedules:
 
-1. Connects to Steam anonymously using SteamKit2
-2. Queries PICS for app changes since last update (incremental mode)
-3. Downloads depot information for changed apps
-4. Merges with existing data
-5. Commits changes to the repository
+**Incremental Updates** (Every 2 days at 3 AM UTC):
+1. Queries PICS for app changes since last update
+2. Downloads depot information for changed apps only
+3. Merges with existing data
+4. Fast: ~5-10 minutes
+
+**Full Updates** (Every Sunday at 4 AM UTC):
+1. Downloads complete app list from Steam Web API (~170k apps)
+2. Fetches depot information for all apps
+3. Rebuilds entire dataset
+4. Slow: ~60-90 minutes
 
 ### Update Modes
 
-- **Incremental** (default for scheduled runs): Only downloads changes since last update
-- **Full**: Downloads all data from scratch (manual trigger only)
+- **Incremental**: Only downloads changes since last update (scheduled every 2 days)
+- **Full**: Downloads all data from scratch (scheduled weekly on Sundays)
 
 ## Usage
 

@@ -1,9 +1,11 @@
 name: Update PICS Depot Mappings
 
 on:
-  # Run every 2 days at 3 AM UTC
+  # Run incremental every 2 days at 3 AM UTC
+  # Run full update every 2 weeks on Sundays at 4 AM UTC
   schedule:
-    - cron: '0 3 */2 * *'
+    - cron: '0 3 */2 * *'    # Incremental: Every 2 days at 3 AM UTC
+    - cron: '0 4 * * 0'      # Full: Every Sunday at 4 AM UTC (weekly)
 
   # Allow manual trigger
   workflow_dispatch:
@@ -41,13 +43,31 @@ jobs:
       - name: Build project
         run: dotnet build PicsDataCollector/PicsDataCollector.csproj --configuration Release --no-restore
 
+      - name: Determine update mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" == "schedule" ]; then
+            # Check if it's Sunday (day 0) for full update
+            if [ "$(date -u +%u)" == "7" ]; then
+              echo "mode=full" >> $GITHUB_OUTPUT
+              echo "Running scheduled FULL update (weekly Sunday)"
+            else
+              echo "mode=incremental" >> $GITHUB_OUTPUT
+              echo "Running scheduled INCREMENTAL update"
+            fi
+          else
+            # Manual trigger - use selected mode
+            echo "mode=${{ github.event.inputs.mode }}" >> $GITHUB_OUTPUT
+            echo "Running manual ${{ github.event.inputs.mode }} update"
+          fi
+
       - name: Run PICS data collector (Incremental)
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'incremental')
+        if: steps.mode.outputs.mode == 'incremental'
         run: dotnet run --project PicsDataCollector/PicsDataCollector.csproj --configuration Release -- --incremental
         timeout-minutes: 60
 
       - name: Run PICS data collector (Full)
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'full'
+        if: steps.mode.outputs.mode == 'full'
         run: dotnet run --project PicsDataCollector/PicsDataCollector.csproj --configuration Release -- --full
         timeout-minutes: 120
 
