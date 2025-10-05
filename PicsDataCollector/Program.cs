@@ -38,8 +38,8 @@ class Program
 
                 if (data != null)
                 {
-                    var (depotMappings, appNames) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames);
+                    var (depotMappings, appNames, depotOwners) = persistenceService.ExtractMappingsFromData(data);
+                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners);
                 }
             }
             else if (fullUpdate)
@@ -54,8 +54,8 @@ class Program
                 {
                     Console.WriteLine("Mode: Incremental update (auto-detected)");
                     lastChangeNumber = changeNumber;
-                    var (depotMappings, appNames) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames);
+                    var (depotMappings, appNames, depotOwners) = persistenceService.ExtractMappingsFromData(data);
+                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners);
                     incrementalOnly = true;
                 }
                 else
@@ -98,11 +98,15 @@ class Program
                 kvp => kvp.Key,
                 kvp => kvp.Value
             );
+            var depotOwnersDict = mappingService.DepotOwners.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value
+            );
 
             // Get the final change number from enumeration service
             var finalChangeNumber = await GetCurrentChangeNumberAsync(connectionService);
 
-            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber);
+            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber, depotOwnersDict);
 
             Console.WriteLine();
             Console.WriteLine("Collection complete!");
