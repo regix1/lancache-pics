@@ -52,7 +52,8 @@ public class DataPersistenceService
     public async Task SaveToJsonAsync(
         Dictionary<uint, HashSet<uint>> depotMappings,
         Dictionary<uint, string> appNames,
-        uint lastChangeNumber)
+        uint lastChangeNumber,
+        Dictionary<uint, uint>? depotOwners = null)
     {
         Console.WriteLine();
         Console.WriteLine("Saving to JSON...");
@@ -72,13 +73,31 @@ public class DataPersistenceService
 
         foreach (var (depotId, appIds) in depotMappings)
         {
-            var appIdsList = appIds.ToList();
+            // Ensure owner app is first in the list
+            var appIdsList = new List<uint>();
+            uint? ownerId = null;
+
+            if (depotOwners != null && depotOwners.TryGetValue(depotId, out var ownerAppId) && appIds.Contains(ownerAppId))
+            {
+                ownerId = ownerAppId;
+                // Add owner first
+                appIdsList.Add(ownerAppId);
+                // Add remaining apps
+                appIdsList.AddRange(appIds.Where(id => id != ownerAppId));
+            }
+            else
+            {
+                // No owner tracked, just convert as-is
+                appIdsList = appIds.ToList();
+            }
+
             var appNamesList = appIdsList.Select(appId =>
                 appNames.TryGetValue(appId, out var name) ? name : $"App {appId}"
             ).ToList();
 
             picsData.DepotMappings[depotId.ToString()] = new PicsDepotMapping
             {
+                OwnerId = ownerId,
                 AppIds = appIdsList,
                 AppNames = appNamesList,
                 Source = "SteamKit2-PICS",
@@ -107,14 +126,15 @@ public class DataPersistenceService
         Console.WriteLine($"Total mappings: {picsData.Metadata.TotalMappings}");
     }
 
-    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames) ExtractMappingsFromData(PicsJsonData? data)
+    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners) ExtractMappingsFromData(PicsJsonData? data)
     {
         var depotMappings = new Dictionary<uint, HashSet<uint>>();
         var appNames = new Dictionary<uint, string>();
+        var depotOwners = new Dictionary<uint, uint>();
 
         if (data?.DepotMappings == null)
         {
-            return (depotMappings, appNames);
+            return (depotMappings, appNames, depotOwners);
         }
 
         foreach (var (depotIdStr, mapping) in data.DepotMappings)
@@ -132,6 +152,17 @@ public class DataPersistenceService
             }
             depotMappings[depotId] = set;
 
+            // Extract owner ID if available
+            if (mapping.OwnerId.HasValue)
+            {
+                depotOwners[depotId] = mapping.OwnerId.Value;
+            }
+            else if (mapping.AppIds != null && mapping.AppIds.Count > 0)
+            {
+                // Fallback: Use first app ID as owner if not explicitly set
+                depotOwners[depotId] = mapping.AppIds[0];
+            }
+
             if (mapping.AppNames != null && mapping.AppIds != null)
             {
                 for (int i = 0; i < Math.Min(mapping.AppIds.Count, mapping.AppNames.Count); i++)
@@ -141,6 +172,6 @@ public class DataPersistenceService
             }
         }
 
-        return (depotMappings, appNames);
+        return (depotMappings, appNames, depotOwners);
     }
 }

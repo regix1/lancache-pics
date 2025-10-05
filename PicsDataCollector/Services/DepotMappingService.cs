@@ -7,11 +7,13 @@ public class DepotMappingService
 {
     private readonly SteamConnectionService _connectionService;
     private readonly ConcurrentDictionary<uint, HashSet<uint>> _depotToAppMappings = new();
+    private readonly ConcurrentDictionary<uint, uint> _depotOwners = new();
     private readonly ConcurrentDictionary<uint, string> _appNames = new();
 
     private const int AppBatchSize = 200;
 
     public IReadOnlyDictionary<uint, HashSet<uint>> DepotMappings => _depotToAppMappings;
+    public IReadOnlyDictionary<uint, uint> DepotOwners => _depotOwners;
     public IReadOnlyDictionary<uint, string> AppNames => _appNames;
 
     public DepotMappingService(SteamConnectionService connectionService)
@@ -19,7 +21,7 @@ public class DepotMappingService
         _connectionService = connectionService;
     }
 
-    public void LoadExistingMappings(Dictionary<uint, HashSet<uint>> mappings, Dictionary<uint, string> names)
+    public void LoadExistingMappings(Dictionary<uint, HashSet<uint>> mappings, Dictionary<uint, string> names, Dictionary<uint, uint>? depotOwners = null)
     {
         foreach (var (depotId, appIds) in mappings)
         {
@@ -33,6 +35,14 @@ public class DepotMappingService
         foreach (var (appId, name) in names)
         {
             _appNames.TryAdd(appId, name);
+        }
+
+        if (depotOwners != null)
+        {
+            foreach (var (depotId, ownerId) in depotOwners)
+            {
+                _depotOwners.TryAdd(depotId, ownerId);
+            }
         }
     }
 
@@ -203,6 +213,9 @@ public class DepotMappingService
 
                 var set = _depotToAppMappings.GetOrAdd(depotId, _ => new HashSet<uint>());
                 set.Add(ownerAppId);
+
+                // Store the owner app for this depot
+                _depotOwners.TryAdd(depotId, ownerAppId);
 
                 // Store owner app name
                 if (ownerFromPics.HasValue && !_appNames.ContainsKey(ownerAppId))
