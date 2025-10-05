@@ -139,66 +139,6 @@ public class DepotMappingService
         }
 
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
-
-        // Add fallback mappings as last resort
-        AddFallbackAppIdDepotMappings();
-    }
-
-    /// <summary>
-    /// Add fallback depot mappings for apps that use their own app ID as depot ID
-    /// This is a LAST RESORT for simple games with no separate depot structure
-    /// Only adds mappings for apps with NO existing depot data AND where the depot ID doesn't already exist
-    /// </summary>
-    private void AddFallbackAppIdDepotMappings()
-    {
-        try
-        {
-            int added = 0;
-            int skipped = 0;
-
-            // Get all apps we've scanned
-            var allApps = _appNames.Keys.ToHashSet();
-
-            // Get all apps that already have depot mappings
-            var appsWithDepots = _depotToAppMappings.Values
-                .SelectMany(appIds => appIds)
-                .ToHashSet();
-
-            // Find apps without any depot mappings
-            var appsWithoutDepots = allApps.Except(appsWithDepots).ToList();
-
-            foreach (var appId in appsWithoutDepots)
-            {
-                // CRITICAL: Only add if the depot ID doesn't already exist
-                // If depot with ID = appId already exists, it means it's a shared depot or has real PICS data
-                // We should NOT override or modify it
-                if (_depotToAppMappings.ContainsKey(appId))
-                {
-                    skipped++;
-                    continue;
-                }
-
-                // Safe to add: app has no depot mappings AND depot ID doesn't exist
-                var set = new HashSet<uint> { appId };
-                if (_depotToAppMappings.TryAdd(appId, set))
-                {
-                    added++;
-                }
-            }
-
-            if (added > 0)
-            {
-                Console.WriteLine($"Added {added} fallback depot mappings for apps using their own app ID as depot ID (skipped {skipped} that had existing depot data)");
-            }
-            else if (skipped > 0)
-            {
-                Console.WriteLine($"No fallback depot mappings added - {skipped} apps skipped because depot already exists with PICS data");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Warning: Error adding fallback app ID depot mappings: {ex.Message}");
-        }
     }
 
     private List<uint> ProcessAppDepots(SteamApps.PICSProductInfoCallback.PICSProductInfo app)
