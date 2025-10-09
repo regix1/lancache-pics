@@ -1,11 +1,11 @@
 name: Update PICS Depot Mappings
 
 on:
-  # Run incremental every 2 days at 3 AM UTC
-  # Run full update every 2 weeks on Sundays at 4 AM UTC
+  # Run incremental every 4 hours
+  # Run full update every Sunday at 4 AM UTC
   schedule:
-    - cron: '0 3 */2 * *'    # Incremental: Every 2 days at 3 AM UTC
-    - cron: '0 4 * * 0'      # Full: Every Sunday at 4 AM UTC (weekly)
+    - cron: '0 */4 * * *'    # Incremental: Every 4 hours
+    - cron: '0 4 * * 0'      # Full: Every Sunday at 4 AM UTC
 
   # Allow manual trigger
   workflow_dispatch:
