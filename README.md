@@ -1,6 +1,6 @@
 # Steam PICS Depot Mappings
 
-Automated collection of Steam depot-to-app mappings using the Product Information and Content System (PICS). Updated every 2 days via GitHub Actions.
+Automated collection of Steam depot-to-app mappings using the Product Information and Content System (PICS). Updated every 4 hours via GitHub Actions.
 
 ## What is this?
 
@@ -54,7 +54,7 @@ dotnet run -- --full    # Full update
 
 ## How It Works
 
-**Incremental Updates** (Every 2 days at 3 AM UTC)
+**Incremental Updates** (Every 4 hours)
 - Queries PICS for changes since last update
 - Fast: ~5-10 minutes
 
@@ -75,7 +75,8 @@ dotnet run -- --full    # Full update
 **Change update frequency** in `.github/workflows/update-pics-data.yml`:
 ```yaml
 schedule:
-  - cron: '0 3 */2 * *'  # Every 2 days
+  - cron: '0 */4 * * *'  # Incremental: Every 4 hours
+  - cron: '0 4 * * 0'    # Full: Every Sunday at 4 AM UTC
 ```
 
 ## Technical Details
