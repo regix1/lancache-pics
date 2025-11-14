@@ -44,8 +44,9 @@ packages/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-# Output data files (too large for git)
-output/
+# Output folder - ignore everything except the JSON files we publish
+output/*
+!output/*.json
 
 # Third-party references
 steamappidlist/
