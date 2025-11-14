@@ -106,6 +106,9 @@ jobs:
                      -m "" \
                      -m "Automated update via GitHub Actions"
 
+          # Pull any remote changes and rebase our commit on top
+          git pull --rebase origin main
+
           git push
 
       - name: Create release with data file
