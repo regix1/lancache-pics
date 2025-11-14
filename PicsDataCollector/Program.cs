@@ -80,6 +80,24 @@ class Program
             // Connect to Steam
             await connectionService.ConnectAndLoginAsync();
 
+            // Fetch Steam app list from Web API (v1)
+            Console.WriteLine("Fetching Steam app list from Web API...");
+            var steamAppListService = new SteamAppListService();
+            List<SteamApp>? steamApps = null;
+
+            try
+            {
+                steamApps = await steamAppListService.GetAllAppsAsync();
+                await persistenceService.SaveSteamAppsToJsonAsync(steamApps);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Failed to fetch Steam app list: {ex.Message}");
+                Console.WriteLine("Continuing with PICS enumeration...");
+            }
+
+            Console.WriteLine();
+
             // Enumerate app IDs
             Console.WriteLine("Enumerating app IDs via PICS...");
             var appIds = await enumerationService.EnumerateAllAppIdsAsync(incrementalOnly, lastChangeNumber);

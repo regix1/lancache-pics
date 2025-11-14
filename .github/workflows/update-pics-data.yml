@@ -63,27 +63,31 @@ jobs:
 
       - name: Run PICS data collector (Incremental)
         if: steps.mode.outputs.mode == 'incremental'
+        env:
+          STEAM_API_KEY: ${{ secrets.STEAM_KEY }}
         run: dotnet run --project PicsDataCollector/PicsDataCollector.csproj --configuration Release -- --incremental
         timeout-minutes: 60
 
       - name: Run PICS data collector (Full)
         if: steps.mode.outputs.mode == 'full'
+        env:
+          STEAM_API_KEY: ${{ secrets.STEAM_KEY }}
         run: dotnet run --project PicsDataCollector/PicsDataCollector.csproj --configuration Release -- --full
         timeout-minutes: 120
 
       - name: Check for changes
         id: check_changes
         run: |
-          # Add file to staging to check if new or modified
-          git add output/pics_depot_mappings.json
+          # Add both JSON files to staging to check if new or modified
+          git add output/pics_depot_mappings.json output/steam_apps.json
 
           # Check if there are staged changes
-          if git diff --cached --quiet output/pics_depot_mappings.json; then
+          if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No changes detected in PICS data"
+            echo "No changes detected in output files"
           else
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Changes detected in PICS data"
+            echo "Changes detected in output files"
           fi
 
       - name: Commit and push changes
@@ -141,11 +145,12 @@ jobs:
           This release contains updated Steam depot-to-app mappings collected via PICS (Product Information and Content System).
           EOF
 
-          # Create release and upload JSON file
+          # Create release and upload both JSON files
           gh release create "$RELEASE_TAG" \
             --title "$RELEASE_NAME" \
             --notes-file release_notes.md \
-            output/pics_depot_mappings.json
+            output/pics_depot_mappings.json \
+            output/steam_apps.json
 
           echo "Created release: $RELEASE_TAG"
 

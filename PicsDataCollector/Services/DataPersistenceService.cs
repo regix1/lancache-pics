@@ -6,6 +6,7 @@ namespace PicsDataCollector.Services;
 public class DataPersistenceService
 {
     private readonly string _outputFilePath;
+    private readonly string _steamAppsFilePath;
 
     public DataPersistenceService()
     {
@@ -14,6 +15,7 @@ public class DataPersistenceService
         var projectDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", ".."));
         var outputDir = Path.Combine(projectDir, "output");
         _outputFilePath = Path.Combine(outputDir, "pics_depot_mappings.json");
+        _steamAppsFilePath = Path.Combine(outputDir, "steam_apps.json");
     }
 
     public async Task<(PicsJsonData? data, uint lastChangeNumber)> LoadExistingDataAsync()
@@ -173,5 +175,56 @@ public class DataPersistenceService
         }
 
         return (depotMappings, appNames, depotOwners);
+    }
+
+    public async Task SaveSteamAppsToJsonAsync(List<SteamApp> steamApps)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Saving Steam apps to JSON...");
+
+        var steamAppsData = new
+        {
+            Metadata = new
+            {
+                LastUpdated = DateTime.UtcNow,
+                TotalApps = steamApps.Count,
+                Version = "1.0",
+                Source = "IStoreService/GetAppList/v1"
+            },
+            Apps = steamApps.OrderBy(a => a.AppId).Select(a => new
+            {
+                AppId = a.AppId,
+                Name = a.Name,
+                Type = a.Type
+            }).ToList()
+        };
+
+        var jsonOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
+        var jsonContent = JsonSerializer.Serialize(steamAppsData, jsonOptions);
+
+        // Ensure directory exists
+        var directory = Path.GetDirectoryName(_steamAppsFilePath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        await File.WriteAllTextAsync(_steamAppsFilePath, jsonContent);
+
+        Console.WriteLine($"Saved to {_steamAppsFilePath}");
+        Console.WriteLine($"Total apps: {steamApps.Count}");
+
+        // Print stats by type
+        var statsByType = steamApps.GroupBy(a => a.Type).OrderBy(g => g.Key);
+        Console.WriteLine("\nApps by type:");
+        foreach (var group in statsByType)
+        {
+            Console.WriteLine($"  {group.Key}: {group.Count()}");
+        }
     }
 }
