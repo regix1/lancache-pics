@@ -1,6 +1,6 @@
 # Steam PICS Data Collection
 
-Automated collection of Steam application data and depot-to-app mappings using Steam Web API and the Product Information and Content System (PICS). Updated every 4 hours via GitHub Actions.
+Automated collection of Steam application data and depot-to-app mappings using Steam Web API and the Product Information and Content System (PICS). Updated every hour via GitHub Actions.
 
 ## What is this?
 
@@ -127,7 +127,7 @@ The collector runs two parallel operations:
 
 **2. PICS Depot Mapping**
 
-**Incremental Updates** (Every 4 hours)
+**Incremental Updates** (Every hour)
 - Queries PICS for changes since last update
 - Updates only modified apps/depots
 - Fast: ~5-10 minutes
@@ -155,7 +155,7 @@ The collector runs two parallel operations:
 2. **Change update frequency** in `.github/workflows/update-pics-data.yml`:
 ```yaml
 schedule:
-  - cron: '0 */4 * * *'  # Incremental: Every 4 hours
+  - cron: '0 * * * *'    # Incremental: Every hour
   - cron: '0 4 * * 0'    # Full: Every Sunday at 4 AM UTC
 ```
 

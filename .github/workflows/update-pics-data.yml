@@ -1,10 +1,10 @@
 name: Update PICS Depot Mappings
 
 on:
-  # Run incremental every 4 hours
+  # Run incremental every hour
   # Run full update every Sunday at 4 AM UTC
   schedule:
-    - cron: '0 */4 * * *'    # Incremental: Every 4 hours
+    - cron: '0 * * * *'      # Incremental: Every hour
     - cron: '0 4 * * 0'      # Full: Every Sunday at 4 AM UTC
 
   # Allow manual trigger
