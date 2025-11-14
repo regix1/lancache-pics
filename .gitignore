@@ -44,9 +44,12 @@ packages/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-# Keep the output folder with PICS data
-!output/
-!output/pics_depot_mappings.json
+# Output data files (too large for git)
+output/
+
+# Third-party references
+steamappidlist/
+SteamKit/
 
 # Claude Code
 claude
