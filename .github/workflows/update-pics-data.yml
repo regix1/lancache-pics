@@ -113,36 +113,72 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Get metadata from JSON
+          # Get metadata from JSON files
           TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' output/pics_depot_mappings.json)
           LAST_UPDATED=$(jq -r '.metadata.lastUpdated' output/pics_depot_mappings.json)
           LAST_CHANGE=$(jq -r '.metadata.lastChangeNumber' output/pics_depot_mappings.json)
+          TOTAL_APPS=$(jq -r '.metadata.totalApps // "N/A"' output/steam_apps.json)
 
           # Create release tag with timestamp
           RELEASE_TAG="v$(date +'%Y.%m.%d-%H%M%S')"
-          RELEASE_NAME="PICS Data Update - $(date +'%Y-%m-%d')"
+          RELEASE_NAME="Steam Data Update - $(date +'%Y-%m-%d')"
 
           # Create release notes
           cat << EOF > release_notes.md
-          ## Steam PICS Depot Mappings Update
+          ## Steam Data Collection Update
 
-          **Total Mappings:** $TOTAL_MAPPINGS
-          **Last Updated:** $LAST_UPDATED
-          **Change Number:** $LAST_CHANGE
+          ### Depot Mappings
+          - **Total Mappings:** $TOTAL_MAPPINGS
+          - **Last Change Number:** $LAST_CHANGE
 
-          ### Download
+          ### Steam Apps
+          - **Total Apps:** $TOTAL_APPS apps
+          - **Types:** games, DLC, software, videos, hardware
 
-          Download the \`pics_depot_mappings.json\` file attached to this release.
+          ### Last Updated
+          $LAST_UPDATED
 
-          ### Direct URL
+          ---
 
+          ## Download
+
+          ### Complete Steam App List
+          All Steam applications with names and types.
+
+          **Direct URL:**
+          \`\`\`
+          https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/steam_apps.json
+          \`\`\`
+
+          ### Depot-to-App Mappings
+          Detailed depot ownership and relationships via PICS.
+
+          **Direct URL:**
           \`\`\`
           https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/pics_depot_mappings.json
           \`\`\`
 
-          ### Changes
+          ---
 
-          This release contains updated Steam depot-to-app mappings collected via PICS (Product Information and Content System).
+          ## What's Included
+
+          **steam_apps.json** - Complete Steam application database
+          - Fetched via IStoreService/GetAppList/v1
+          - Includes all games, DLC, software, videos, and hardware
+          - ~205,000+ applications
+
+          **pics_depot_mappings.json** - Depot-to-app mappings
+          - Collected via SteamKit2 PICS protocol
+          - Tracks depot ownership and app relationships
+          - Essential for lancache and content distribution
+
+          ## Usage
+
+          \`\`\`bash
+          # Download both files
+          curl -LO https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/steam_apps.json
+          curl -LO https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/pics_depot_mappings.json
+          \`\`\`
           EOF
 
           # Create release and upload both JSON files

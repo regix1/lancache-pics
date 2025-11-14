@@ -1,12 +1,61 @@
-# Steam PICS Depot Mappings
+# Steam PICS Data Collection
 
-Automated collection of Steam depot-to-app mappings using the Product Information and Content System (PICS). Updated every 4 hours via GitHub Actions.
+Automated collection of Steam application data and depot-to-app mappings using Steam Web API and the Product Information and Content System (PICS). Updated every 4 hours via GitHub Actions.
 
 ## What is this?
 
-Steam organizes game content into "depots" (content packages) and "apps" (games/applications). This project maintains an up-to-date mapping between depot IDs and their associated app IDs, essential for lancache management tools, content distribution analysis, and tracking game updates.
+Steam organizes game content into "depots" (content packages) and "apps" (games/applications). This project maintains two comprehensive datasets:
 
-## Data Format
+1. **Complete Steam App List** - All Steam applications (games, DLC, software, videos, hardware)
+2. **Depot-to-App Mappings** - Detailed depot ownership and relationships
+
+These datasets are essential for lancache management tools, content distribution analysis, game update tracking, and Steam platform research.
+
+## Data Files
+
+### 1. Steam Apps (`steam_apps.json`)
+
+Complete list of all Steam applications with metadata.
+
+**Download:**
+```bash
+curl -LO https://github.com/regix1/lancache-pics/releases/latest/download/steam_apps.json
+```
+
+**Format:**
+```json
+{
+  "metadata": {
+    "lastUpdated": "2025-11-14T22:00:00Z",
+    "totalApps": 205101,
+    "version": "1.0",
+    "source": "IStoreService/GetAppList/v1"
+  },
+  "apps": [
+    {
+      "appId": 10,
+      "name": "Counter-Strike",
+      "type": "game"
+    },
+    {
+      "appId": 220,
+      "name": "Half-Life 2",
+      "type": "game"
+    },
+    {
+      "appId": 228980,
+      "name": "Steamworks Common Redistributables",
+      "type": "dlc"
+    }
+  ]
+}
+```
+
+**Types:** `game`, `dlc`, `software`, `video`, `hardware`
+
+### 2. Depot Mappings (`pics_depot_mappings.json`)
+
+Detailed depot-to-app relationships collected via PICS.
 
 ```json
 {
@@ -35,11 +84,20 @@ Steam organizes game content into "depots" (content packages) and "apps" (games/
 - `appNames` - Corresponding app names
 - `lastChangeNumber` - PICS change number for incremental updates
 
+**Download:**
+```bash
+curl -LO https://github.com/regix1/lancache-pics/releases/latest/download/pics_depot_mappings.json
+```
+
 ## Quick Start
 
-**Download latest data:**
+**Download both datasets:**
 ```bash
-curl -s https://api.github.com/repos/regix1/lancache-pics/releases/latest | jq -r '.assets[0].browser_download_url' | xargs curl -LO
+# Steam app list
+curl -LO https://github.com/regix1/lancache-pics/releases/latest/download/steam_apps.json
+
+# Depot mappings
+curl -LO https://github.com/regix1/lancache-pics/releases/latest/download/pics_depot_mappings.json
 ```
 
 Or visit [Releases](https://github.com/regix1/lancache-pics/releases/latest)
@@ -48,19 +106,35 @@ Or visit [Releases](https://github.com/regix1/lancache-pics/releases/latest)
 ```bash
 git clone https://github.com/regix1/lancache-pics.git
 cd lancache-pics/PicsDataCollector
+
+# Set Steam API key (get one at https://steamcommunity.com/dev/apikey)
+export STEAM_API_KEY="YOUR_KEY_HERE"
+
 dotnet run              # Incremental update
 dotnet run -- --full    # Full update
 ```
 
 ## How It Works
 
+The collector runs two parallel operations:
+
+**1. Steam App List Collection**
+- Fetches complete app list via `IStoreService/GetAppList/v1`
+- Requires Steam API key
+- Includes games, DLC, software, videos, hardware
+- Paginated: ~50,000 apps per request
+- Fast: ~2-5 minutes for ~205k apps
+
+**2. PICS Depot Mapping**
+
 **Incremental Updates** (Every 4 hours)
 - Queries PICS for changes since last update
+- Updates only modified apps/depots
 - Fast: ~5-10 minutes
 
 **Full Updates** (Every Sunday at 4 AM UTC)
-- Downloads complete app list (~170k apps)
-- Rebuilds entire dataset
+- Rebuilds entire depot mapping dataset
+- Queries all ~170k active apps
 - Slow: ~60-90 minutes
 
 ### Manual Updates
@@ -72,7 +146,13 @@ dotnet run -- --full    # Full update
 
 ## Configuration
 
-**Change update frequency** in `.github/workflows/update-pics-data.yml`:
+**GitHub Actions Setup:**
+
+1. Add Steam API key as repository secret:
+   - Go to repository **Settings** → **Secrets and variables** → **Actions**
+   - Add secret: `STEAM_KEY` = Your Steam API key
+
+2. **Change update frequency** in `.github/workflows/update-pics-data.yml`:
 ```yaml
 schedule:
   - cron: '0 */4 * * *'  # Incremental: Every 4 hours
@@ -81,9 +161,20 @@ schedule:
 
 ## Technical Details
 
-- **Dependencies:** SteamKit2, System.Text.Json
-- **Rate Limiting:** 150ms between batches, 200 apps per batch
-- **Incremental Updates:** Tracks `lastChangeNumber` for efficiency
+**Data Sources:**
+- Steam App List: `IStoreService/GetAppList/v1` (Steam Web API with key)
+- Depot Mappings: SteamKit2 PICS protocol (anonymous connection)
+
+**Features:**
+- Dual-JSON output system
+- API fallback: tries v2 (no key), falls back to v1 (with key)
+- Rate limiting: 150ms between batches, 200 apps per batch
+- Incremental updates: tracks `lastChangeNumber` for efficiency
+- Automatic releases with both datasets
+
+**Dependencies:**
+- SteamKit2 (PICS + WebAPI wrapper)
+- System.Text.Json
 
 ## Related Projects
 
