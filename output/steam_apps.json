@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "lastUpdated": "2025-11-15T10:25:00.5187768Z",
-    "totalApps": 120257,
+    "lastUpdated": "2025-11-15T11:19:31.3598132Z",
+    "totalApps": 120259,
     "version": "1.0",
     "source": "IStoreService/GetAppList/v1"
   },
@@ -164,12 +164,12 @@
     {
       "appId": 1280,
       "name": "Darkest Hour: Europe \u002744-\u002745",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1290,
       "name": "Darkest Hour: Europe \u002744-\u002745 Dedicated Server",
-      "type": "tool"
+      "type": "unknown"
     },
     {
       "appId": 1300,
@@ -1414,7 +1414,7 @@
     {
       "appId": 11150,
       "name": "Sherlock Holmes: The Secret of the Silver Earring",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 11180,
@@ -1994,7 +1994,7 @@
     {
       "appId": 16900,
       "name": "GROUND BRANCH",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 17100,
@@ -2359,7 +2359,7 @@
     {
       "appId": 22000,
       "name": "World of Goo",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 22100,
@@ -2524,7 +2524,7 @@
     {
       "appId": 23600,
       "name": "Depths of Peril",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 23700,
@@ -3470,6 +3470,11 @@
       "appId": 37000,
       "name": "The Void",
       "type": "unknown"
+    },
+    {
+      "appId": 37030,
+      "name": "UFO: Extraterrestrials Gold",
+      "type": "game"
     },
     {
       "appId": 37210,
@@ -12767,6 +12772,11 @@
       "type": "unknown"
     },
     {
+      "appId": 271590,
+      "name": "Grand Theft Auto V Legacy",
+      "type": "game"
+    },
+    {
       "appId": 271640,
       "name": "Humanity Asset",
       "type": "unknown"
@@ -12789,7 +12799,7 @@
     {
       "appId": 271860,
       "name": "Super Killer Hornet: Resurrection",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 271900,
@@ -17364,7 +17374,7 @@
     {
       "appId": 306350,
       "name": "Slipstream 5000",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 306370,
@@ -18209,7 +18219,7 @@
     {
       "appId": 312960,
       "name": "Starion Tactics",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 312970,
@@ -23154,7 +23164,7 @@
     {
       "appId": 342510,
       "name": "Bret Airborne",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 342520,
@@ -25584,7 +25594,7 @@
     {
       "appId": 355350,
       "name": "Reign of Bullets",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 355370,
@@ -32649,7 +32659,7 @@
     {
       "appId": 393380,
       "name": "Squad",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 393390,
@@ -34319,7 +34329,7 @@
     {
       "appId": 403240,
       "name": "Squad Dedicated Server",
-      "type": "tool"
+      "type": "unknown"
     },
     {
       "appId": 403270,
@@ -38514,7 +38524,7 @@
     {
       "appId": 430080,
       "name": "Elysium: Blood Games",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 430100,
@@ -39664,7 +39674,7 @@
     {
       "appId": 436150,
       "name": "Governor of Poker 3",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 436160,
@@ -40249,7 +40259,7 @@
     {
       "appId": 439660,
       "name": "Tower Unite Dedicated Server",
-      "type": "unknown"
+      "type": "tool"
     },
     {
       "appId": 439700,
@@ -40439,7 +40449,7 @@
     {
       "appId": 440900,
       "name": "Conan Exiles",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 440950,
@@ -40649,7 +40659,7 @@
     {
       "appId": 443030,
       "name": "Conan Exiles Dedicated Server",
-      "type": "tool"
+      "type": "unknown"
     },
     {
       "appId": 443070,
@@ -43124,7 +43134,7 @@
     {
       "appId": 456130,
       "name": "Space Scaven",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 456150,
@@ -45184,7 +45194,7 @@
     {
       "appId": 466820,
       "name": "Zenodyne R",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 466840,
@@ -50169,7 +50179,7 @@
     {
       "appId": 502570,
       "name": "Houdini Indie",
-      "type": "application"
+      "type": "unknown"
     },
     {
       "appId": 502600,
@@ -53489,7 +53499,7 @@
     {
       "appId": 521100,
       "name": "MinosMaze - The Minotaur\u0027s Labyrinth",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 521110,
@@ -57684,7 +57694,7 @@
     {
       "appId": 544920,
       "name": "Darwin Project",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 544970,
@@ -59814,7 +59824,7 @@
     {
       "appId": 555160,
       "name": "Pavlov VR",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 555170,
@@ -66652,11 +66662,6 @@
       "type": "unknown"
     },
     {
-      "appId": 590830,
-      "name": "s\u0026box",
-      "type": "game"
-    },
-    {
       "appId": 590840,
       "name": "Attack of the Giant Mutant Lizard",
       "type": "unknown"
@@ -71364,7 +71369,7 @@
     {
       "appId": 617990,
       "name": "Thieves Of Dingirra",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 618000,
@@ -72245,6 +72250,11 @@
       "appId": 622950,
       "name": "Ball laB II",
       "type": "unknown"
+    },
+    {
+      "appId": 622970,
+      "name": "Pavlov VR Dedicated Server",
+      "type": "tool"
     },
     {
       "appId": 622980,
@@ -76469,7 +76479,7 @@
     {
       "appId": 652230,
       "name": "CrazyCar",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 652250,
@@ -79069,7 +79079,7 @@
     {
       "appId": 664320,
       "name": "Holy Potatoes! What the Hell?!",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 664340,
@@ -80209,7 +80219,7 @@
     {
       "appId": 669660,
       "name": "Debris",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 669690,
@@ -80709,7 +80719,7 @@
     {
       "appId": 671920,
       "name": "Dead Secret Circle",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 671950,
@@ -91804,7 +91814,7 @@
     {
       "appId": 726980,
       "name": "Cyber Warrior",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 727010,
@@ -96922,6 +96932,11 @@
       "type": "unknown"
     },
     {
+      "appId": 754923,
+      "name": "Car Mechanic Simulator 2018 - Lotus DLC",
+      "type": "dlc"
+    },
+    {
       "appId": 754930,
       "name": "Zero Days VR",
       "type": "unknown"
@@ -100015,6 +100030,11 @@
       "appId": 770660,
       "name": "Thetaball",
       "type": "unknown"
+    },
+    {
+      "appId": 770720,
+      "name": "Hunt: Showdown 1896 (Test Server)",
+      "type": "game"
     },
     {
       "appId": 770790,
@@ -103339,7 +103359,7 @@
     {
       "appId": 787790,
       "name": "Epic Roller Coasters",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 787810,
@@ -105794,7 +105814,7 @@
     {
       "appId": 799860,
       "name": "BREATHE",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 799870,
@@ -116697,11 +116717,6 @@
       "type": "unknown"
     },
     {
-      "appId": 858200,
-      "name": "Scratch The Cat",
-      "type": "game"
-    },
-    {
       "appId": 858210,
       "name": "Nova Drift",
       "type": "unknown"
@@ -124459,7 +124474,7 @@
     {
       "appId": 897450,
       "name": "The Survivalists",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 897530,
@@ -136454,7 +136469,7 @@
     {
       "appId": 960990,
       "name": "Beyond: Two Souls",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 961000,
@@ -143075,6 +143090,11 @@
       "appId": 995720,
       "name": "Coffee VendoR",
       "type": "unknown"
+    },
+    {
+      "appId": 995760,
+      "name": "VortX",
+      "type": "game"
     },
     {
       "appId": 995790,
@@ -157024,7 +157044,7 @@
     {
       "appId": 1063420,
       "name": "Void Crew",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1063440,
@@ -159227,11 +159247,6 @@
       "type": "unknown"
     },
     {
-      "appId": 1072740,
-      "name": "App 1072740",
-      "type": "unknown"
-    },
-    {
       "appId": 1072750,
       "name": "That Flipping Mountain",
       "type": "unknown"
@@ -160469,7 +160484,7 @@
     {
       "appId": 1079510,
       "name": "Sumerians",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1079550,
@@ -161699,7 +161714,7 @@
     {
       "appId": 1085660,
       "name": "Destiny 2",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1085680,
@@ -164814,11 +164829,6 @@
     {
       "appId": 1099790,
       "name": "PROTOCOL 11",
-      "type": "unknown"
-    },
-    {
-      "appId": 1099810,
-      "name": "App 1099810",
       "type": "unknown"
     },
     {
@@ -172364,7 +172374,7 @@
     {
       "appId": 1135260,
       "name": "The Falconeer: Revolution Remaster",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1135300,
@@ -177929,7 +177939,7 @@
     {
       "appId": 1161830,
       "name": "Age of Reforging:The Freelands",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1161840,
@@ -178629,7 +178639,7 @@
     {
       "appId": 1165380,
       "name": "To Be Headed Or Not To Be",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1165400,
@@ -181784,7 +181794,7 @@
     {
       "appId": 1180330,
       "name": "Manor of Mystic Courtesans",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1180360,
@@ -182522,6 +182532,11 @@
       "type": "unknown"
     },
     {
+      "appId": 1184120,
+      "name": "App 1184120",
+      "type": "unknown"
+    },
+    {
       "appId": 1184130,
       "name": "LoliTower - OST",
       "type": "unknown"
@@ -182694,7 +182709,7 @@
     {
       "appId": 1184760,
       "name": "Shovel Knight Pocket Dungeon",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1184770,
@@ -183889,7 +183904,7 @@
     {
       "appId": 1190970,
       "name": "House Flipper 2",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1190980,
@@ -187074,7 +187089,7 @@
     {
       "appId": 1206200,
       "name": "Conan Exiles: Isle of Siptah",
-      "type": "dlc"
+      "type": "unknown"
     },
     {
       "appId": 1206230,
@@ -188524,7 +188539,7 @@
     {
       "appId": 1213300,
       "name": "\u53DB\u9006\u795E\u9B42 GODSOUL\uD83D\uDD25",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1213330,
@@ -189179,7 +189194,7 @@
     {
       "appId": 1215950,
       "name": "Getaway Storm",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1215960,
@@ -196269,7 +196284,7 @@
     {
       "appId": 1252600,
       "name": "ANOTHER EDEN",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1252630,
@@ -200299,7 +200314,7 @@
     {
       "appId": 1272290,
       "name": "Space Chef",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1272300,
@@ -201589,7 +201604,7 @@
     {
       "appId": 1278540,
       "name": "Esports Godfather",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1278580,
@@ -203109,7 +203124,7 @@
     {
       "appId": 1286220,
       "name": "Sea Power",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1286280,
@@ -204904,7 +204919,7 @@
     {
       "appId": 1295750,
       "name": "Jack Hayes: The Lazarus Sign",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1295760,
@@ -205229,7 +205244,7 @@
     {
       "appId": 1297480,
       "name": "Isorropia",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1297490,
@@ -205264,7 +205279,7 @@
     {
       "appId": 1297660,
       "name": "Fragment\u0027s Moonrise",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1297680,
@@ -217267,11 +217282,6 @@
       "type": "unknown"
     },
     {
-      "appId": 1368050,
-      "name": "La Mer La Guerre",
-      "type": "game"
-    },
-    {
       "appId": 1368060,
       "name": "Sokpop S08: dead run",
       "type": "unknown"
@@ -217384,7 +217394,7 @@
     {
       "appId": 1368750,
       "name": "Jigsaw Puzzle: Master Artists of Old",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1368770,
@@ -225332,11 +225342,6 @@
       "type": "unknown"
     },
     {
-      "appId": 1409142,
-      "name": "Insurgency: Sandstorm - Rogue Spec Ops Gear Set",
-      "type": "dlc"
-    },
-    {
       "appId": 1409160,
       "name": "Plasma",
       "type": "unknown"
@@ -230404,7 +230409,7 @@
     {
       "appId": 1435970,
       "name": "Anomalous",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1435980,
@@ -230774,7 +230779,7 @@
     {
       "appId": 1438560,
       "name": "Faraway Lands: Rise of Yokai Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 1438680,
@@ -231499,7 +231504,7 @@
     {
       "appId": 1442530,
       "name": "Outbreak Island",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1442590,
@@ -235024,7 +235029,7 @@
     {
       "appId": 1460200,
       "name": "Merge Nymphs",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1460220,
@@ -235034,7 +235039,7 @@
     {
       "appId": 1460230,
       "name": "Javols VR",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1460250,
@@ -236239,7 +236244,7 @@
     {
       "appId": 1466060,
       "name": "Tainted Grail: The Fall of Avalon",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1466070,
@@ -236494,7 +236499,7 @@
     {
       "appId": 1467410,
       "name": "Isekai Eternal",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1467560,
@@ -238827,11 +238832,6 @@
       "type": "unknown"
     },
     {
-      "appId": 1481111,
-      "name": "Insurgency: Sandstorm - Yeti Gear Set",
-      "type": "dlc"
-    },
-    {
       "appId": 1481120,
       "name": "Re-Nullum",
       "type": "unknown"
@@ -238854,7 +238854,7 @@
     {
       "appId": 1481170,
       "name": "ZEPHON",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1481210,
@@ -240129,7 +240129,7 @@
     {
       "appId": 1487610,
       "name": "ISLAND MIRRORGE VR",
-      "type": "application"
+      "type": "unknown"
     },
     {
       "appId": 1487630,
@@ -240819,7 +240819,7 @@
     {
       "appId": 1491410,
       "name": "Eternal Strands",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1491450,
@@ -249779,7 +249779,7 @@
     {
       "appId": 1539140,
       "name": "STONKS-9800: Stock Market Simulator",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1539160,
@@ -251569,7 +251569,7 @@
     {
       "appId": 1548850,
       "name": "Six Days in Fallujah",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1548860,
@@ -251859,7 +251859,7 @@
     {
       "appId": 1550280,
       "name": "Jamie\u0027s Toy Box",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1550330,
@@ -252215,11 +252215,6 @@
       "appId": 1551950,
       "name": "Coloring Book for Kids - Expansion Pack",
       "type": "unknown"
-    },
-    {
-      "appId": 1551980,
-      "name": "Clive Barker\u0027s Hellraiser: Revival",
-      "type": "game"
     },
     {
       "appId": 1551990,
@@ -253630,11 +253625,6 @@
       "appId": 1559700,
       "name": "Dreamer",
       "type": "unknown"
-    },
-    {
-      "appId": 1559720,
-      "name": "We Harvest Shadows",
-      "type": "game"
     },
     {
       "appId": 1559740,
@@ -258224,7 +258214,7 @@
     {
       "appId": 1581100,
       "name": "Bittersweet Birthday",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1581150,
@@ -258709,7 +258699,7 @@
     {
       "appId": 1583540,
       "name": "Meco Rocket Simulator",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1583570,
@@ -260054,6 +260044,11 @@
     {
       "appId": 1589890,
       "name": "\u4FBF\u5229\u5546\u5E97\u202A6",
+      "type": "unknown"
+    },
+    {
+      "appId": 1589910,
+      "name": "App 1589910",
       "type": "unknown"
     },
     {
@@ -271359,7 +271354,7 @@
     {
       "appId": 1653510,
       "name": "Cross Board SOCCER",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1653520,
@@ -274182,6 +274177,11 @@
       "type": "unknown"
     },
     {
+      "appId": 1671100,
+      "name": "App 1671100",
+      "type": "unknown"
+    },
+    {
       "appId": 1671140,
       "name": "Royal Riders",
       "type": "unknown"
@@ -275059,7 +275059,7 @@
     {
       "appId": 1675830,
       "name": "1000xRESIST",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1675900,
@@ -278584,7 +278584,7 @@
     {
       "appId": 1693760,
       "name": "The Ditty of Carmeana",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1693780,
@@ -281854,7 +281854,7 @@
     {
       "appId": 1712110,
       "name": "Deep Space Outpost",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1712120,
@@ -283964,7 +283964,7 @@
     {
       "appId": 1723780,
       "name": "Finnish Cottage Simulator",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1723790,
@@ -284624,6 +284624,11 @@
     {
       "appId": 1727400,
       "name": "Captain Diarrhea and The Shartening",
+      "type": "unknown"
+    },
+    {
+      "appId": 1727410,
+      "name": "App 1727410",
       "type": "unknown"
     },
     {
@@ -287489,7 +287494,7 @@
     {
       "appId": 1742850,
       "name": "Card Game Simulator",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1742880,
@@ -288129,7 +288134,7 @@
     {
       "appId": 1746400,
       "name": "The Foretold: Westmark Legacy",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1746420,
@@ -289952,6 +289957,11 @@
       "type": "unknown"
     },
     {
+      "appId": 1756100,
+      "name": "Who The Fuck Ate Grandma ?",
+      "type": "game"
+    },
+    {
       "appId": 1756120,
       "name": "Your Sword Is So Big",
       "type": "unknown"
@@ -290159,7 +290169,7 @@
     {
       "appId": 1757300,
       "name": "Jump Space",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1757360,
@@ -290635,11 +290645,6 @@
       "appId": 1760240,
       "name": "Skator Gator",
       "type": "unknown"
-    },
-    {
-      "appId": 1760280,
-      "name": "Insurgency: Sandstorm - Warlord Gear Set",
-      "type": "dlc"
     },
     {
       "appId": 1760300,
@@ -291700,11 +291705,6 @@
       "appId": 1766440,
       "name": "Sokoramp",
       "type": "unknown"
-    },
-    {
-      "appId": 1766500,
-      "name": "Dread Pilots",
-      "type": "game"
     },
     {
       "appId": 1766540,
@@ -294259,7 +294259,7 @@
     {
       "appId": 1780940,
       "name": "Inquisitor\u2019s Heart and Soul",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1780960,
@@ -309189,7 +309189,7 @@
     {
       "appId": 1859290,
       "name": "Crypto Miner Tycoon Simulator",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1859360,
@@ -310075,6 +310075,11 @@
       "appId": 1864490,
       "name": "3D Solar System Simulator",
       "type": "unknown"
+    },
+    {
+      "appId": 1864520,
+      "name": "Nzera",
+      "type": "game"
     },
     {
       "appId": 1864530,
@@ -312649,7 +312654,7 @@
     {
       "appId": 1879040,
       "name": "Mycosis",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1879100,
@@ -312735,6 +312740,11 @@
       "appId": 1879640,
       "name": "\u751C\u9EDE\u738B\u5B502",
       "type": "unknown"
+    },
+    {
+      "appId": 1879660,
+      "name": "Mycosis Demo",
+      "type": "demo"
     },
     {
       "appId": 1879670,
@@ -314959,7 +314969,7 @@
     {
       "appId": 1892930,
       "name": "s\u0026box server",
-      "type": "tool"
+      "type": "unknown"
     },
     {
       "appId": 1892950,
@@ -317004,7 +317014,7 @@
     {
       "appId": 1904480,
       "name": "Absolum",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1904530,
@@ -317739,7 +317749,7 @@
     {
       "appId": 1908720,
       "name": "Half-Life: VR Mod",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1908730,
@@ -318679,7 +318689,7 @@
     {
       "appId": 1913370,
       "name": "OPERATOR",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1913420,
@@ -321249,7 +321259,7 @@
     {
       "appId": 1927100,
       "name": "\u4E09\u56FD\u4EC1\u4E49\u4F20 the Romantic of Righteousness: SanGuo",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1927110,
@@ -322744,7 +322754,7 @@
     {
       "appId": 1934680,
       "name": "Age of Mythology: Retold",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1934690,
@@ -329034,7 +329044,7 @@
     {
       "appId": 1969370,
       "name": "LEGO\u00AE Party!",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 1969410,
@@ -330957,11 +330967,6 @@
       "type": "unknown"
     },
     {
-      "appId": 1981320,
-      "name": "App 1981320",
-      "type": "unknown"
-    },
-    {
       "appId": 1981350,
       "name": "Hitstun",
       "type": "unknown"
@@ -332749,7 +332754,7 @@
     {
       "appId": 1990980,
       "name": "The siege of Brimir",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 1991010,
@@ -335457,11 +335462,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2007400,
-      "name": "App 2007400",
-      "type": "unknown"
-    },
-    {
       "appId": 2007410,
       "name": "Strange Investigations: Two for Solitaire Collector\u0027s Edition",
       "type": "unknown"
@@ -335814,7 +335814,7 @@
     {
       "appId": 2009850,
       "name": "Lofi Ball",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2009860,
@@ -336482,6 +336482,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2013540,
+      "name": "Belly Bumpers",
+      "type": "game"
+    },
+    {
       "appId": 2013580,
       "name": "XP Soccer",
       "type": "unknown"
@@ -336762,6 +336767,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2015210,
+      "name": "App 2015210",
+      "type": "unknown"
+    },
+    {
       "appId": 2015240,
       "name": "Dwarven Realms",
       "type": "unknown"
@@ -336774,7 +336784,7 @@
     {
       "appId": 2015270,
       "name": "Rotwood",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2015280,
@@ -338462,6 +338472,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2026650,
+      "name": "The Exorcists Demo",
+      "type": "demo"
+    },
+    {
       "appId": 2026690,
       "name": "A toad well travelled",
       "type": "unknown"
@@ -338819,7 +338834,7 @@
     {
       "appId": 2050800,
       "name": "Let Them Come Onslaught",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2050820,
@@ -340092,11 +340107,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2060310,
-      "name": "Cyberpunk 2077 REDmod",
-      "type": "dlc"
-    },
-    {
       "appId": 2060320,
       "name": "Survive Till Morning",
       "type": "unknown"
@@ -340455,11 +340465,6 @@
       "appId": 2062350,
       "name": "May\u0027s Mysteries: The Secret of Dragonville Remastered",
       "type": "unknown"
-    },
-    {
-      "appId": 2062372,
-      "name": "Insurgency: Sandstorm - Dealer Gear Set",
-      "type": "dlc"
     },
     {
       "appId": 2062390,
@@ -341720,6 +341725,11 @@
       "appId": 2069240,
       "name": "Little Wing",
       "type": "unknown"
+    },
+    {
+      "appId": 2069250,
+      "name": "High On Life 2",
+      "type": "game"
     },
     {
       "appId": 2069260,
@@ -344674,7 +344684,7 @@
     {
       "appId": 2085540,
       "name": "Stick It to the Stickman",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2085550,
@@ -346787,11 +346797,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2097050,
-      "name": "App 2097050",
-      "type": "unknown"
-    },
-    {
       "appId": 2097090,
       "name": "Snow Problem",
       "type": "unknown"
@@ -347539,11 +347544,6 @@
     {
       "appId": 2100810,
       "name": "cheesequest",
-      "type": "unknown"
-    },
-    {
-      "appId": 2100820,
-      "name": "App 2100820",
       "type": "unknown"
     },
     {
@@ -349134,7 +349134,7 @@
     {
       "appId": 2110540,
       "name": "The Suits Have Gone Mad!",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2110550,
@@ -350529,7 +350529,7 @@
     {
       "appId": 2116620,
       "name": "Swords and Sandals 3 Redux",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2116670,
@@ -351787,6 +351787,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2124100,
+      "name": "Transience",
+      "type": "game"
+    },
+    {
       "appId": 2124120,
       "name": "SULFUR",
       "type": "unknown"
@@ -352144,7 +352149,7 @@
     {
       "appId": 2126190,
       "name": "Rue Valley",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2126200,
@@ -353294,7 +353299,7 @@
     {
       "appId": 2132890,
       "name": "Possessor(s)",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2132900,
@@ -354005,11 +354010,6 @@
       "appId": 2137400,
       "name": "EmyLiveShow: S\u0026M story",
       "type": "unknown"
-    },
-    {
-      "appId": 2137430,
-      "name": "ChaseTag",
-      "type": "game"
     },
     {
       "appId": 2137460,
@@ -355037,11 +355037,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2143120,
-      "name": "App 2143120",
-      "type": "unknown"
-    },
-    {
       "appId": 2143140,
       "name": "The Eyes of Dr Kautzmann",
       "type": "unknown"
@@ -355145,11 +355140,6 @@
       "appId": 2143740,
       "name": "FukTopia 4",
       "type": "unknown"
-    },
-    {
-      "appId": 2143760,
-      "name": "Her Name",
-      "type": "game"
     },
     {
       "appId": 2143770,
@@ -357445,6 +357435,11 @@
       "appId": 2157710,
       "name": "Hordes of Hunger",
       "type": "unknown"
+    },
+    {
+      "appId": 2157830,
+      "name": "John Carpenter\u0027s Toxic Commando",
+      "type": "game"
     },
     {
       "appId": 2157860,
@@ -360729,7 +360724,7 @@
     {
       "appId": 2176580,
       "name": "FlipScapes",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2176640,
@@ -361257,11 +361252,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2179370,
-      "name": "\u6EAF\u5149\u884C",
-      "type": "game"
-    },
-    {
       "appId": 2179380,
       "name": "Sand:box",
       "type": "unknown"
@@ -361294,7 +361284,7 @@
     {
       "appId": 2179490,
       "name": "Ravenous Horde",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2179520,
@@ -361504,7 +361494,7 @@
     {
       "appId": 2180700,
       "name": "ABI-DOS",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2180710,
@@ -362369,7 +362359,7 @@
     {
       "appId": 2185060,
       "name": "Two Point Museum",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2185080,
@@ -362734,7 +362724,7 @@
     {
       "appId": 2187050,
       "name": "Blackout Football",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2187060,
@@ -363564,7 +363554,7 @@
     {
       "appId": 2191500,
       "name": "Vampires: Bloodlord Rising",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2191530,
@@ -365414,7 +365404,7 @@
     {
       "appId": 2201910,
       "name": "Winds Of Arcana: Ruination",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2201930,
@@ -365425,11 +365415,6 @@
       "appId": 2201940,
       "name": "Ship Graveyard Simulator 2",
       "type": "unknown"
-    },
-    {
-      "appId": 2201980,
-      "name": "Hentai Beach 2",
-      "type": "game"
     },
     {
       "appId": 2202010,
@@ -365829,7 +365814,7 @@
     {
       "appId": 2204560,
       "name": "Mineral Madness",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2204600,
@@ -367229,7 +367214,7 @@
     {
       "appId": 2212560,
       "name": "\u6EAF\u5149\u884C\u4F20\u5A92\u6D4B\u8BD5",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 2212600,
@@ -367749,7 +367734,7 @@
     {
       "appId": 2215390,
       "name": "Five Nights at Freddy\u0027s: Secret of the Mimic",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2215410,
@@ -375079,7 +375064,7 @@
     {
       "appId": 2257910,
       "name": "Project Zero",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2257940,
@@ -376099,7 +376084,7 @@
     {
       "appId": 2263550,
       "name": "Touch the Color",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2263560,
@@ -377159,7 +377144,7 @@
     {
       "appId": 2269950,
       "name": "The Karters 2: Turbo Charged",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2269970,
@@ -378804,7 +378789,7 @@
     {
       "appId": 2280350,
       "name": "Turbo Dismount 2",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2280370,
@@ -380799,7 +380784,7 @@
     {
       "appId": 2292370,
       "name": "PlayM2M",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2292400,
@@ -383224,7 +383209,7 @@
     {
       "appId": 2307350,
       "name": "Into the Radius 2",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2307370,
@@ -383514,7 +383499,7 @@
     {
       "appId": 2308690,
       "name": "Ground of Aces",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2308700,
@@ -384347,6 +384332,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2313700,
+      "name": "Constance",
+      "type": "game"
+    },
+    {
       "appId": 2313720,
       "name": "Noun Town Language Learning",
       "type": "unknown"
@@ -384629,7 +384619,7 @@
     {
       "appId": 2315100,
       "name": "The Great Smog",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2315130,
@@ -390777,11 +390767,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2350790,
-      "name": "Moonlighter 2: The Endless Vault",
-      "type": "game"
-    },
-    {
       "appId": 2350810,
       "name": "Glory Room",
       "type": "unknown"
@@ -392254,7 +392239,7 @@
     {
       "appId": 2360690,
       "name": "Pixel Ripped 1978: An Atari Adventure",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2360700,
@@ -394644,7 +394629,7 @@
     {
       "appId": 2374670,
       "name": "Duncrush",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2374760,
@@ -394840,11 +394825,6 @@
       "appId": 2375870,
       "name": "The Revolt Fire Rising",
       "type": "unknown"
-    },
-    {
-      "appId": 2375901,
-      "name": "Train Sim World\u00AE 4 Compatible: DB BR 204 Add-On",
-      "type": "dlc"
     },
     {
       "appId": 2375930,
@@ -395604,7 +395584,7 @@
     {
       "appId": 2379740,
       "name": "Wizardry Variants Daphne",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2379770,
@@ -395654,7 +395634,7 @@
     {
       "appId": 2379900,
       "name": "Rooted Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 2379910,
@@ -398972,6 +398952,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2399940,
+      "name": "Atomic Picnic: Prologue",
+      "type": "game"
+    },
+    {
       "appId": 2400030,
       "name": "Bulanci: Wallpaper Pack",
       "type": "unknown"
@@ -401277,11 +401262,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2413170,
-      "name": "App 2413170",
-      "type": "unknown"
-    },
-    {
       "appId": 2413190,
       "name": "Emergency Cleanup Co.",
       "type": "unknown"
@@ -401752,6 +401732,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2416230,
+      "name": "App 2416230",
+      "type": "unknown"
+    },
+    {
       "appId": 2416250,
       "name": "Chronautical",
       "type": "unknown"
@@ -401975,6 +401960,11 @@
       "appId": 2417430,
       "name": "Path to Knighthood",
       "type": "unknown"
+    },
+    {
+      "appId": 2417470,
+      "name": "Beastro",
+      "type": "game"
     },
     {
       "appId": 2417490,
@@ -404477,11 +404467,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2432520,
-      "name": "Insurgency: Sandstorm - Mountain Tactical Gear Set",
-      "type": "dlc"
-    },
-    {
       "appId": 2432630,
       "name": "Mythical Agent",
       "type": "unknown"
@@ -404594,7 +404579,7 @@
     {
       "appId": 2433470,
       "name": "Romance Club",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2433540,
@@ -405524,7 +405509,7 @@
     {
       "appId": 2438680,
       "name": "Airborne Empire",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2438760,
@@ -406500,11 +406485,6 @@
       "appId": 2444900,
       "name": "Walpurgis Raid",
       "type": "unknown"
-    },
-    {
-      "appId": 2444930,
-      "name": "WORM GAME",
-      "type": "game"
     },
     {
       "appId": 2444940,
@@ -412697,6 +412677,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2484770,
+      "name": "Cube Kingdoms Demo",
+      "type": "demo"
+    },
+    {
       "appId": 2484790,
       "name": "Bambie",
       "type": "unknown"
@@ -412854,11 +412839,6 @@
     {
       "appId": 2485750,
       "name": "Midnight Scenes: A Safe Place",
-      "type": "unknown"
-    },
-    {
-      "appId": 2485840,
-      "name": "App 2485840",
       "type": "unknown"
     },
     {
@@ -415397,11 +415377,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2502780,
-      "name": "Ranger\u2019s Path: National Park Simulator",
-      "type": "game"
-    },
-    {
       "appId": 2502790,
       "name": "love story",
       "type": "unknown"
@@ -416114,7 +416089,7 @@
     {
       "appId": 2507820,
       "name": "Bloodgrounds",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2507840,
@@ -417129,7 +417104,7 @@
     {
       "appId": 2514910,
       "name": "KKCKC",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2514920,
@@ -417369,7 +417344,7 @@
     {
       "appId": 2516520,
       "name": "\u5947\u602A\u7684RPG 2 Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 2516530,
@@ -420632,6 +420607,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2538170,
+      "name": "The Clubies",
+      "type": "game"
+    },
+    {
       "appId": 2538250,
       "name": "Steampunk Runner",
       "type": "unknown"
@@ -421174,7 +421154,7 @@
     {
       "appId": 2541890,
       "name": "Abnormality",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2541900,
@@ -422739,11 +422719,6 @@
     {
       "appId": 2552740,
       "name": "Plagueborn Survivor",
-      "type": "unknown"
-    },
-    {
-      "appId": 2552790,
-      "name": "App 2552790",
       "type": "unknown"
     },
     {
@@ -426099,7 +426074,7 @@
     {
       "appId": 2576410,
       "name": "Disco Samurai",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2576430,
@@ -427095,6 +427070,11 @@
       "appId": 2584260,
       "name": "What have you done, Father?",
       "type": "unknown"
+    },
+    {
+      "appId": 2584270,
+      "name": "Mortal Shell II",
+      "type": "game"
     },
     {
       "appId": 2584280,
@@ -428384,11 +428364,6 @@
     {
       "appId": 2593150,
       "name": "FISTAGON",
-      "type": "unknown"
-    },
-    {
-      "appId": 2593350,
-      "name": "App 2593350",
       "type": "unknown"
     },
     {
@@ -432754,7 +432729,7 @@
     {
       "appId": 2624660,
       "name": "Superfetch Dog",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2624690,
@@ -432774,11 +432749,6 @@
     {
       "appId": 2624760,
       "name": "Eros Lights: Strip-Club \uD83D\uDD1E",
-      "type": "unknown"
-    },
-    {
-      "appId": 2624870,
-      "name": "App 2624870",
       "type": "unknown"
     },
     {
@@ -435932,6 +435902,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2646320,
+      "name": "\u606F\u98CE\u8C37\u6218\u7565",
+      "type": "game"
+    },
+    {
       "appId": 2646350,
       "name": "\u5E7D\u8C37\u6218\u57DF Mystic Valley Battleground",
       "type": "unknown"
@@ -437352,11 +437327,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2656170,
-      "name": "App 2656170",
-      "type": "unknown"
-    },
-    {
       "appId": 2656180,
       "name": "Galacticverse",
       "type": "unknown"
@@ -437784,7 +437754,7 @@
     {
       "appId": 2658700,
       "name": "\u534E\u590F\u53F2\u8BD7\uFF1A\u6218\u56FD Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 2658720,
@@ -439684,7 +439654,7 @@
     {
       "appId": 2670960,
       "name": "\u56E0\u72C4\u65AF\u7684\u8C0E\u8A002\uFF1A\u71C3\u70E7\u7684\u706B\u79CD",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2670980,
@@ -440329,7 +440299,7 @@
     {
       "appId": 2675160,
       "name": "\u534E\u590F\u53F2\u8BD7\uFF1A\u6218\u56FD Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 2675270,
@@ -441582,6 +441552,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2683440,
+      "name": "App 2683440",
+      "type": "unknown"
+    },
+    {
       "appId": 2683490,
       "name": "Glimpse",
       "type": "unknown"
@@ -441984,7 +441959,7 @@
     {
       "appId": 2685480,
       "name": "Jewel Spirits",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2685490,
@@ -442124,7 +442099,7 @@
     {
       "appId": 2686020,
       "name": "Faith in Despair",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2686060,
@@ -442899,7 +442874,7 @@
     {
       "appId": 2690540,
       "name": "Faith in Despair Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 2690550,
@@ -447874,7 +447849,7 @@
     {
       "appId": 2722600,
       "name": "Merchant Isle",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2722610,
@@ -448374,7 +448349,7 @@
     {
       "appId": 2725560,
       "name": "Idle Fishing",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2725600,
@@ -449189,7 +449164,7 @@
     {
       "appId": 2730970,
       "name": "Westland Survival",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2730990,
@@ -449469,6 +449444,11 @@
     {
       "appId": 2733010,
       "name": "Ex Vitro - Bonus Content",
+      "type": "unknown"
+    },
+    {
+      "appId": 2733050,
+      "name": "App 2733050",
       "type": "unknown"
     },
     {
@@ -450182,6 +450162,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2738290,
+      "name": "At Night",
+      "type": "game"
+    },
+    {
       "appId": 2738320,
       "name": "Phantom Ascension 2",
       "type": "unknown"
@@ -450300,6 +450285,11 @@
       "appId": 2738870,
       "name": "Hotel Business Simulator",
       "type": "unknown"
+    },
+    {
+      "appId": 2738880,
+      "name": "Forza Horizon 5 Chinese Lucky Stars Car Pack",
+      "type": "dlc"
     },
     {
       "appId": 2738890,
@@ -451984,7 +451974,7 @@
     {
       "appId": 2749770,
       "name": "Galaxy Burger",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2749930,
@@ -454232,6 +454222,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2765790,
+      "name": "Dreadweave",
+      "type": "game"
+    },
+    {
       "appId": 2765850,
       "name": "Unreality",
       "type": "unknown"
@@ -454944,7 +454939,7 @@
     {
       "appId": 2771600,
       "name": "Maid Survivors : Little Angels",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2771650,
@@ -455629,11 +455624,6 @@
     {
       "appId": 2775910,
       "name": "Infinite Blue",
-      "type": "unknown"
-    },
-    {
-      "appId": 2775940,
-      "name": "App 2775940",
       "type": "unknown"
     },
     {
@@ -456582,6 +456572,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2781990,
+      "name": "Hell On Earth",
+      "type": "game"
+    },
+    {
       "appId": 2782020,
       "name": "WATTGAMES",
       "type": "unknown"
@@ -457519,7 +457514,7 @@
     {
       "appId": 2788220,
       "name": "The Island",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2788310,
@@ -457685,6 +457680,11 @@
       "appId": 2789400,
       "name": "Don\u0027t Puke!",
       "type": "unknown"
+    },
+    {
+      "appId": 2789410,
+      "name": "Komadori Inn",
+      "type": "game"
     },
     {
       "appId": 2789460,
@@ -457954,11 +457954,6 @@
     {
       "appId": 2791650,
       "name": "100 Cats Berlin",
-      "type": "unknown"
-    },
-    {
-      "appId": 2791660,
-      "name": "App 2791660",
       "type": "unknown"
     },
     {
@@ -459114,7 +459109,7 @@
     {
       "appId": 2799860,
       "name": "INAZUMA ELEVEN: Victory Road",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2799920,
@@ -459204,7 +459199,7 @@
     {
       "appId": 2800420,
       "name": "Publish or Perish",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2800440,
@@ -459454,11 +459449,6 @@
     {
       "appId": 2801830,
       "name": "\u6C38\u65E0\u6B62\u5883\u7684\u9ED1\u6697\u68EE\u6797",
-      "type": "unknown"
-    },
-    {
-      "appId": 2801850,
-      "name": "App 2801850",
       "type": "unknown"
     },
     {
@@ -460752,11 +460742,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2811140,
-      "name": "App 2811140",
-      "type": "unknown"
-    },
-    {
       "appId": 2811150,
       "name": "IdleCraft",
       "type": "unknown"
@@ -461692,11 +461677,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2817420,
-      "name": "Attribute2 / \u968F\u624B\u5C5E\u60272",
-      "type": "game"
-    },
-    {
       "appId": 2817450,
       "name": "Miaow.Emma",
       "type": "unknown"
@@ -461894,11 +461874,6 @@
     {
       "appId": 2818660,
       "name": "Bad Mechanic",
-      "type": "unknown"
-    },
-    {
-      "appId": 2818700,
-      "name": "App 2818700",
       "type": "unknown"
     },
     {
@@ -462759,7 +462734,7 @@
     {
       "appId": 2824790,
       "name": "GUG",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2824810,
@@ -463124,7 +463099,7 @@
     {
       "appId": 2827030,
       "name": "ARK: The Center Ascended",
-      "type": "unknown"
+      "type": "dlc"
     },
     {
       "appId": 2827080,
@@ -463414,6 +463389,11 @@
     {
       "appId": 2828890,
       "name": "VGA Planets Nu",
+      "type": "unknown"
+    },
+    {
+      "appId": 2828900,
+      "name": "App 2828900",
       "type": "unknown"
     },
     {
@@ -464264,7 +464244,7 @@
     {
       "appId": 2835530,
       "name": "Backrooms: Extractions",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2835540,
@@ -464424,7 +464404,7 @@
     {
       "appId": 2836600,
       "name": "\u30D0\u30B0\u3060\u3089\u3051\u306E\u753A",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2836620,
@@ -464840,6 +464820,11 @@
       "appId": 2838940,
       "name": "\u795E\u9B54\u51B3\u4E4B\u6C5F\u6E56\u884C",
       "type": "unknown"
+    },
+    {
+      "appId": 2838950,
+      "name": "Game of Thrones: War for Westeros",
+      "type": "game"
     },
     {
       "appId": 2838960,
@@ -466434,7 +466419,7 @@
     {
       "appId": 2849450,
       "name": "ARK: Scorched Earth Ascended",
-      "type": "unknown"
+      "type": "dlc"
     },
     {
       "appId": 2849470,
@@ -466730,6 +466715,11 @@
       "appId": 2850920,
       "name": "The Best Treasure",
       "type": "unknown"
+    },
+    {
+      "appId": 2850940,
+      "name": "Timestamps: Lost Love",
+      "type": "game"
     },
     {
       "appId": 2850950,
@@ -467204,7 +467194,7 @@
     {
       "appId": 2855180,
       "name": "Midnight Mazesoba",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2855190,
@@ -467779,7 +467769,7 @@
     {
       "appId": 2859870,
       "name": "\u6E38\u620F\u5927\u5BF9\u51B3",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2859920,
@@ -467934,11 +467924,6 @@
     {
       "appId": 2860850,
       "name": "Fantasy Shootoff",
-      "type": "unknown"
-    },
-    {
-      "appId": 2860880,
-      "name": "App 2860880",
       "type": "unknown"
     },
     {
@@ -469494,7 +469479,7 @@
     {
       "appId": 2871820,
       "name": "\u795F\u308A\u5742 Curse road",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2871840,
@@ -470309,7 +470294,7 @@
     {
       "appId": 2877170,
       "name": "TouHou Makuka Sai ~ Fantastic Danmaku Festival Part III",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2877190,
@@ -470670,6 +470655,11 @@
       "appId": 2879350,
       "name": "\u94F6\u6CB3\u6218\u4E89\u4E00(Galactic Wars One\uFF09",
       "type": "unknown"
+    },
+    {
+      "appId": 2879370,
+      "name": "Blasphemous 2 - Mea Culpa",
+      "type": "dlc"
     },
     {
       "appId": 2879470,
@@ -477492,11 +477482,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2927930,
-      "name": "App 2927930",
-      "type": "unknown"
-    },
-    {
       "appId": 2927960,
       "name": "Vector Space",
       "type": "unknown"
@@ -479159,7 +479144,7 @@
     {
       "appId": 2939870,
       "name": "Vampire Dynasty Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 2939900,
@@ -479617,6 +479602,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2942920,
+      "name": "Angel Legion-DLC Shadow Woven (Green)",
+      "type": "dlc"
+    },
+    {
       "appId": 2942930,
       "name": "Hentai Tales: Another Fairy Tales",
       "type": "unknown"
@@ -480054,7 +480044,7 @@
     {
       "appId": 2945640,
       "name": "Cities: Skylines II - Creator Pack: Dragon Gate",
-      "type": "unknown"
+      "type": "dlc"
     },
     {
       "appId": 2945730,
@@ -480775,6 +480765,11 @@
       "appId": 2950100,
       "name": "Cats of the Tang Dynasty",
       "type": "unknown"
+    },
+    {
+      "appId": 2950120,
+      "name": "Sex Wishes \uD83D\uDD2E",
+      "type": "game"
     },
     {
       "appId": 2950190,
@@ -482302,11 +482297,6 @@
       "type": "unknown"
     },
     {
-      "appId": 2960630,
-      "name": "App 2960630",
-      "type": "unknown"
-    },
-    {
       "appId": 2960650,
       "name": "Tankbot Battle",
       "type": "unknown"
@@ -483057,6 +483047,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2966140,
+      "name": "Angel Legion-DLC Shadow Woven (Black)",
+      "type": "dlc"
+    },
+    {
       "appId": 2966150,
       "name": "Magic Venue",
       "type": "unknown"
@@ -483080,6 +483075,11 @@
       "appId": 2966280,
       "name": "\u5E1D\u56FD\u4F59\u6656",
       "type": "unknown"
+    },
+    {
+      "appId": 2966300,
+      "name": "Sliding Hero",
+      "type": "game"
     },
     {
       "appId": 2966360,
@@ -483614,11 +483614,6 @@
     {
       "appId": 2969380,
       "name": "BAKERU",
-      "type": "unknown"
-    },
-    {
-      "appId": 2969590,
-      "name": "App 2969590",
       "type": "unknown"
     },
     {
@@ -484522,6 +484517,11 @@
       "type": "unknown"
     },
     {
+      "appId": 2977710,
+      "name": "MedCom Origin Demo",
+      "type": "demo"
+    },
+    {
       "appId": 2977770,
       "name": "Rusts Of Corruption",
       "type": "unknown"
@@ -484534,7 +484534,7 @@
     {
       "appId": 2977810,
       "name": "Dollhouse of Dead",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 2977850,
@@ -486274,7 +486274,7 @@
     {
       "appId": 2990600,
       "name": "Fireside Feelings",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 2990640,
@@ -487942,11 +487942,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3003140,
-      "name": "App 3003140",
-      "type": "unknown"
-    },
-    {
       "appId": 3003190,
       "name": "\u5BB6\u65CF\u5D1B\u8D77\u6A21\u62DF\u5668 Demo",
       "type": "unknown"
@@ -488397,6 +488392,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3006280,
+      "name": "Sheepherds!",
+      "type": "game"
+    },
+    {
       "appId": 3006350,
       "name": "\u306F\u304C\u308C\u304C\u3057\u30FC",
       "type": "unknown"
@@ -488560,6 +488560,11 @@
       "appId": 3007590,
       "name": "Dog Walking Adventures",
       "type": "unknown"
+    },
+    {
+      "appId": 3007610,
+      "name": "Angel Legion-DLC Shadow Woven (Red)",
+      "type": "dlc"
     },
     {
       "appId": 3007630,
@@ -488769,7 +488774,7 @@
     {
       "appId": 3008740,
       "name": "Winter Burrow",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3008800,
@@ -491129,7 +491134,7 @@
     {
       "appId": 3026450,
       "name": "Deadly Days: Roadtrip",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3026460,
@@ -491435,6 +491440,11 @@
       "appId": 3028660,
       "name": "RERODENT",
       "type": "unknown"
+    },
+    {
+      "appId": 3028670,
+      "name": "The Clubies Demo",
+      "type": "demo"
     },
     {
       "appId": 3028680,
@@ -491899,7 +491909,7 @@
     {
       "appId": 3032250,
       "name": "Compu-Tron x3000",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3032350,
@@ -493102,6 +493112,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3040710,
+      "name": "Angel Legion-DLC Shadow Woven (Cyan)",
+      "type": "dlc"
+    },
+    {
       "appId": 3040740,
       "name": "\u522B\u6210\u82F1\u96C4",
       "type": "unknown"
@@ -493224,7 +493239,7 @@
     {
       "appId": 3041770,
       "name": "Breakout Beyond",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3041810,
@@ -495874,7 +495889,7 @@
     {
       "appId": 3058630,
       "name": "Assetto Corsa EVO",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3058640,
@@ -496054,7 +496069,7 @@
     {
       "appId": 3059650,
       "name": "ARK: Aberration Ascended",
-      "type": "unknown"
+      "type": "dlc"
     },
     {
       "appId": 3059670,
@@ -496364,7 +496379,7 @@
     {
       "appId": 3061900,
       "name": "Revenge of the Boxer: Moscow Criminality",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3061910,
@@ -497190,11 +497205,6 @@
       "appId": 3067180,
       "name": "The Duck Pond",
       "type": "unknown"
-    },
-    {
-      "appId": 3067190,
-      "name": "Age of Empires IV: Dynasties of the East",
-      "type": "dlc"
     },
     {
       "appId": 3067200,
@@ -498027,6 +498037,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3072920,
+      "name": "Angel Legion-DLC Shadow Woven (Blue)",
+      "type": "dlc"
+    },
+    {
       "appId": 3072970,
       "name": "Tri Survive",
       "type": "unknown"
@@ -498339,7 +498354,7 @@
     {
       "appId": 3075150,
       "name": "The Cuniculus of Paradise",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3075170,
@@ -498860,11 +498875,6 @@
       "appId": 3079150,
       "name": "GuiGui",
       "type": "unknown"
-    },
-    {
-      "appId": 3079210,
-      "name": "Hell Let Loose: Vietnam",
-      "type": "game"
     },
     {
       "appId": 3079230,
@@ -499802,6 +499812,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3086590,
+      "name": "Gods, Death \u0026 Reapers",
+      "type": "game"
+    },
+    {
       "appId": 3086600,
       "name": "Sex Clinic 18\u002B",
       "type": "unknown"
@@ -500110,11 +500125,6 @@
       "appId": 3088820,
       "name": "VocabVan",
       "type": "unknown"
-    },
-    {
-      "appId": 3088870,
-      "name": "\u5343\u91CC\u5C71\u6CB3\u5F55",
-      "type": "game"
     },
     {
       "appId": 3088890,
@@ -501432,6 +501442,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3097970,
+      "name": "Angel Legion-DLC Shadow Woven (Purple)",
+      "type": "dlc"
+    },
+    {
       "appId": 3098020,
       "name": "A Few Days With Samantha",
       "type": "unknown"
@@ -502045,11 +502060,6 @@
       "appId": 3102740,
       "name": "Signs Of Life",
       "type": "unknown"
-    },
-    {
-      "appId": 3102750,
-      "name": "\u86C6\u866B\u7684\u5E78\u798F",
-      "type": "game"
     },
     {
       "appId": 3102790,
@@ -503034,7 +503044,7 @@
     {
       "appId": 3108990,
       "name": "\u8776\u68A6",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3109000,
@@ -503259,7 +503269,7 @@
     {
       "appId": 3110370,
       "name": "Dustwind: Resistance",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3110390,
@@ -504084,11 +504094,6 @@
     {
       "appId": 3116410,
       "name": "Chi Health App",
-      "type": "unknown"
-    },
-    {
-      "appId": 3116440,
-      "name": "App 3116440",
       "type": "unknown"
     },
     {
@@ -506082,11 +506087,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3132680,
-      "name": "App 3132680",
-      "type": "unknown"
-    },
-    {
       "appId": 3132770,
       "name": "\u30B7\u30B7\u30C6\u30CA\u30AA -Even in Death-",
       "type": "unknown"
@@ -507299,7 +507299,7 @@
     {
       "appId": 3140810,
       "name": "D3AD HAND",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3140860,
@@ -508754,7 +508754,7 @@
     {
       "appId": 3151380,
       "name": "Small Spaces",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3151400,
@@ -510564,7 +510564,7 @@
     {
       "appId": 3166140,
       "name": "Fallen Lean",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3166200,
@@ -511062,11 +511062,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3170130,
-      "name": "Red Recon: 1944",
-      "type": "game"
-    },
-    {
       "appId": 3170140,
       "name": "Piece Yourself Up",
       "type": "unknown"
@@ -511149,7 +511144,7 @@
     {
       "appId": 3170590,
       "name": "Backyard Hockey \u002702",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3170660,
@@ -513112,11 +513107,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3185880,
-      "name": "Wish Of Hers",
-      "type": "game"
-    },
-    {
       "appId": 3185890,
       "name": "\u6211\u6253\u4E0D\u8FC7\u6F02\u4EAE\u7684\u5979\u4EEC",
       "type": "unknown"
@@ -513884,7 +513874,7 @@
     {
       "appId": 3192310,
       "name": "Amelia and the Erotic Tentacle Trap Dungeon",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3192350,
@@ -514584,7 +514574,7 @@
     {
       "appId": 3197600,
       "name": "Light\u0027Em Up",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3197640,
@@ -514820,11 +514810,6 @@
       "appId": 3199610,
       "name": "Mia and me",
       "type": "unknown"
-    },
-    {
-      "appId": 3199650,
-      "name": "Pathologic 3",
-      "type": "game"
     },
     {
       "appId": 3199680,
@@ -515559,7 +515544,7 @@
     {
       "appId": 3205380,
       "name": "Omelet You Cook",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3205390,
@@ -516337,11 +516322,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3211490,
-      "name": "DYSTHANASIA",
-      "type": "game"
-    },
-    {
       "appId": 3211510,
       "name": "Falling Cube",
       "type": "unknown"
@@ -516949,7 +516929,7 @@
     {
       "appId": 3215750,
       "name": "Astralith Playtest",
-      "type": "unknown"
+      "type": "beta"
     },
     {
       "appId": 3215770,
@@ -517464,6 +517444,11 @@
     {
       "appId": 3219490,
       "name": "Duck Paradox - Art Book",
+      "type": "unknown"
+    },
+    {
+      "appId": 3219530,
+      "name": "App 3219530",
       "type": "unknown"
     },
     {
@@ -518259,7 +518244,7 @@
     {
       "appId": 3225970,
       "name": "\u5C01\u795E\u699C\u91CD\u7F6E\u7248",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3225990,
@@ -519042,6 +519027,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3232080,
+      "name": "Dead Weight Playtest",
+      "type": "beta"
+    },
+    {
       "appId": 3232130,
       "name": "Into The Void",
       "type": "unknown"
@@ -519485,6 +519475,11 @@
       "appId": 3235740,
       "name": "Fruit vs. Aliens",
       "type": "unknown"
+    },
+    {
+      "appId": 3235780,
+      "name": "Crafty Racer Demo",
+      "type": "demo"
     },
     {
       "appId": 3235910,
@@ -520167,11 +520162,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3241410,
-      "name": "App 3241410",
-      "type": "unknown"
-    },
-    {
       "appId": 3241440,
       "name": "Hover REV Hispeed Burst",
       "type": "unknown"
@@ -520787,11 +520777,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3245680,
-      "name": "App 3245680",
-      "type": "unknown"
-    },
-    {
       "appId": 3245740,
       "name": "100 Hidden Kooky \u0026 Hiking Boots",
       "type": "unknown"
@@ -521105,6 +521090,11 @@
       "appId": 3248290,
       "name": "Defend\u00F3polis",
       "type": "unknown"
+    },
+    {
+      "appId": 3248310,
+      "name": "Karting of Banban",
+      "type": "game"
     },
     {
       "appId": 3248320,
@@ -521954,7 +521944,7 @@
     {
       "appId": 3255860,
       "name": "Hymer 2000",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3255870,
@@ -522862,11 +522852,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3264600,
-      "name": "Arcane Whispers: The Last Stand",
-      "type": "game"
-    },
-    {
       "appId": 3264610,
       "name": "REDHAWK Simulator",
       "type": "unknown"
@@ -523499,7 +523484,7 @@
     {
       "appId": 3270450,
       "name": "Cursed Companions Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 3270510,
@@ -523834,7 +523819,7 @@
     {
       "appId": 3273130,
       "name": "Roots of Harmony",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3273230,
@@ -525307,11 +525292,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3286040,
-      "name": "Not My Tempo, Mozart!",
-      "type": "game"
-    },
-    {
       "appId": 3286080,
       "name": "Stellar Stables Demo",
       "type": "unknown"
@@ -526159,7 +526139,7 @@
     {
       "appId": 3293010,
       "name": "Easy Delivery Co.",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3293020,
@@ -526604,7 +526584,7 @@
     {
       "appId": 3296550,
       "name": "My Kirin kidney and my beloved teachers 2",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3296570,
@@ -527214,7 +527194,7 @@
     {
       "appId": 3301040,
       "name": "FANTATALE",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3301060,
@@ -527275,6 +527255,11 @@
       "appId": 3301530,
       "name": "Boogey Hunters",
       "type": "unknown"
+    },
+    {
+      "appId": 3301650,
+      "name": "Superstellar",
+      "type": "game"
     },
     {
       "appId": 3301660,
@@ -529494,7 +529479,7 @@
     {
       "appId": 3319720,
       "name": "\u5FC3\u6838",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3319740,
@@ -533127,11 +533112,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3347410,
-      "name": "App 3347410",
-      "type": "unknown"
-    },
-    {
       "appId": 3347420,
       "name": ":3",
       "type": "unknown"
@@ -533339,12 +533319,17 @@
     {
       "appId": 3349320,
       "name": "ARK: Extinction Ascended",
-      "type": "unknown"
+      "type": "dlc"
     },
     {
       "appId": 3349440,
       "name": "Watcher from the Void",
       "type": "unknown"
+    },
+    {
+      "appId": 3349480,
+      "name": "The Lord of the Rings: Return to Moria\u2122 Dedicated Server",
+      "type": "tool"
     },
     {
       "appId": 3349500,
@@ -535514,7 +535499,7 @@
     {
       "appId": 3364870,
       "name": "Knights of Messiah IF: Castle in an Alternate Dimension",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3364880,
@@ -535805,6 +535790,11 @@
       "appId": 3367170,
       "name": "Mystic Watcher",
       "type": "unknown"
+    },
+    {
+      "appId": 3367180,
+      "name": "HitTube Demo",
+      "type": "demo"
     },
     {
       "appId": 3367190,
@@ -536372,11 +536362,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3372460,
-      "name": "Screaming Head",
-      "type": "game"
-    },
-    {
       "appId": 3372510,
       "name": "Car Wash",
       "type": "unknown"
@@ -536504,7 +536489,7 @@
     {
       "appId": 3373660,
       "name": "Look Outside",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3373670,
@@ -537612,11 +537597,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3383100,
-      "name": "Echoes of Myth",
-      "type": "game"
-    },
-    {
       "appId": 3383120,
       "name": "\u546A\u3044\u306E\u7A62\u308C\u5504\u3000\u9CF4\u6D77\u9F8D\u4E5F\u306E\u56DE\u5947\u9332",
       "type": "unknown"
@@ -537890,6 +537870,11 @@
       "appId": 3384720,
       "name": "Disguise Royale",
       "type": "unknown"
+    },
+    {
+      "appId": 3384820,
+      "name": "Broken Relic",
+      "type": "game"
     },
     {
       "appId": 3384860,
@@ -540007,11 +539992,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3401960,
-      "name": "Join Us",
-      "type": "game"
-    },
-    {
       "appId": 3401990,
       "name": "Bear Furry - DLC",
       "type": "unknown"
@@ -540434,7 +540414,7 @@
     {
       "appId": 3405540,
       "name": "Tiny Auto Knights",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3405580,
@@ -541202,6 +541182,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3411860,
+      "name": "Project: Fractured Reality",
+      "type": "game"
+    },
+    {
       "appId": 3411920,
       "name": "Omicrocity2",
       "type": "unknown"
@@ -541699,7 +541684,7 @@
     {
       "appId": 3415570,
       "name": "Die For The Lich",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3415580,
@@ -542474,7 +542459,7 @@
     {
       "appId": 3421810,
       "name": "Manalia Notes -A memory of innocence-",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3421830,
@@ -542774,7 +542759,7 @@
     {
       "appId": 3424190,
       "name": "The Golden Tile",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3424230,
@@ -544817,11 +544802,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3440770,
-      "name": "The Glued",
-      "type": "game"
-    },
-    {
       "appId": 3440790,
       "name": "Night of the Wendigo",
       "type": "unknown"
@@ -545224,7 +545204,7 @@
     {
       "appId": 3444010,
       "name": "The Chroma",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3444020,
@@ -545299,7 +545279,7 @@
     {
       "appId": 3444630,
       "name": "Coastal Kitchen Simulator",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3444690,
@@ -546072,6 +546052,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3450460,
+      "name": "Fallen Lean Demo",
+      "type": "demo"
+    },
+    {
       "appId": 3450480,
       "name": "Figure it Out!",
       "type": "unknown"
@@ -546199,7 +546184,7 @@
     {
       "appId": 3451500,
       "name": "Car Guys",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3451520,
@@ -547534,7 +547519,7 @@
     {
       "appId": 3464550,
       "name": "No Human Shall Pass",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3464560,
@@ -547812,6 +547797,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3467550,
+      "name": "App 3467550",
+      "type": "unknown"
+    },
+    {
       "appId": 3467590,
       "name": "Tiny Tots",
       "type": "unknown"
@@ -547829,7 +547819,7 @@
     {
       "appId": 3467710,
       "name": "Wall World 2",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3467770,
@@ -548394,6 +548384,11 @@
     {
       "appId": 3472510,
       "name": "IcoNick Duster - Planets Defender",
+      "type": "unknown"
+    },
+    {
+      "appId": 3472530,
+      "name": "App 3472530",
       "type": "unknown"
     },
     {
@@ -549639,7 +549634,7 @@
     {
       "appId": 3483400,
       "name": "ARK: Astraeos",
-      "type": "unknown"
+      "type": "dlc"
     },
     {
       "appId": 3483630,
@@ -550374,7 +550369,7 @@
     {
       "appId": 3490970,
       "name": "Hotel Tales Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3491040,
@@ -551442,6 +551437,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3500850,
+      "name": "Dreadweave Playtest",
+      "type": "beta"
+    },
+    {
       "appId": 3500910,
       "name": "Backpack Scavenger",
       "type": "unknown"
@@ -551584,11 +551584,6 @@
     {
       "appId": 3502610,
       "name": "Red Van Simulator \u6975\u901F\u7D05Van\u50B3\u8AAA",
-      "type": "unknown"
-    },
-    {
-      "appId": 3502620,
-      "name": "App 3502620",
       "type": "unknown"
     },
     {
@@ -552259,7 +552254,7 @@
     {
       "appId": 3508450,
       "name": "BlueLine Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3508720,
@@ -552305,6 +552300,11 @@
       "appId": 3508940,
       "name": "Last Stand: Zombie Horde",
       "type": "unknown"
+    },
+    {
+      "appId": 3508960,
+      "name": "WorldShaper Idle Playtest",
+      "type": "beta"
     },
     {
       "appId": 3509050,
@@ -552364,6 +552364,11 @@
     {
       "appId": 3509460,
       "name": "Through the Edges",
+      "type": "unknown"
+    },
+    {
+      "appId": 3509600,
+      "name": "App 3509600",
       "type": "unknown"
     },
     {
@@ -552897,11 +552902,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3514940,
-      "name": "Social Caterpillar",
-      "type": "game"
-    },
-    {
       "appId": 3515040,
       "name": "APOCALYPTIC PUSSY",
       "type": "unknown"
@@ -552984,7 +552984,7 @@
     {
       "appId": 3515790,
       "name": "Capybara Achievement Clicker",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3515810,
@@ -553134,7 +553134,7 @@
     {
       "appId": 3516890,
       "name": "Drop Dead: The Cabin",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3516920,
@@ -553487,13 +553487,13 @@
       "type": "unknown"
     },
     {
-      "appId": 3520670,
-      "name": "Yes Sir",
+      "appId": 3520600,
+      "name": "App 3520600",
       "type": "unknown"
     },
     {
-      "appId": 3520760,
-      "name": "App 3520760",
+      "appId": 3520670,
+      "name": "Yes Sir",
       "type": "unknown"
     },
     {
@@ -553704,7 +553704,7 @@
     {
       "appId": 3522620,
       "name": "Super Cricket Fighter Turbo",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3522650,
@@ -554279,7 +554279,7 @@
     {
       "appId": 3529740,
       "name": "Bento Blocks Demo",
-      "type": "unknown"
+      "type": "demo"
     },
     {
       "appId": 3529780,
@@ -554429,7 +554429,7 @@
     {
       "appId": 3531470,
       "name": "Driving Life",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3531520,
@@ -554799,7 +554799,7 @@
     {
       "appId": 3535220,
       "name": "\u77F3\u982D\u7269\u8A9E",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3535310,
@@ -555137,11 +555137,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3539200,
-      "name": "Crownbound",
-      "type": "game"
-    },
-    {
       "appId": 3539230,
       "name": "Tank Fight Ready",
       "type": "unknown"
@@ -555164,7 +555159,7 @@
     {
       "appId": 3539500,
       "name": "My Witch Wants Elixirs!",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3539580,
@@ -555262,14 +555257,9 @@
       "type": "unknown"
     },
     {
-      "appId": 3540680,
-      "name": "App 3540680",
-      "type": "unknown"
-    },
-    {
       "appId": 3540710,
       "name": "Deskie",
-      "type": "application"
+      "type": "unknown"
     },
     {
       "appId": 3540830,
@@ -555949,17 +555939,12 @@
     {
       "appId": 3548560,
       "name": "BLOODLETTER Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3548570,
       "name": "The Milk Store",
       "type": "unknown"
-    },
-    {
-      "appId": 3548580,
-      "name": "Chill with You Lo-Fi Story",
-      "type": "game"
     },
     {
       "appId": 3548850,
@@ -556362,6 +556347,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3552240,
+      "name": "LEKANO WORLD ONLINE",
+      "type": "game"
+    },
+    {
       "appId": 3552390,
       "name": "Kiwi\u0027s Adventure",
       "type": "unknown"
@@ -556415,11 +556405,6 @@
       "appId": 3552690,
       "name": "Unbox The Cats",
       "type": "unknown"
-    },
-    {
-      "appId": 3552750,
-      "name": "Enfora Star",
-      "type": "game"
     },
     {
       "appId": 3552760,
@@ -556529,7 +556514,7 @@
     {
       "appId": 3553650,
       "name": "Dream Slayers",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3553660,
@@ -556904,7 +556889,7 @@
     {
       "appId": 3556750,
       "name": "Warhammer 40,000: Dawn of War - Definitive Edition",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3556760,
@@ -557759,7 +557744,7 @@
     {
       "appId": 3564740,
       "name": "Where Winds Meet",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3564790,
@@ -558134,7 +558119,7 @@
     {
       "appId": 3568260,
       "name": "Qohelet",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3568290,
@@ -558275,11 +558260,6 @@
       "appId": 3569940,
       "name": "Rolling In Gears",
       "type": "unknown"
-    },
-    {
-      "appId": 3569950,
-      "name": "Everdream Village",
-      "type": "game"
     },
     {
       "appId": 3569980,
@@ -558667,6 +558647,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3574000,
+      "name": "TwiwoodTales",
+      "type": "game"
+    },
+    {
       "appId": 3574090,
       "name": "Void Guard Outpost",
       "type": "unknown"
@@ -558879,7 +558864,7 @@
     {
       "appId": 3575930,
       "name": "Lyric Reaper",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3575940,
@@ -559249,7 +559234,7 @@
     {
       "appId": 3579220,
       "name": "\u7EA2\u6708",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3579270,
@@ -559340,6 +559325,11 @@
       "appId": 3580300,
       "name": "Hit Idol",
       "type": "unknown"
+    },
+    {
+      "appId": 3580350,
+      "name": "Look Outside Soundtrack",
+      "type": "music"
     },
     {
       "appId": 3580370,
@@ -559932,6 +559922,16 @@
       "type": "unknown"
     },
     {
+      "appId": 3585230,
+      "name": "Pro Basketball Manager 2026",
+      "type": "game"
+    },
+    {
+      "appId": 3585250,
+      "name": "App 3585250",
+      "type": "unknown"
+    },
+    {
       "appId": 3585310,
       "name": "KUNKUN Defender 2",
       "type": "unknown"
@@ -560469,7 +560469,7 @@
     {
       "appId": 3592140,
       "name": "Anima Gate of Memories: I \u0026 II Remastered",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3592170,
@@ -560760,11 +560760,6 @@
       "appId": 3594670,
       "name": "Ranman",
       "type": "unknown"
-    },
-    {
-      "appId": 3594680,
-      "name": "Battle Food Mania",
-      "type": "game"
     },
     {
       "appId": 3594780,
@@ -562694,7 +562689,7 @@
     {
       "appId": 3614460,
       "name": "Hypermarket Simulator",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3614550,
@@ -563260,6 +563255,11 @@
       "appId": 3619420,
       "name": "Lab Eject",
       "type": "unknown"
+    },
+    {
+      "appId": 3619560,
+      "name": "EXTERMINATION SHIP Demo",
+      "type": "demo"
     },
     {
       "appId": 3619600,
@@ -564217,11 +564217,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3627860,
-      "name": "Angel Legion-DLC Sexy Sweater E",
-      "type": "dlc"
-    },
-    {
       "appId": 3627900,
       "name": "Zero Gravity Heroes",
       "type": "unknown"
@@ -564782,9 +564777,14 @@
       "type": "unknown"
     },
     {
+      "appId": 3633220,
+      "name": "Aletheia: Prophecy of Perseus",
+      "type": "game"
+    },
+    {
       "appId": 3633250,
       "name": "Junji Ito Maniac: An Infinite Gaol",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3633310,
@@ -564914,7 +564914,7 @@
     {
       "appId": 3634260,
       "name": "Wicked Seed Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3634370,
@@ -564994,7 +564994,7 @@
     {
       "appId": 3634870,
       "name": "Caverns And Dryads",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3634880,
@@ -565527,6 +565527,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3639650,
+      "name": "Kotama and Academy Citadel",
+      "type": "game"
+    },
+    {
       "appId": 3639730,
       "name": "Omnos: The Endless Journey",
       "type": "unknown"
@@ -565752,11 +565757,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3643250,
-      "name": "Chiklet\u0027s Human Products",
-      "type": "game"
-    },
-    {
       "appId": 3643330,
       "name": "Car Parkour X: Zozo Edition",
       "type": "unknown"
@@ -565844,6 +565844,11 @@
     {
       "appId": 3644260,
       "name": "Cyber Shard Clicker",
+      "type": "unknown"
+    },
+    {
+      "appId": 3644400,
+      "name": "App 3644400",
       "type": "unknown"
     },
     {
@@ -566562,6 +566567,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3651200,
+      "name": "Jurassic World Evolution 3: Deluxe Upgrade Pack",
+      "type": "dlc"
+    },
+    {
       "appId": 3651300,
       "name": "Mist",
       "type": "unknown"
@@ -566987,6 +566997,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3654570,
+      "name": "Cube Mind",
+      "type": "game"
+    },
+    {
       "appId": 3654580,
       "name": "Toy Escape",
       "type": "unknown"
@@ -567020,11 +567035,6 @@
       "appId": 3654850,
       "name": "AQUARIUMS",
       "type": "unknown"
-    },
-    {
-      "appId": 3655020,
-      "name": "BALLBOY",
-      "type": "game"
     },
     {
       "appId": 3655030,
@@ -567067,6 +567077,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3655250,
+      "name": "App 3655250",
+      "type": "unknown"
+    },
+    {
       "appId": 3655330,
       "name": "Quiver and Die",
       "type": "unknown"
@@ -567079,7 +567094,7 @@
     {
       "appId": 3655390,
       "name": "Alien: Rogue Incursion Evolved Edition",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3655520,
@@ -567449,7 +567464,7 @@
     {
       "appId": 3659280,
       "name": "Off The Grid",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3659410,
@@ -567607,6 +567622,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3661240,
+      "name": "App 3661240",
+      "type": "unknown"
+    },
+    {
       "appId": 3661280,
       "name": "Desert Dino Run",
       "type": "unknown"
@@ -567744,7 +567764,7 @@
     {
       "appId": 3664490,
       "name": "ESA SHIELD",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3664510,
@@ -568079,7 +568099,7 @@
     {
       "appId": 3667330,
       "name": "Mad Metal Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3667510,
@@ -568469,7 +568489,7 @@
     {
       "appId": 3670880,
       "name": "Fallen Kunoichi ~Netorare Hidden Village~",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3670920,
@@ -568789,7 +568809,7 @@
     {
       "appId": 3675020,
       "name": "ARK: Ragnarok Ascended",
-      "type": "unknown"
+      "type": "dlc"
     },
     {
       "appId": 3675040,
@@ -568937,6 +568957,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3676480,
+      "name": "The Office Killer Demo",
+      "type": "demo"
+    },
+    {
       "appId": 3676500,
       "name": "Princess Shall Prevail",
       "type": "unknown"
@@ -568984,6 +569009,11 @@
     {
       "appId": 3677120,
       "name": "3Tower",
+      "type": "unknown"
+    },
+    {
+      "appId": 3677200,
+      "name": "App 3677200",
       "type": "unknown"
     },
     {
@@ -569065,6 +569095,11 @@
       "appId": 3678270,
       "name": "Death end re;Quest Code Z - Deluxe Pack",
       "type": "unknown"
+    },
+    {
+      "appId": 3678390,
+      "name": "\u55B5\u55B5\u89D2\u6597\u58EB Demo",
+      "type": "demo"
     },
     {
       "appId": 3678420,
@@ -570209,7 +570244,7 @@
     {
       "appId": 3689660,
       "name": "\u591C\u5DE1\u5B88\u5219",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3689670,
@@ -571379,7 +571414,7 @@
     {
       "appId": 3703860,
       "name": "Legend Battles Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 3703870,
@@ -571637,6 +571672,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3707390,
+      "name": "Quizrealms: From Stone to Steam",
+      "type": "game"
+    },
+    {
       "appId": 3707550,
       "name": "Kevin Toms Football Star Manager",
       "type": "unknown"
@@ -571645,6 +571685,11 @@
       "appId": 3707610,
       "name": "Delirium: Echoes of the Domino",
       "type": "unknown"
+    },
+    {
+      "appId": 3707620,
+      "name": "Dying Light: The Beast - Soundtrack",
+      "type": "dlc"
     },
     {
       "appId": 3707660,
@@ -571684,7 +571729,7 @@
     {
       "appId": 3708420,
       "name": "Of Ash and Steel Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3708470,
@@ -571894,12 +571939,12 @@
     {
       "appId": 3710390,
       "name": "Prison Escape Simulator: Dig Out Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3710450,
       "name": "Virtual Girlfriend",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3710460,
@@ -572234,7 +572279,7 @@
     {
       "appId": 3714180,
       "name": "Cropia",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3714210,
@@ -572479,7 +572524,7 @@
     {
       "appId": 3716710,
       "name": "The Last Scion",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3716780,
@@ -572580,6 +572625,11 @@
       "appId": 3717310,
       "name": "Danmaku Girl",
       "type": "unknown"
+    },
+    {
+      "appId": 3717320,
+      "name": "Space Witch Demo",
+      "type": "demo"
     },
     {
       "appId": 3717410,
@@ -572909,6 +572959,11 @@
     {
       "appId": 3721080,
       "name": "Don\u0027t Look Behind",
+      "type": "unknown"
+    },
+    {
+      "appId": 3721150,
+      "name": "App 3721150",
       "type": "unknown"
     },
     {
@@ -574014,7 +574069,7 @@
     {
       "appId": 3734680,
       "name": "\u6211\u53EA\u662F\u60F3\u8BA9\u5979\u4EEC\u90FD\u5E78\u798F",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3734690,
@@ -574327,11 +574382,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3738270,
-      "name": "Abhay Demo",
-      "type": "demo"
-    },
-    {
       "appId": 3738330,
       "name": "Moose Diver",
       "type": "unknown"
@@ -574344,7 +574394,7 @@
     {
       "appId": 3738530,
       "name": "\u65E0\u5C3D\u4E4B\u6F6E:[\u6F6E\u8D77]",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3738540,
@@ -574384,7 +574434,7 @@
     {
       "appId": 3738680,
       "name": "NoSlack Pets: Lo-Fi Paws demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3738700,
@@ -575439,7 +575489,7 @@
     {
       "appId": 3748740,
       "name": "Paper Xian",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3748790,
@@ -575494,7 +575544,7 @@
     {
       "appId": 3749790,
       "name": "Go Kart Island",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3749880,
@@ -575634,7 +575684,7 @@
     {
       "appId": 3751890,
       "name": "\u6211\u768426\u5C81\u5973\u623F\u5BA2\uFF1A\u5728\u4E91\u7AEF",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3751920,
@@ -575982,11 +576032,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3756020,
-      "name": "Racer Overdrive",
-      "type": "game"
-    },
-    {
       "appId": 3756170,
       "name": "Inside the Light Switcher\u0027s Mind",
       "type": "unknown"
@@ -576090,6 +576135,11 @@
       "appId": 3757410,
       "name": "Bayraktar and Stugna",
       "type": "unknown"
+    },
+    {
+      "appId": 3757450,
+      "name": "Immortum Demo",
+      "type": "demo"
     },
     {
       "appId": 3757470,
@@ -576782,6 +576832,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3765410,
+      "name": "Blue Book Demo",
+      "type": "demo"
+    },
+    {
       "appId": 3765460,
       "name": "Dragons Reef VR",
       "type": "unknown"
@@ -576977,6 +577032,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3767730,
+      "name": "AstroScaper Playtest",
+      "type": "beta"
+    },
+    {
       "appId": 3768020,
       "name": "Doomvile Brainrot",
       "type": "unknown"
@@ -577034,7 +577094,7 @@
     {
       "appId": 3768450,
       "name": "Better Fortress 2 - Beta",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3768490,
@@ -577124,6 +577184,11 @@
     {
       "appId": 3769710,
       "name": "\u4F2A\u88C5",
+      "type": "unknown"
+    },
+    {
+      "appId": 3769800,
+      "name": "App 3769800",
       "type": "unknown"
     },
     {
@@ -577289,7 +577354,7 @@
     {
       "appId": 3771390,
       "name": "Carefully Stamped",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3771570,
@@ -578112,11 +578177,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3781760,
-      "name": "App 3781760",
-      "type": "unknown"
-    },
-    {
       "appId": 3781840,
       "name": "Bartholomew.exe",
       "type": "unknown"
@@ -578144,7 +578204,7 @@
     {
       "appId": 3782120,
       "name": "NEODITRONIX",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3782170,
@@ -578279,11 +578339,6 @@
     {
       "appId": 3783570,
       "name": "A Tithe in Blood - Official Artbook",
-      "type": "unknown"
-    },
-    {
-      "appId": 3783580,
-      "name": "App 3783580",
       "type": "unknown"
     },
     {
@@ -579349,7 +579404,7 @@
     {
       "appId": 3795490,
       "name": "Don\u0027t Get Your Hopes Up",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3795540,
@@ -579430,11 +579485,6 @@
       "appId": 3796160,
       "name": "Mole Digging",
       "type": "unknown"
-    },
-    {
-      "appId": 3796250,
-      "name": "Hearts of Iron IV: Seaplane Tenders",
-      "type": "dlc"
     },
     {
       "appId": 3796280,
@@ -579980,6 +580030,11 @@
       "appId": 3804070,
       "name": "\u52C7\u8005\u5927\u66B4\u8D70",
       "type": "unknown"
+    },
+    {
+      "appId": 3804090,
+      "name": "HOVERDRIVE Playtest",
+      "type": "beta"
     },
     {
       "appId": 3804190,
@@ -581174,7 +581229,7 @@
     {
       "appId": 3816700,
       "name": "Logic Bombs",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3816780,
@@ -581220,11 +581275,6 @@
       "appId": 3817110,
       "name": "CAPTAIN FIRAT",
       "type": "unknown"
-    },
-    {
-      "appId": 3817540,
-      "name": "Daemon X Machina: Titanic Scion - Into the Abyss",
-      "type": "dlc"
     },
     {
       "appId": 3817570,
@@ -581497,6 +581547,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3820880,
+      "name": "Rush Roulette",
+      "type": "game"
+    },
+    {
       "appId": 3820890,
       "name": "The Coffin of Sarah",
       "type": "unknown"
@@ -581534,7 +581589,7 @@
     {
       "appId": 3821150,
       "name": "Burger Shift: Team Rush: Prologue",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3821160,
@@ -581952,6 +582007,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3825390,
+      "name": "App 3825390",
+      "type": "unknown"
+    },
+    {
       "appId": 3825410,
       "name": "Snake Eyes",
       "type": "unknown"
@@ -582090,11 +582150,6 @@
       "appId": 3826460,
       "name": "Looking For Waifu",
       "type": "unknown"
-    },
-    {
-      "appId": 3826520,
-      "name": "Team Fortress 2: Gold Rush",
-      "type": "game"
     },
     {
       "appId": 3826540,
@@ -582507,11 +582562,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3831120,
-      "name": "\u6C5F\u5C71\u5317\u671B",
-      "type": "game"
-    },
-    {
       "appId": 3831220,
       "name": "Is this a Game yet?",
       "type": "unknown"
@@ -582842,11 +582892,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3835100,
-      "name": "Starnded: Gardens of the Rubellite",
-      "type": "game"
-    },
-    {
       "appId": 3835170,
       "name": "Kimchi: A Stars in the Trash Story",
       "type": "unknown"
@@ -582879,7 +582924,7 @@
     {
       "appId": 3835510,
       "name": "Pro Eleven Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 3835530,
@@ -583225,6 +583270,11 @@
       "appId": 3839350,
       "name": "LCF1",
       "type": "unknown"
+    },
+    {
+      "appId": 3839370,
+      "name": "\uC804\uAD6D\uD1F4\uB9C8\uC0AC\uD611\uD68C Demo",
+      "type": "demo"
     },
     {
       "appId": 3839550,
@@ -583594,7 +583644,7 @@
     {
       "appId": 3843400,
       "name": "CRABS MUST DIE!",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3843500,
@@ -584449,7 +584499,7 @@
     {
       "appId": 3853840,
       "name": "The Enigma Cases Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 3853960,
@@ -585519,7 +585569,7 @@
     {
       "appId": 3863330,
       "name": "A Thousand Cloys Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 3863340,
@@ -585675,6 +585725,11 @@
       "appId": 3865190,
       "name": "Jump Slash",
       "type": "unknown"
+    },
+    {
+      "appId": 3865300,
+      "name": "Europa Universalis V: Sacred Sites",
+      "type": "dlc"
     },
     {
       "appId": 3865340,
@@ -585914,7 +585969,7 @@
     {
       "appId": 3867660,
       "name": "Erebos Loop",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3867790,
@@ -585999,11 +586054,6 @@
     {
       "appId": 3868500,
       "name": "Droppy Ball",
-      "type": "unknown"
-    },
-    {
-      "appId": 3868580,
-      "name": "App 3868580",
       "type": "unknown"
     },
     {
@@ -586352,11 +586402,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3872630,
-      "name": "App 3872630",
-      "type": "unknown"
-    },
-    {
       "appId": 3872670,
       "name": "\u6C99\u57CE\u9738\u4E3B",
       "type": "unknown"
@@ -586460,6 +586505,11 @@
       "appId": 3874090,
       "name": "Animal Smash",
       "type": "unknown"
+    },
+    {
+      "appId": 3874140,
+      "name": "Revenge of the Savage Planet Demo",
+      "type": "demo"
     },
     {
       "appId": 3874210,
@@ -587002,6 +587052,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3880190,
+      "name": "Coconut Simulator 2",
+      "type": "game"
+    },
+    {
       "appId": 3880210,
       "name": "The Vending Machine",
       "type": "unknown"
@@ -587034,7 +587089,7 @@
     {
       "appId": 3880640,
       "name": "Katana",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3880650,
@@ -587057,8 +587112,8 @@
       "type": "unknown"
     },
     {
-      "appId": 3881510,
-      "name": "App 3881510",
+      "appId": 3880780,
+      "name": "App 3880780",
       "type": "unknown"
     },
     {
@@ -587259,7 +587314,7 @@
     {
       "appId": 3884110,
       "name": "The Secret of Velmora",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3884140,
@@ -588047,6 +588102,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3894270,
+      "name": "Sugar Phone",
+      "type": "game"
+    },
+    {
       "appId": 3894280,
       "name": "The Coin",
       "type": "unknown"
@@ -588325,11 +588385,6 @@
       "appId": 3897480,
       "name": "Tiny Terrors",
       "type": "unknown"
-    },
-    {
-      "appId": 3897530,
-      "name": "Dark Monastry",
-      "type": "game"
     },
     {
       "appId": 3897600,
@@ -588630,6 +588685,11 @@
       "appId": 3900740,
       "name": "Nachtmahr",
       "type": "unknown"
+    },
+    {
+      "appId": 3900880,
+      "name": "Fallen Lean Playtest",
+      "type": "beta"
     },
     {
       "appId": 3901530,
@@ -589087,11 +589147,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3906380,
-      "name": "App 3906380",
-      "type": "unknown"
-    },
-    {
       "appId": 3906410,
       "name": "Whispered Secrets: Song of Sorrow Collector\u0027s Edition",
       "type": "unknown"
@@ -589200,6 +589255,11 @@
       "appId": 3907660,
       "name": "Tai Chi Like",
       "type": "unknown"
+    },
+    {
+      "appId": 3907790,
+      "name": "Oxygen Train",
+      "type": "game"
     },
     {
       "appId": 3907820,
@@ -589347,6 +589407,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3909830,
+      "name": "Ballerspiel Playtest",
+      "type": "beta"
+    },
+    {
       "appId": 3909860,
       "name": "\u306A\u3064\u307E\u3064\u308A",
       "type": "unknown"
@@ -589364,7 +589429,7 @@
     {
       "appId": 3909960,
       "name": "Dementium: The Ward",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3909990,
@@ -589662,11 +589727,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3914200,
-      "name": "Even20: The Interference of Parallels",
-      "type": "game"
-    },
-    {
       "appId": 3914210,
       "name": "Draft Day Sports: Pro Basketball 2026",
       "type": "unknown"
@@ -589819,7 +589879,7 @@
     {
       "appId": 3916180,
       "name": "Transport Legion",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3916230,
@@ -590047,11 +590107,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3918980,
-      "name": "SpelBrawl",
-      "type": "game"
-    },
-    {
       "appId": 3919000,
       "name": "SailFront",
       "type": "unknown"
@@ -590079,7 +590134,7 @@
     {
       "appId": 3919250,
       "name": "FUCK YOU MACHINE Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3919270,
@@ -590260,6 +590315,11 @@
       "appId": 3921030,
       "name": "Sweet Bar",
       "type": "unknown"
+    },
+    {
+      "appId": 3921090,
+      "name": "The ENDLESS BACKGATE",
+      "type": "game"
     },
     {
       "appId": 3921130,
@@ -590517,11 +590577,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3923980,
-      "name": "Holo ADV: SakuraSingularity.exe",
-      "type": "game"
-    },
-    {
       "appId": 3924010,
       "name": "UnderAttack",
       "type": "unknown"
@@ -590619,7 +590674,7 @@
     {
       "appId": 3924680,
       "name": "Meco Rocket Simulator (Pro DLC)",
-      "type": "dlc"
+      "type": "unknown"
     },
     {
       "appId": 3924700,
@@ -590962,11 +591017,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3928990,
-      "name": "Food Processing Simulator",
-      "type": "game"
-    },
-    {
       "appId": 3929030,
       "name": "Why Did You Leave Me Like This?",
       "type": "unknown"
@@ -591030,11 +591080,6 @@
       "appId": 3929740,
       "name": "Tom Clancy\u0027s Splinter Cell: Pandora Tomorrow",
       "type": "unknown"
-    },
-    {
-      "appId": 3929760,
-      "name": "Incredicer",
-      "type": "game"
     },
     {
       "appId": 3929770,
@@ -591582,11 +591627,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3939020,
-      "name": "Poem for the Caged",
-      "type": "game"
-    },
-    {
       "appId": 3939090,
       "name": "H.Z.T.",
       "type": "unknown"
@@ -591974,7 +592014,7 @@
     {
       "appId": 3944530,
       "name": "Knockless",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3944540,
@@ -592169,7 +592209,7 @@
     {
       "appId": 3947300,
       "name": "\u661F\u8FB0\u5927\u9646",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3947310,
@@ -592345,6 +592385,11 @@
       "appId": 3949430,
       "name": "Farmer\u0027s Market",
       "type": "unknown"
+    },
+    {
+      "appId": 3949500,
+      "name": "Goth Phone",
+      "type": "game"
     },
     {
       "appId": 3949670,
@@ -592744,7 +592789,7 @@
     {
       "appId": 3954370,
       "name": "I\u0027m not a robot!",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3954540,
@@ -592809,6 +592854,11 @@
     {
       "appId": 3955350,
       "name": "50 Minutes Til Impact",
+      "type": "unknown"
+    },
+    {
+      "appId": 3955380,
+      "name": "App 3955380",
       "type": "unknown"
     },
     {
@@ -593117,11 +593167,6 @@
       "type": "unknown"
     },
     {
-      "appId": 3960410,
-      "name": "Hot Property",
-      "type": "game"
-    },
-    {
       "appId": 3960440,
       "name": "Space Memory: Artiodactyls",
       "type": "unknown"
@@ -593240,6 +593285,11 @@
       "appId": 3962230,
       "name": "Hentai Romance",
       "type": "unknown"
+    },
+    {
+      "appId": 3962300,
+      "name": "Battle Food Mania Demo",
+      "type": "demo"
     },
     {
       "appId": 3962310,
@@ -593549,7 +593599,7 @@
     {
       "appId": 3966400,
       "name": "Den-Den: Tokyo Horror Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3966660,
@@ -593714,7 +593764,7 @@
     {
       "appId": 3970660,
       "name": "Hunter: The Reckoning \u2014 A Time of Monsters",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 3970710,
@@ -593927,6 +593977,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3974400,
+      "name": "App 3974400",
+      "type": "unknown"
+    },
+    {
       "appId": 3974510,
       "name": "Mindcraft",
       "type": "unknown"
@@ -593980,6 +594035,11 @@
       "appId": 3976170,
       "name": "Cube Game Server Boss",
       "type": "unknown"
+    },
+    {
+      "appId": 3976180,
+      "name": "UNO - Show \u2018em No Mercy DLC",
+      "type": "dlc"
     },
     {
       "appId": 3976310,
@@ -594262,6 +594322,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3980380,
+      "name": "Frog It Up Demo",
+      "type": "demo"
+    },
+    {
       "appId": 3980450,
       "name": "\u041D\u0430\u0441\u0442\u043E\u044F\u0449\u0438\u0435 \u043F\u0430\u0437\u043B\u044B - \u041A\u0430\u043D\u044C\u043E\u043D\u044B",
       "type": "unknown"
@@ -594282,6 +594347,11 @@
       "type": "unknown"
     },
     {
+      "appId": 3980940,
+      "name": "Otherworld Wandering Merchant",
+      "type": "game"
+    },
+    {
       "appId": 3981030,
       "name": "Yandere Goth BDSM 9",
       "type": "unknown"
@@ -594300,11 +594370,6 @@
       "appId": 3981180,
       "name": "Who Was That \uFF5E\u9854\u795E\u7D4C\u8870\u5F31\uFF5E",
       "type": "unknown"
-    },
-    {
-      "appId": 3981220,
-      "name": "Ezmeralda",
-      "type": "game"
     },
     {
       "appId": 3981230,
@@ -594364,7 +594429,7 @@
     {
       "appId": 3982310,
       "name": "ARK: Valguero Ascended",
-      "type": "unknown"
+      "type": "dlc"
     },
     {
       "appId": 3982330,
@@ -594504,7 +594569,7 @@
     {
       "appId": 3984430,
       "name": "Genesis Relic: Idle Sandbox Simulator Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 3984440,
@@ -594919,7 +594984,7 @@
     {
       "appId": 3992260,
       "name": "Ascend From Nine Mountains",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 3992300,
@@ -595010,6 +595075,11 @@
       "appId": 3992860,
       "name": "Ultimate Auto-RPG - Glimmerpass Dungeon",
       "type": "unknown"
+    },
+    {
+      "appId": 3992880,
+      "name": "Rush Roulette Demo",
+      "type": "demo"
     },
     {
       "appId": 3992910,
@@ -595637,6 +595707,11 @@
       "type": "unknown"
     },
     {
+      "appId": 4002530,
+      "name": "Trialspire",
+      "type": "game"
+    },
+    {
       "appId": 4002550,
       "name": "a.sector",
       "type": "unknown"
@@ -595932,11 +596007,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4007540,
-      "name": "App 4007540",
-      "type": "unknown"
-    },
-    {
       "appId": 4007600,
       "name": "Hentai Abandoned",
       "type": "unknown"
@@ -595954,6 +596024,11 @@
     {
       "appId": 4007850,
       "name": "Sweetie Candy Maze: Blueberry",
+      "type": "unknown"
+    },
+    {
+      "appId": 4008040,
+      "name": "App 4008040",
       "type": "unknown"
     },
     {
@@ -596367,6 +596442,11 @@
       "type": "unknown"
     },
     {
+      "appId": 4017120,
+      "name": "Drunkard Simulator Demo",
+      "type": "demo"
+    },
+    {
       "appId": 4017140,
       "name": "Drone-Locked",
       "type": "unknown"
@@ -596400,11 +596480,6 @@
       "appId": 4017430,
       "name": "Tales of Legendary Lust: Aphrodisia - Spicy Short Stories",
       "type": "unknown"
-    },
-    {
-      "appId": 4017450,
-      "name": "Villainy",
-      "type": "game"
     },
     {
       "appId": 4017580,
@@ -596932,11 +597007,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4026480,
-      "name": "Cafe Business Manager",
-      "type": "game"
-    },
-    {
       "appId": 4026630,
       "name": "Blaster Bunny Sacrilege",
       "type": "unknown"
@@ -597152,11 +597222,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4032820,
-      "name": "\u9774\u4E0B\u7269\u8A9E\u30FC\u5927\u9580\u30B8\u30B2\u30F3\u306E\u9774\u4E0B\u5E97\u30FC",
-      "type": "game"
-    },
-    {
       "appId": 4033020,
       "name": "Logic Deck",
       "type": "unknown"
@@ -597324,7 +597389,7 @@
     {
       "appId": 4036420,
       "name": "Hometown Store Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 4036650,
@@ -597419,6 +597484,11 @@
     {
       "appId": 4038370,
       "name": "Drugy",
+      "type": "unknown"
+    },
+    {
+      "appId": 4038530,
+      "name": "App 4038530",
       "type": "unknown"
     },
     {
@@ -597792,6 +597862,11 @@
       "type": "unknown"
     },
     {
+      "appId": 4047500,
+      "name": "Genesis Relic: Idle Sandbox Simulator Playtest",
+      "type": "beta"
+    },
+    {
       "appId": 4047560,
       "name": "god of medicine",
       "type": "unknown"
@@ -597930,6 +598005,11 @@
       "appId": 4050510,
       "name": "Bubble Hook Mania",
       "type": "unknown"
+    },
+    {
+      "appId": 4050580,
+      "name": "Toxoplasma",
+      "type": "game"
     },
     {
       "appId": 4050600,
@@ -598147,11 +598227,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4054700,
-      "name": "Warface - \u041C\u043E\u0449\u043D\u043E\u0435 \u043D\u0430\u0447\u0430\u043B\u043E",
-      "type": "dlc"
-    },
-    {
       "appId": 4054800,
       "name": "Femdom Girlfriend 7: Big-Breasted Bully",
       "type": "unknown"
@@ -598252,6 +598327,11 @@
       "type": "unknown"
     },
     {
+      "appId": 4056470,
+      "name": "Rhythm Ball",
+      "type": "game"
+    },
+    {
       "appId": 4056480,
       "name": "\u5E78\u5B58\u8005:\u67AA\u706B",
       "type": "unknown"
@@ -598295,11 +598375,6 @@
       "appId": 4056980,
       "name": "Bomb Vehicle The Idle Clicker - Game Speed Shifter",
       "type": "unknown"
-    },
-    {
-      "appId": 4057440,
-      "name": "Tap 4 Sex 2",
-      "type": "game"
     },
     {
       "appId": 4057560,
@@ -598564,7 +598639,7 @@
     {
       "appId": 4059360,
       "name": "The Salesman",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 4059530,
@@ -599007,11 +599082,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4071090,
-      "name": "Tiny Town Market Simulator",
-      "type": "game"
-    },
-    {
       "appId": 4071100,
       "name": "\u65E9\u82D7\u306E\u4FE1\u4EF0\u738B\u3078\u306E\u9053",
       "type": "unknown"
@@ -599060,11 +599130,6 @@
       "appId": 4072010,
       "name": "Backgammon Premium",
       "type": "unknown"
-    },
-    {
-      "appId": 4072080,
-      "name": "BoobyRogue: Tumor Takedown",
-      "type": "game"
     },
     {
       "appId": 4072150,
@@ -599307,11 +599372,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4077010,
-      "name": "App 4077010",
-      "type": "unknown"
-    },
-    {
       "appId": 4077160,
       "name": "The Predecessor",
       "type": "unknown"
@@ -599362,11 +599422,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4078640,
-      "name": "Granite Noir: The Social Experiment",
-      "type": "game"
-    },
-    {
       "appId": 4078770,
       "name": "Hentai Tanvi",
       "type": "unknown"
@@ -599392,11 +599447,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4079330,
-      "name": "App 4079330",
-      "type": "unknown"
-    },
-    {
       "appId": 4079430,
       "name": "ScrapBots",
       "type": "unknown"
@@ -599419,6 +599469,11 @@
     {
       "appId": 4080230,
       "name": "GLOBAL CONTROL COUNTRIES",
+      "type": "unknown"
+    },
+    {
+      "appId": 4080400,
+      "name": "App 4080400",
       "type": "unknown"
     },
     {
@@ -599574,7 +599629,7 @@
     {
       "appId": 4086050,
       "name": "Scam Centre Simulator: Under Kingdom Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 4086120,
@@ -599670,11 +599725,6 @@
       "appId": 4087720,
       "name": "MESUGAKi DESKTOP",
       "type": "unknown"
-    },
-    {
-      "appId": 4087740,
-      "name": "When will I get Home?",
-      "type": "game"
     },
     {
       "appId": 4088000,
@@ -599832,6 +599882,16 @@
       "type": "unknown"
     },
     {
+      "appId": 4090950,
+      "name": "Escape from Tarkov: Left Behind - Expansion Pack",
+      "type": "dlc"
+    },
+    {
+      "appId": 4090970,
+      "name": "Escape from Tarkov: Prepare for Escape - Expansion Pack",
+      "type": "dlc"
+    },
+    {
       "appId": 4091000,
       "name": "Camp Buddy: Scoutmaster Season - The Journal",
       "type": "unknown"
@@ -599840,6 +599900,11 @@
       "appId": 4091250,
       "name": "If you\u2019re a man, hold on for half a song",
       "type": "unknown"
+    },
+    {
+      "appId": 4091290,
+      "name": "Escape from Tarkov: PVE Zone",
+      "type": "dlc"
     },
     {
       "appId": 4092540,
@@ -599860,6 +599925,11 @@
       "appId": 4092620,
       "name": "101 Cats Hidden in Jakarta",
       "type": "unknown"
+    },
+    {
+      "appId": 4092680,
+      "name": "WORM GAME Demo",
+      "type": "demo"
     },
     {
       "appId": 4092850,
@@ -599944,7 +600014,7 @@
     {
       "appId": 4094560,
       "name": "Hoptale Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 4094810,
@@ -599974,7 +600044,7 @@
     {
       "appId": 4095240,
       "name": "House 2 Demo",
-      "type": "demo"
+      "type": "unknown"
     },
     {
       "appId": 4095640,
@@ -599995,6 +600065,11 @@
       "appId": 4096080,
       "name": "\u307E\uFF5E\u3059\u308B -\u7B2C\uFF11\u7AE0-",
       "type": "unknown"
+    },
+    {
+      "appId": 4096150,
+      "name": "KinForge",
+      "type": "game"
     },
     {
       "appId": 4096280,
@@ -600102,6 +600177,11 @@
       "type": "unknown"
     },
     {
+      "appId": 4099210,
+      "name": "App 4099210",
+      "type": "unknown"
+    },
+    {
       "appId": 4099570,
       "name": "RPG Maker MZ - Battle and Dungeon Anthems Vol01",
       "type": "unknown"
@@ -600137,6 +600217,11 @@
       "type": "unknown"
     },
     {
+      "appId": 4101180,
+      "name": "Summer Adventurers: Mediterranean Demo",
+      "type": "demo"
+    },
+    {
       "appId": 4101760,
       "name": "Dungeon \u0026 Poker",
       "type": "unknown"
@@ -600162,9 +600247,14 @@
       "type": "unknown"
     },
     {
+      "appId": 4102240,
+      "name": "Stay in the rhythm",
+      "type": "game"
+    },
+    {
       "appId": 4102350,
-      "name": "App 4102350",
-      "type": "unknown"
+      "name": "Cational Meographic",
+      "type": "game"
     },
     {
       "appId": 4102760,
@@ -600257,6 +600347,11 @@
       "type": "unknown"
     },
     {
+      "appId": 4105500,
+      "name": "Agent Pigeon 7",
+      "type": "game"
+    },
+    {
       "appId": 4105610,
       "name": "Quiet Office Floors",
       "type": "unknown"
@@ -600265,6 +600360,16 @@
       "appId": 4105760,
       "name": "1-DC",
       "type": "unknown"
+    },
+    {
+      "appId": 4105930,
+      "name": "App 4105930",
+      "type": "unknown"
+    },
+    {
+      "appId": 4105980,
+      "name": "\u6C34\u4E0B\u53CC\u96C4 Playtest",
+      "type": "beta"
     },
     {
       "appId": 4106180,
@@ -600322,6 +600427,11 @@
       "type": "unknown"
     },
     {
+      "appId": 4108370,
+      "name": "App 4108370",
+      "type": "unknown"
+    },
+    {
       "appId": 4108750,
       "name": "Marshallese Dominatrixes Are the Best",
       "type": "unknown"
@@ -600337,19 +600447,9 @@
       "type": "unknown"
     },
     {
-      "appId": 4109160,
-      "name": "Teaching Simulator: Elite Class",
-      "type": "game"
-    },
-    {
       "appId": 4109200,
       "name": "WorkParadise",
       "type": "unknown"
-    },
-    {
-      "appId": 4109380,
-      "name": "Sins of the Desert",
-      "type": "game"
     },
     {
       "appId": 4109600,
@@ -600404,7 +600504,7 @@
     {
       "appId": 4111070,
       "name": "The Earthen Reign",
-      "type": "game"
+      "type": "unknown"
     },
     {
       "appId": 4111120,
@@ -600489,7 +600589,7 @@
     {
       "appId": 4113780,
       "name": "\u0E3ABob To The Top",
-      "type": "unknown"
+      "type": "game"
     },
     {
       "appId": 4113910,
@@ -600652,11 +600752,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4119310,
-      "name": "Stab Club",
-      "type": "game"
-    },
-    {
       "appId": 4119350,
       "name": "Star Ores Inc. \u2013 The Official Book: Story, Background \u0026 Insights",
       "type": "unknown"
@@ -600672,11 +600767,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4119690,
-      "name": "MISERY - Zaslavie Supporter Pack",
-      "type": "dlc"
-    },
-    {
       "appId": 4120160,
       "name": "Yongjiang River",
       "type": "unknown"
@@ -600685,11 +600775,6 @@
       "appId": 4120210,
       "name": "Mohyeong World",
       "type": "unknown"
-    },
-    {
-      "appId": 4120500,
-      "name": "Lewd Network",
-      "type": "game"
     },
     {
       "appId": 4120850,
@@ -600777,16 +600862,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4124510,
-      "name": "Archetypes Festival",
-      "type": "game"
-    },
-    {
-      "appId": 4124880,
-      "name": "Hidden Cats in Christmas",
-      "type": "game"
-    },
-    {
       "appId": 4125710,
       "name": "Runesica: The Legendary Part-Timer",
       "type": "unknown"
@@ -600830,11 +600905,6 @@
       "appId": 4127970,
       "name": "Femdom Hero 3",
       "type": "unknown"
-    },
-    {
-      "appId": 4128150,
-      "name": "The Riese Project",
-      "type": "game"
     },
     {
       "appId": 4128200,
@@ -600897,11 +600967,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4132480,
-      "name": "Guilty Pleasures",
-      "type": "game"
-    },
-    {
       "appId": 4132880,
       "name": "Bushidon\u0027t: Rhythm battles and the unnecessarily long subtitle",
       "type": "unknown"
@@ -600917,13 +600982,13 @@
       "type": "unknown"
     },
     {
-      "appId": 4134720,
-      "name": "Hidden Tails: From the World of I Am a Mouse",
-      "type": "game"
-    },
-    {
       "appId": 4134990,
       "name": "Pixelate TD",
+      "type": "unknown"
+    },
+    {
+      "appId": 4135190,
+      "name": "App 4135190",
       "type": "unknown"
     },
     {
@@ -600972,11 +601037,6 @@
       "type": "unknown"
     },
     {
-      "appId": 4137730,
-      "name": "The Curse Of Grandfather",
-      "type": "game"
-    },
-    {
       "appId": 4137820,
       "name": "\u041D\u0430\u0441\u0442\u043E\u044F\u0449\u0438\u0435 \u043F\u0430\u0437\u043B\u044B - \u041A\u043E\u0442\u044F\u0442\u0430 (\u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F)",
       "type": "unknown"
@@ -600997,6 +601057,11 @@
       "type": "unknown"
     },
     {
+      "appId": 4138190,
+      "name": "App 4138190",
+      "type": "unknown"
+    },
+    {
       "appId": 4138730,
       "name": "Fun Times at the Bibi Resort and Spa - 18\u002B DLC",
       "type": "unknown"
@@ -601010,11 +601075,6 @@
       "appId": 4140620,
       "name": "Crusader",
       "type": "unknown"
-    },
-    {
-      "appId": 4140860,
-      "name": "A Thousand Cloys Demo",
-      "type": "demo"
     },
     {
       "appId": 4141160,
@@ -601057,19 +601117,19 @@
       "type": "unknown"
     },
     {
-      "appId": 4146390,
-      "name": "App 4146390",
-      "type": "unknown"
-    },
-    {
-      "appId": 4146700,
-      "name": "Cosmic Commandos",
-      "type": "game"
-    },
-    {
       "appId": 4147300,
       "name": "The Remainer Demo",
       "type": "unknown"
+    },
+    {
+      "appId": 4148260,
+      "name": "\u30A2\u30CE\u30DE\u30E9\u30B9\u30B7\u30C6\u30A3 Demo",
+      "type": "demo"
+    },
+    {
+      "appId": 4148640,
+      "name": "Giant Cursor",
+      "type": "application"
     },
     {
       "appId": 4152000,
@@ -601079,7 +601139,12 @@
     {
       "appId": 4152870,
       "name": "BALLBOY Playtest",
-      "type": "beta"
+      "type": "unknown"
+    },
+    {
+      "appId": 4153290,
+      "name": "App 4153290",
+      "type": "unknown"
     },
     {
       "appId": 4153520,
@@ -601092,9 +601157,14 @@
       "type": "unknown"
     },
     {
+      "appId": 4155770,
+      "name": "Always With You Demo",
+      "type": "demo"
+    },
+    {
       "appId": 4155800,
       "name": "Mage Escape 2000 Playtest",
-      "type": "beta"
+      "type": "unknown"
     },
     {
       "appId": 4156170,
@@ -601107,29 +601177,34 @@
       "type": "unknown"
     },
     {
+      "appId": 4156500,
+      "name": "App 4156500",
+      "type": "unknown"
+    },
+    {
       "appId": 4156740,
       "name": "Bluegrass: Mindfulness Simulator Demo",
       "type": "unknown"
     },
     {
-      "appId": 4157770,
-      "name": "IT\u0027s for Adults \uD83E\uDD21",
-      "type": "game"
-    },
-    {
-      "appId": 4158720,
-      "name": "App 4158720",
+      "appId": 4156930,
+      "name": "App 4156930",
       "type": "unknown"
     },
     {
-      "appId": 4159200,
-      "name": "\u86C6\u866B\u7684\u5E78\u798F\uFF1A\u8150\u7532\u75C5",
+      "appId": 4159120,
+      "name": "Mommy don\u0027t hurt me mommy don\u0027t hurt me mommy don\u0027t hurt me ",
       "type": "game"
     },
     {
       "appId": 4161050,
       "name": "Reflections of Life: Gone But Not Forgotten Collector\u0027s Edition",
       "type": "unknown"
+    },
+    {
+      "appId": 4161430,
+      "name": "Golden Escape",
+      "type": "game"
     },
     {
       "appId": 4164550,
@@ -601139,11 +601214,6 @@
     {
       "appId": 4165790,
       "name": "Tower! Simulator 3 - KORD Airport",
-      "type": "unknown"
-    },
-    {
-      "appId": 4167440,
-      "name": "App 4167440",
       "type": "unknown"
     },
     {
@@ -601157,14 +601227,19 @@
       "type": "unknown"
     },
     {
+      "appId": 4170070,
+      "name": "Mommy don\u0027t hurt me mommy don\u0027t hurt me mommy don\u0027t hurt me  Demo",
+      "type": "demo"
+    },
+    {
       "appId": 4170990,
       "name": "Snack Escort Demo",
       "type": "unknown"
     },
     {
-      "appId": 4171810,
-      "name": "App 4171810",
-      "type": "unknown"
+      "appId": 4171030,
+      "name": "Dino Citadel Playtest",
+      "type": "beta"
     },
     {
       "appId": 4172100,
@@ -601177,24 +601252,9 @@
       "type": "unknown"
     },
     {
-      "appId": 4172540,
-      "name": "Skillshot City: Starter Pack",
-      "type": "dlc"
-    },
-    {
-      "appId": 4172680,
-      "name": "Skinwalkers Valley",
-      "type": "game"
-    },
-    {
       "appId": 4172710,
       "name": "Gray Protocol Demo",
       "type": "unknown"
-    },
-    {
-      "appId": 4173940,
-      "name": "A Mystic Journey With Terra",
-      "type": "game"
     },
     {
       "appId": 4175960,
@@ -601209,31 +601269,16 @@
     {
       "appId": 4176390,
       "name": "\u65AF\u51EF\u5C14\u7684\u4E4C\u9E26 Playtest",
+      "type": "unknown"
+    },
+    {
+      "appId": 4179510,
+      "name": "NotFunGolf Playtest",
       "type": "beta"
     },
     {
-      "appId": 4177700,
-      "name": "App 4177700",
-      "type": "unknown"
-    },
-    {
-      "appId": 4178980,
-      "name": "Holo Picture Viewer",
-      "type": "application"
-    },
-    {
-      "appId": 4181520,
-      "name": "App 4181520",
-      "type": "unknown"
-    },
-    {
-      "appId": 4183610,
-      "name": "App 4183610",
-      "type": "unknown"
-    },
-    {
-      "appId": 4184830,
-      "name": "App 4184830",
+      "appId": 4181010,
+      "name": "App 4181010",
       "type": "unknown"
     },
     {
@@ -601242,38 +601287,8 @@
       "type": "unknown"
     },
     {
-      "appId": 4186530,
-      "name": "App 4186530",
-      "type": "unknown"
-    },
-    {
-      "appId": 4186550,
-      "name": "App 4186550",
-      "type": "unknown"
-    },
-    {
-      "appId": 4186560,
-      "name": "App 4186560",
-      "type": "unknown"
-    },
-    {
-      "appId": 4186580,
-      "name": "App 4186580",
-      "type": "unknown"
-    },
-    {
-      "appId": 4186670,
-      "name": "App 4186670",
-      "type": "unknown"
-    },
-    {
       "appId": 4186680,
       "name": "App 4186680",
-      "type": "unknown"
-    },
-    {
-      "appId": 4186690,
-      "name": "App 4186690",
       "type": "unknown"
     },
     {
@@ -601282,13 +601297,8 @@
       "type": "unknown"
     },
     {
-      "appId": 4186710,
-      "name": "App 4186710",
-      "type": "unknown"
-    },
-    {
-      "appId": 4186720,
-      "name": "App 4186720",
+      "appId": 4186730,
+      "name": "App 4186730",
       "type": "unknown"
     }
   ]
