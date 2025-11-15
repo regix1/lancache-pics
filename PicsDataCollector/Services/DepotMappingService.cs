@@ -9,12 +9,14 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, HashSet<uint>> _depotToAppMappings = new();
     private readonly ConcurrentDictionary<uint, uint> _depotOwners = new();
     private readonly ConcurrentDictionary<uint, string> _appNames = new();
+    private readonly ConcurrentDictionary<uint, string> _appTypes = new();
 
     private const int AppBatchSize = 200;
 
     public IReadOnlyDictionary<uint, HashSet<uint>> DepotMappings => _depotToAppMappings;
     public IReadOnlyDictionary<uint, uint> DepotOwners => _depotOwners;
     public IReadOnlyDictionary<uint, string> AppNames => _appNames;
+    public IReadOnlyDictionary<uint, string> AppTypes => _appTypes;
 
     public DepotMappingService(SteamConnectionService connectionService)
     {
@@ -167,6 +169,7 @@ public class DepotMappingService
             var appName = common?["name"]?.AsString() ?? $"App {appId}";
             var appType = common?["type"]?.AsString()?.ToLower() ?? "unknown";
             _appNames[appId] = appName;
+            _appTypes[appId] = appType;
 
             // Extract DLC list for DLC depot discovery
             var listofdlc = common?["listofdlc"];

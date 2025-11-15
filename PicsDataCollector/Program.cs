@@ -80,7 +80,7 @@ class Program
             // Connect to Steam
             await connectionService.ConnectAndLoginAsync();
 
-            // Fetch Steam app list from Web API (v1)
+            // Fetch Steam app list from Web API (v1) - don't save yet
             Console.WriteLine("Fetching Steam app list from Web API...");
             var steamAppListService = new SteamAppListService();
             List<SteamApp>? steamApps = null;
@@ -88,7 +88,6 @@ class Program
             try
             {
                 steamApps = await steamAppListService.GetAllAppsAsync();
-                await persistenceService.SaveSteamAppsToJsonAsync(steamApps);
             }
             catch (Exception ex)
             {
@@ -104,8 +103,34 @@ class Program
             Console.WriteLine($"Found {appIds.Count} app IDs to process");
             Console.WriteLine();
 
-            // Build depot mappings
+            // Build depot mappings (this collects app types from PICS)
             await mappingService.BuildDepotIndexAsync(appIds);
+
+            // Update steam apps with types from PICS
+            if (steamApps != null && steamApps.Count > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Updating Steam apps with types from PICS...");
+                var appTypesFromPics = mappingService.AppTypes;
+                int typesUpdated = 0;
+
+                foreach (var app in steamApps)
+                {
+                    if (appTypesFromPics.TryGetValue(app.AppId, out var type))
+                    {
+                        if (app.Type == "unknown" || string.IsNullOrEmpty(app.Type))
+                        {
+                            app.Type = type;
+                            typesUpdated++;
+                        }
+                    }
+                }
+
+                Console.WriteLine($"Updated {typesUpdated} app types from PICS data");
+
+                // Now save steam_apps.json with updated types
+                await persistenceService.SaveSteamAppsToJsonAsync(steamApps);
+            }
 
             // Save to JSON
             var depotMappingsDict = mappingService.DepotMappings.ToDictionary(
