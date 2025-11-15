@@ -15,6 +15,7 @@ public class SteamConnectionService
 
     public SteamClient Client => _steamClient;
     public CallbackManager CallbackManager => _callbackManager;
+    public SteamUser User => _steamUser;
     public SteamApps Apps => _steamApps;
     public bool IsLoggedOn => _isLoggedOn;
 

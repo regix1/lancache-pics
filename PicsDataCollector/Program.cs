@@ -80,19 +80,33 @@ class Program
             // Connect to Steam
             await connectionService.ConnectAndLoginAsync();
 
-            // Fetch Steam app list from Web API (v1) - don't save yet
-            Console.WriteLine("Fetching Steam app list from Web API...");
-            var steamAppListService = new SteamAppListService();
-            List<SteamApp>? steamApps = null;
+            // Pre-flight check: Verify change number status if doing incremental update
+            if (incrementalOnly && lastChangeNumber > 0)
+            {
+                Console.WriteLine("Pre-flight check: Verifying change number status...");
+                var incrementalService = new IncrementalUpdateService(connectionService, mappingService);
+                var status = await incrementalService.CheckChangeNumberStatusAsync(lastChangeNumber);
 
-            try
-            {
-                steamApps = await steamAppListService.GetAllAppsAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Warning: Failed to fetch Steam app list: {ex.Message}");
-                Console.WriteLine("Continuing with PICS enumeration...");
+                Console.WriteLine($"Change Number Status: {status}");
+
+                if (status.Status == ChangeNumberHealthStatus.Critical)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("⚠️  WARNING: Database is significantly out of date!");
+                    Console.WriteLine($"   You are {status.Delta:N0} changes behind.");
+                    Console.WriteLine($"   Steam may require a FULL update instead of incremental.");
+                    Console.WriteLine();
+                    Console.WriteLine("Recommendation: Run with --full to rebuild from scratch");
+                    Console.WriteLine("                or continue with incremental (may fall back to full)");
+                    Console.WriteLine();
+                }
+                else if (status.Status == ChangeNumberHealthStatus.Warning)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"⚠️  Notice: Database is {status.Delta:N0} changes behind");
+                    Console.WriteLine($"   Incremental update should work, but may take longer");
+                    Console.WriteLine();
+                }
             }
 
             Console.WriteLine();
@@ -106,33 +120,29 @@ class Program
             // Build depot mappings (this collects app types from PICS)
             await mappingService.BuildDepotIndexAsync(appIds);
 
-            // Update steam apps with types from PICS
-            if (steamApps != null && steamApps.Count > 0)
+            // Build steam_apps.json entirely from PICS data
+            Console.WriteLine();
+            Console.WriteLine("Building steam_apps.json from PICS data...");
+            var steamApps = new List<SteamApp>();
+
+            foreach (var kvp in mappingService.AppNames)
             {
-                Console.WriteLine();
-                Console.WriteLine("Updating Steam apps with types from PICS...");
-                var appTypesFromPics = mappingService.AppTypes;
-                int typesUpdated = 0;
+                var appId = kvp.Key;
+                var appName = kvp.Value;
+                var appType = mappingService.AppTypes.TryGetValue(appId, out var type) ? type : "unknown";
 
-                foreach (var app in steamApps)
+                steamApps.Add(new SteamApp
                 {
-                    if (appTypesFromPics.TryGetValue(app.AppId, out var type))
-                    {
-                        if (app.Type == "unknown" || string.IsNullOrEmpty(app.Type))
-                        {
-                            app.Type = type;
-                            typesUpdated++;
-                        }
-                    }
-                }
-
-                Console.WriteLine($"Updated {typesUpdated} app types from PICS data");
-
-                // Now save steam_apps.json with updated types
-                await persistenceService.SaveSteamAppsToJsonAsync(steamApps);
+                    AppId = appId,
+                    Name = appName,
+                    Type = appType
+                });
             }
 
-            // Save to JSON
+            Console.WriteLine($"Built steam_apps.json with {steamApps.Count} apps from PICS");
+            await persistenceService.SaveSteamAppsToJsonAsync(steamApps);
+
+            // Save depot mappings to JSON
             var depotMappingsDict = mappingService.DepotMappings.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value

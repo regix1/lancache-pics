@@ -22,6 +22,11 @@ on:
 permissions:
   contents: write
 
+# Prevent concurrent runs to avoid merge conflicts
+concurrency:
+  group: pics-update
+  cancel-in-progress: false  # Let current run finish, queue the next one
+
 jobs:
   update-pics-data:
     runs-on: ubuntu-latest
@@ -107,7 +112,16 @@ jobs:
                      -m "Automated update via GitHub Actions"
 
           # Pull any remote changes and rebase our commit on top
-          git pull --rebase origin main
+          # With concurrency control, conflicts should be rare, but handle them gracefully
+          if ! git pull --rebase origin main; then
+            echo "⚠️ Rebase conflict detected - aborting and using latest data"
+            git rebase --abort
+            # Fetch latest and reset to it (our incremental run will catch up next time)
+            git fetch origin main
+            git reset --hard origin/main
+            echo "Skipping push - will retry on next scheduled run"
+            exit 0
+          fi
 
           git push
 

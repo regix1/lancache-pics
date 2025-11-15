@@ -13,8 +13,6 @@ public class PicsEnumerationService
 
     public async Task<List<uint>> EnumerateAllAppIdsAsync(bool incrementalOnly, uint lastChangeNumberSeen)
     {
-        var allApps = new HashSet<uint>();
-
         // For full update with no existing data, use Steam Web API
         if (!incrementalOnly && lastChangeNumberSeen == 0)
         {
@@ -24,73 +22,32 @@ public class PicsEnumerationService
             return webApiApps;
         }
 
-        // For incremental updates, use PICS changes
-        uint since = 0;
-
-        // Get current change number
-        var initialJob = _connectionService.Apps.PICSGetChangesSince(0, false, false);
-        var initialChanges = await WaitForCallbackAsync(initialJob);
-        var currentChangeNumber = initialChanges.CurrentChangeNumber;
-
-        // Use saved change number for incremental
+        // For TRUE incremental updates, use proper PICS change tracking
         if (incrementalOnly && lastChangeNumberSeen > 0)
         {
-            since = lastChangeNumberSeen;
-            Console.WriteLine($"Incremental update from change #{since} to #{currentChangeNumber}");
-        }
-        else
-        {
-            // Start from recent point for partial updates
-            since = Math.Max(0, currentChangeNumber - 50000);
-            Console.WriteLine($"Enumerating from change #{since} to #{currentChangeNumber}");
-        }
+            Console.WriteLine($"True incremental update: Only fetching apps changed since #{lastChangeNumberSeen}");
 
-        int consecutiveFullUpdates = 0;
-        const int maxFullUpdates = 3;
-
-        while (since < currentChangeNumber && consecutiveFullUpdates < maxFullUpdates)
-        {
-            var job = _connectionService.Apps.PICSGetChangesSince(since, true, true);
+            var job = _connectionService.Apps.PICSGetChangesSince(lastChangeNumberSeen, sendAppChangelist: true, sendPackageChangelist: false);
             var changes = await WaitForCallbackAsync(job);
 
             if (changes.RequiresFullUpdate || changes.RequiresFullAppUpdate)
             {
-                consecutiveFullUpdates++;
-                Console.WriteLine($"PICS requesting full update, falling back to Web API");
-                // Fall back to Web API
+                Console.WriteLine($"⚠️  PICS requires full update - change delta too large!");
+                Console.WriteLine($"   Falling back to Web API for full app list");
                 return await GetAllAppIdsFromWebApiAsync();
             }
 
-            consecutiveFullUpdates = 0;
+            // Return only the changed apps
+            var changedAppIds = changes.AppChanges.Keys.ToList();
+            Console.WriteLine($"Found {changedAppIds.Count} apps with changes since #{lastChangeNumberSeen}");
+            Console.WriteLine($"Current change number: #{changes.CurrentChangeNumber}");
 
-            foreach (var change in changes.AppChanges)
-            {
-                allApps.Add(change.Key);
-            }
-
-            var last = changes.LastChangeNumber;
-            if (last <= since)
-            {
-                if (changes.AppChanges.Count == 0)
-                {
-                    since += 500;
-                    await Task.Delay(100);
-                    continue;
-                }
-                last = (uint)Math.Min((long)currentChangeNumber, (long)since + Math.Max(1, changes.AppChanges.Count));
-            }
-
-            since = last;
-
-            if (allApps.Count >= 500000)
-                break;
-
-            await Task.Delay(100);
+            return changedAppIds;
         }
 
-        var list = allApps.ToList();
-        list.Sort();
-        return list;
+        // For partial/fallback enumeration (shouldn't normally hit this)
+        Console.WriteLine("Partial enumeration mode (fallback) - using Web API");
+        return await GetAllAppIdsFromWebApiAsync();
     }
 
     private async Task<List<uint>> GetAllAppIdsFromWebApiAsync()
