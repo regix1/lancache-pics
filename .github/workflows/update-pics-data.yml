@@ -83,8 +83,8 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          # Add both JSON files to staging to check if new or modified
-          git add output/pics_depot_mappings.json output/steam_apps.json
+          # Add JSON file to staging to check if new or modified
+          git add output/pics_depot_mappings.json
 
           # Check if there are staged changes
           if git diff --cached --quiet; then
@@ -130,11 +130,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Get metadata from JSON files
+          # Get metadata from JSON file
           TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' output/pics_depot_mappings.json)
           LAST_UPDATED=$(jq -r '.metadata.lastUpdated' output/pics_depot_mappings.json)
           LAST_CHANGE=$(jq -r '.metadata.lastChangeNumber' output/pics_depot_mappings.json)
-          TOTAL_APPS=$(jq -r '.metadata.totalApps // "N/A"' output/steam_apps.json)
 
           # Create release tag with timestamp
           RELEASE_TAG="v$(date +'%Y.%m.%d-%H%M%S')"
@@ -142,33 +141,19 @@ jobs:
 
           # Create release notes
           cat << EOF > release_notes.md
-          ## Steam Data Collection Update
+          ## Steam PICS Data Collection Update
 
-          ### Depot Mappings
+          ### PICS Depot Mappings
           - **Total Mappings:** $TOTAL_MAPPINGS
           - **Last Change Number:** $LAST_CHANGE
-
-          ### Steam Apps
-          - **Total Apps:** $TOTAL_APPS apps
-          - **Types:** games, DLC, software, videos, hardware
-
-          ### Last Updated
-          $LAST_UPDATED
+          - **Last Updated:** $LAST_UPDATED
 
           ---
 
           ## Download
 
-          ### Complete Steam App List
-          All Steam applications with names and types.
-
-          **Direct URL:**
-          \`\`\`
-          https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/steam_apps.json
-          \`\`\`
-
-          ### Depot-to-App Mappings
-          Detailed depot ownership and relationships via PICS.
+          ### PICS Depot-to-App Mappings
+          Complete depot mappings with app information collected via PICS protocol.
 
           **Direct URL:**
           \`\`\`
@@ -179,31 +164,34 @@ jobs:
 
           ## What's Included
 
-          **steam_apps.json** - Complete Steam application database
-          - Fetched via IStoreService/GetAppList/v1
-          - Includes all games, DLC, software, videos, and hardware
-          - ~205,000+ applications
-
-          **pics_depot_mappings.json** - Depot-to-app mappings
+          **pics_depot_mappings.json** - Complete depot-to-app mappings via PICS
           - Collected via SteamKit2 PICS protocol
+          - Includes app names, types, and header image URLs
           - Tracks depot ownership and app relationships
           - Essential for lancache and content distribution
+          - ~230,000+ depot mappings
+
+          ### Data Structure
+          Each depot mapping includes:
+          - App IDs and names
+          - App types (game, dlc, demo, etc.)
+          - Header image URLs
+          - Depot owner information
+          - Discovery metadata
 
           ## Usage
 
           \`\`\`bash
-          # Download both files
-          curl -LO https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/steam_apps.json
+          # Download the PICS data file
           curl -LO https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG/pics_depot_mappings.json
           \`\`\`
           EOF
 
-          # Create release and upload both JSON files
+          # Create release and upload JSON file
           gh release create "$RELEASE_TAG" \
             --title "$RELEASE_NAME" \
             --notes-file release_notes.md \
-            output/pics_depot_mappings.json \
-            output/steam_apps.json
+            output/pics_depot_mappings.json
 
           echo "Created release: $RELEASE_TAG"
 
