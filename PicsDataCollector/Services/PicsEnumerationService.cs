@@ -6,6 +6,11 @@ public class PicsEnumerationService
 {
     private readonly SteamConnectionService _connectionService;
 
+    /// <summary>
+    /// The API version used for the last enumeration (v1, v2, or PICS)
+    /// </summary>
+    public string LastApiVersionUsed { get; private set; } = "PICS";
+
     public PicsEnumerationService(SteamConnectionService connectionService)
     {
         _connectionService = connectionService;
@@ -42,6 +47,7 @@ public class PicsEnumerationService
             Console.WriteLine($"Found {changedAppIds.Count} apps with changes since #{lastChangeNumberSeen}");
             Console.WriteLine($"Current change number: #{changes.CurrentChangeNumber}");
 
+            LastApiVersionUsed = "PICS";
             return changedAppIds;
         }
 
@@ -91,6 +97,7 @@ public class PicsEnumerationService
             }
 
             ids.Sort();
+            LastApiVersionUsed = "v2";
             Console.WriteLine($"Successfully retrieved {ids.Count} apps from ISteamApps/GetAppList/v2");
             return ids;
         }
@@ -164,6 +171,7 @@ public class PicsEnumerationService
 
             var ids = allIds.ToList();
             ids.Sort();
+            LastApiVersionUsed = "v1";
             Console.WriteLine($"Successfully retrieved {ids.Count} apps from IStoreService/GetAppList/v1");
             return ids;
         }

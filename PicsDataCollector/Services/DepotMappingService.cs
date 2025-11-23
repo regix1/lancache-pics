@@ -23,7 +23,7 @@ public class DepotMappingService
         _connectionService = connectionService;
     }
 
-    public void LoadExistingMappings(Dictionary<uint, HashSet<uint>> mappings, Dictionary<uint, string> names, Dictionary<uint, uint>? depotOwners = null)
+    public void LoadExistingMappings(Dictionary<uint, HashSet<uint>> mappings, Dictionary<uint, string> names, Dictionary<uint, uint>? depotOwners = null, Dictionary<uint, string>? types = null)
     {
         foreach (var (depotId, appIds) in mappings)
         {
@@ -44,6 +44,14 @@ public class DepotMappingService
             foreach (var (depotId, ownerId) in depotOwners)
             {
                 _depotOwners.TryAdd(depotId, ownerId);
+            }
+        }
+
+        if (types != null)
+        {
+            foreach (var (appId, type) in types)
+            {
+                _appTypes.TryAdd(appId, type);
             }
         }
     }

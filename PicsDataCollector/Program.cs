@@ -38,8 +38,8 @@ class Program
 
                 if (data != null)
                 {
-                    var (depotMappings, appNames, depotOwners) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners);
+                    var (depotMappings, appNames, depotOwners, appTypes) = persistenceService.ExtractMappingsFromData(data);
+                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes);
                 }
             }
             else if (fullUpdate)
@@ -54,8 +54,8 @@ class Program
                 {
                     Console.WriteLine("Mode: Incremental update (auto-detected)");
                     lastChangeNumber = changeNumber;
-                    var (depotMappings, appNames, depotOwners) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners);
+                    var (depotMappings, appNames, depotOwners, appTypes) = persistenceService.ExtractMappingsFromData(data);
+                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes);
                     incrementalOnly = true;
                 }
                 else
@@ -120,29 +120,7 @@ class Program
             // Build depot mappings (this collects app types from PICS)
             await mappingService.BuildDepotIndexAsync(appIds);
 
-            // Build steam_apps.json entirely from PICS data
-            Console.WriteLine();
-            Console.WriteLine("Building steam_apps.json from PICS data...");
-            var steamApps = new List<SteamApp>();
-
-            foreach (var kvp in mappingService.AppNames)
-            {
-                var appId = kvp.Key;
-                var appName = kvp.Value;
-                var appType = mappingService.AppTypes.TryGetValue(appId, out var type) ? type : "unknown";
-
-                steamApps.Add(new SteamApp
-                {
-                    AppId = appId,
-                    Name = appName,
-                    Type = appType
-                });
-            }
-
-            Console.WriteLine($"Built steam_apps.json with {steamApps.Count} apps from PICS");
-            await persistenceService.SaveSteamAppsToJsonAsync(steamApps);
-
-            // Save depot mappings to JSON
+            // Save depot mappings to JSON (now includes app types and header images)
             var depotMappingsDict = mappingService.DepotMappings.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value
@@ -159,7 +137,17 @@ class Program
             // Get the final change number from enumeration service
             var finalChangeNumber = await GetCurrentChangeNumberAsync(connectionService);
 
-            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber, depotOwnersDict);
+            // Convert AppTypes to Dictionary for persistence
+            var appTypesDict = mappingService.AppTypes.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value
+            );
+
+            // Get the API version used for enumeration
+            var apiVersion = enumerationService.LastApiVersionUsed;
+            Console.WriteLine($"API Version Used: {apiVersion}");
+
+            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber, depotOwnersDict, appTypesDict, apiVersion);
 
             Console.WriteLine();
             Console.WriteLine("Collection complete!");

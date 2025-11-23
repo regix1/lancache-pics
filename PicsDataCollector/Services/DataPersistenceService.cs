@@ -6,7 +6,6 @@ namespace PicsDataCollector.Services;
 public class DataPersistenceService
 {
     private readonly string _outputFilePath;
-    private readonly string _steamAppsFilePath;
 
     public DataPersistenceService()
     {
@@ -15,7 +14,6 @@ public class DataPersistenceService
         var projectDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", ".."));
         var outputDir = Path.Combine(projectDir, "output");
         _outputFilePath = Path.Combine(outputDir, "pics_depot_mappings.json");
-        _steamAppsFilePath = Path.Combine(outputDir, "steam_apps.json");
     }
 
     public async Task<(PicsJsonData? data, uint lastChangeNumber)> LoadExistingDataAsync()
@@ -55,7 +53,9 @@ public class DataPersistenceService
         Dictionary<uint, HashSet<uint>> depotMappings,
         Dictionary<uint, string> appNames,
         uint lastChangeNumber,
-        Dictionary<uint, uint>? depotOwners = null)
+        Dictionary<uint, uint>? depotOwners = null,
+        Dictionary<uint, string>? appTypes = null,
+        string apiVersion = "PICS")
     {
         Console.WriteLine();
         Console.WriteLine("Saving to JSON...");
@@ -97,12 +97,25 @@ public class DataPersistenceService
                 appNames.TryGetValue(appId, out var name) ? name : $"App {appId}"
             ).ToList();
 
+            var appTypesList = appIdsList.Select(appId =>
+                appTypes != null && appTypes.TryGetValue(appId, out var type) ? type : "unknown"
+            ).ToList();
+
+            var appHeaderImagesList = appIdsList.Select(appId =>
+                $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/header.jpg"
+            ).ToList();
+
+            // Build source string with API version
+            var source = apiVersion == "PICS" ? "SteamKit2-PICS" : $"SteamKit2-PICS-{apiVersion}";
+
             picsData.DepotMappings[depotId.ToString()] = new PicsDepotMapping
             {
                 OwnerId = ownerId,
                 AppIds = appIdsList,
                 AppNames = appNamesList,
-                Source = "SteamKit2-PICS",
+                AppTypes = appTypesList,
+                AppHeaderImages = appHeaderImagesList,
+                Source = source,
                 DiscoveredAt = DateTime.UtcNow
             };
         }
@@ -128,15 +141,16 @@ public class DataPersistenceService
         Console.WriteLine($"Total mappings: {picsData.Metadata.TotalMappings}");
     }
 
-    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners) ExtractMappingsFromData(PicsJsonData? data)
+    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners, Dictionary<uint, string> appTypes) ExtractMappingsFromData(PicsJsonData? data)
     {
         var depotMappings = new Dictionary<uint, HashSet<uint>>();
         var appNames = new Dictionary<uint, string>();
         var depotOwners = new Dictionary<uint, uint>();
+        var appTypes = new Dictionary<uint, string>();
 
         if (data?.DepotMappings == null)
         {
-            return (depotMappings, appNames, depotOwners);
+            return (depotMappings, appNames, depotOwners, appTypes);
         }
 
         foreach (var (depotIdStr, mapping) in data.DepotMappings)
@@ -172,59 +186,17 @@ public class DataPersistenceService
                     appNames.TryAdd(mapping.AppIds[i], mapping.AppNames[i]);
                 }
             }
-        }
 
-        return (depotMappings, appNames, depotOwners);
-    }
-
-    public async Task SaveSteamAppsToJsonAsync(List<SteamApp> steamApps)
-    {
-        Console.WriteLine();
-        Console.WriteLine("Saving Steam apps to JSON...");
-
-        var steamAppsData = new
-        {
-            Metadata = new
+            // Extract app types if available
+            if (mapping.AppTypes != null && mapping.AppIds != null)
             {
-                LastUpdated = DateTime.UtcNow,
-                TotalApps = steamApps.Count,
-                Version = "1.0",
-                Source = "IStoreService/GetAppList/v1"
-            },
-            Apps = steamApps.OrderBy(a => a.AppId).Select(a => new
-            {
-                AppId = a.AppId,
-                Name = a.Name,
-                Type = a.Type
-            }).ToList()
-        };
-
-        var jsonOptions = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
-        var jsonContent = JsonSerializer.Serialize(steamAppsData, jsonOptions);
-
-        // Ensure directory exists
-        var directory = Path.GetDirectoryName(_steamAppsFilePath);
-        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-        {
-            Directory.CreateDirectory(directory);
+                for (int i = 0; i < Math.Min(mapping.AppIds.Count, mapping.AppTypes.Count); i++)
+                {
+                    appTypes.TryAdd(mapping.AppIds[i], mapping.AppTypes[i]);
+                }
+            }
         }
 
-        await File.WriteAllTextAsync(_steamAppsFilePath, jsonContent);
-
-        Console.WriteLine($"Saved to {_steamAppsFilePath}");
-        Console.WriteLine($"Total apps: {steamApps.Count}");
-
-        // Print stats by type
-        var statsByType = steamApps.GroupBy(a => a.Type).OrderBy(g => g.Key);
-        Console.WriteLine("\nApps by type:");
-        foreach (var group in statsByType)
-        {
-            Console.WriteLine($"  {group.Key}: {group.Count()}");
-        }
+        return (depotMappings, appNames, depotOwners, appTypes);
     }
 }
