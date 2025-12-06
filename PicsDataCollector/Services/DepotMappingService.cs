@@ -10,7 +10,8 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, uint> _depotOwners = new();
     private readonly ConcurrentDictionary<uint, string> _appNames = new();
     private readonly ConcurrentDictionary<uint, string> _appTypes = new();
-    private readonly ConcurrentDictionary<uint, string> _depotNames = new();  // Depot names from PICS
+    private readonly ConcurrentDictionary<uint, string> _depotNames = new();
+    private readonly HashSet<uint> _scannedApps = new();  // Track scanned apps to avoid rescanning
 
     private const int AppBatchSize = 200;
 
@@ -169,6 +170,7 @@ public class DepotMappingService
         }
 
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
+        Console.WriteLine($"Found {_depotNames.Count} depots with names");
     }
 
     private List<uint> ProcessAppDepots(SteamApps.PICSProductInfoCallback.PICSProductInfo app)
@@ -243,14 +245,19 @@ public class DepotMappingService
                 if (!string.IsNullOrEmpty(depotName))
                 {
                     _depotNames.TryAdd(depotId, depotName);
+                    Console.WriteLine($"  Found depot name: {depotId} = '{depotName}'");
                 }
 
-                // Store owner app name
-                if (ownerFromPics.HasValue && !_appNames.ContainsKey(ownerAppId))
+                // Queue owner app for scanning if we don't have its name yet
+                // This handles redistributables/launchers (e.g., EA App, Ubisoft Connect, Rockstar Launcher)
+                if (ownerFromPics.HasValue && !_appNames.ContainsKey(ownerAppId) && !_scannedApps.Contains(ownerAppId))
                 {
-                    _appNames[ownerAppId] = $"App {ownerAppId}";
+                    dlcAppIdsToScan.Add(ownerAppId);
+                    _appNames[ownerAppId] = $"App {ownerAppId}"; // Temporary placeholder until scanned
                 }
             }
+
+            _scannedApps.Add(appId);
         }
         catch (Exception ex)
         {
