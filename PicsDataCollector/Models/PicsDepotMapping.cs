@@ -3,7 +3,6 @@ namespace PicsDataCollector.Models;
 public class PicsDepotMapping
 {
     public uint? OwnerId { get; set; }  // The app that owns this depot (from depotfromapp PICS field)
-    public string? DepotName { get; set; }  // Name of the depot from PICS (e.g., "EA App Installer", "Ubisoft Connect PC Client Content")
     public List<uint>? AppIds { get; set; }
     public List<string>? AppNames { get; set; }
     public List<string>? AppTypes { get; set; }  // App types (game, dlc, demo, etc.)

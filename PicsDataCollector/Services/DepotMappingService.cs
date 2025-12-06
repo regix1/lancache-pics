@@ -10,7 +10,6 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, uint> _depotOwners = new();
     private readonly ConcurrentDictionary<uint, string> _appNames = new();
     private readonly ConcurrentDictionary<uint, string> _appTypes = new();
-    private readonly ConcurrentDictionary<uint, string> _depotNames = new();
     private readonly HashSet<uint> _scannedApps = new();  // Track scanned apps to avoid rescanning
 
     private const int AppBatchSize = 200;
@@ -19,14 +18,13 @@ public class DepotMappingService
     public IReadOnlyDictionary<uint, uint> DepotOwners => _depotOwners;
     public IReadOnlyDictionary<uint, string> AppNames => _appNames;
     public IReadOnlyDictionary<uint, string> AppTypes => _appTypes;
-    public IReadOnlyDictionary<uint, string> DepotNames => _depotNames;
 
     public DepotMappingService(SteamConnectionService connectionService)
     {
         _connectionService = connectionService;
     }
 
-    public void LoadExistingMappings(Dictionary<uint, HashSet<uint>> mappings, Dictionary<uint, string> names, Dictionary<uint, uint>? depotOwners = null, Dictionary<uint, string>? types = null, Dictionary<uint, string>? depotNames = null)
+    public void LoadExistingMappings(Dictionary<uint, HashSet<uint>> mappings, Dictionary<uint, string> names, Dictionary<uint, uint>? depotOwners = null, Dictionary<uint, string>? types = null)
     {
         foreach (var (depotId, appIds) in mappings)
         {
@@ -55,14 +53,6 @@ public class DepotMappingService
             foreach (var (appId, type) in types)
             {
                 _appTypes.TryAdd(appId, type);
-            }
-        }
-
-        if (depotNames != null)
-        {
-            foreach (var (depotId, name) in depotNames)
-            {
-                _depotNames.TryAdd(depotId, name);
             }
         }
     }
@@ -170,7 +160,6 @@ public class DepotMappingService
         }
 
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
-        Console.WriteLine($"Found {_depotNames.Count} depots with names");
     }
 
     private List<uint> ProcessAppDepots(SteamApps.PICSProductInfoCallback.PICSProductInfo app)
@@ -239,14 +228,6 @@ public class DepotMappingService
 
                 // Store the owner app for this depot
                 _depotOwners.TryAdd(depotId, ownerAppId);
-
-                // Extract and store depot name from PICS (e.g., "Ubisoft Connect PC Client Content")
-                var depotName = child["name"]?.AsString();
-                if (!string.IsNullOrEmpty(depotName))
-                {
-                    _depotNames.TryAdd(depotId, depotName);
-                    Console.WriteLine($"  Found depot name: {depotId} = '{depotName}'");
-                }
 
                 // Queue owner app for scanning if we don't have its name yet
                 // This handles redistributables/launchers (e.g., EA App, Ubisoft Connect, Rockstar Launcher)

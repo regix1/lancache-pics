@@ -55,7 +55,6 @@ public class DataPersistenceService
         uint lastChangeNumber,
         Dictionary<uint, uint>? depotOwners = null,
         Dictionary<uint, string>? appTypes = null,
-        Dictionary<uint, string>? depotNames = null,
         string apiVersion = "PICS")
     {
         Console.WriteLine();
@@ -106,17 +105,12 @@ public class DataPersistenceService
                 $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/header.jpg"
             ).ToList();
 
-            // Get depot name if available
-            string? depotName = null;
-            depotNames?.TryGetValue(depotId, out depotName);
-
             // Build source string with API version
             var source = apiVersion == "PICS" ? "SteamKit2-PICS" : $"SteamKit2-PICS-{apiVersion}";
 
             picsData.DepotMappings[depotId.ToString()] = new PicsDepotMapping
             {
                 OwnerId = ownerId,
-                DepotName = depotName,
                 AppIds = appIdsList,
                 AppNames = appNamesList,
                 AppTypes = appTypesList,
@@ -147,17 +141,16 @@ public class DataPersistenceService
         Console.WriteLine($"Total mappings: {picsData.Metadata.TotalMappings}");
     }
 
-    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners, Dictionary<uint, string> appTypes, Dictionary<uint, string> depotNames) ExtractMappingsFromData(PicsJsonData? data)
+    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners, Dictionary<uint, string> appTypes) ExtractMappingsFromData(PicsJsonData? data)
     {
         var depotMappings = new Dictionary<uint, HashSet<uint>>();
         var appNames = new Dictionary<uint, string>();
         var depotOwners = new Dictionary<uint, uint>();
         var appTypes = new Dictionary<uint, string>();
-        var depotNames = new Dictionary<uint, string>();
 
         if (data?.DepotMappings == null)
         {
-            return (depotMappings, appNames, depotOwners, appTypes, depotNames);
+            return (depotMappings, appNames, depotOwners, appTypes);
         }
 
         foreach (var (depotIdStr, mapping) in data.DepotMappings)
@@ -186,12 +179,6 @@ public class DataPersistenceService
                 depotOwners[depotId] = mapping.AppIds[0];
             }
 
-            // Extract depot name if available
-            if (!string.IsNullOrEmpty(mapping.DepotName))
-            {
-                depotNames[depotId] = mapping.DepotName;
-            }
-
             if (mapping.AppNames != null && mapping.AppIds != null)
             {
                 for (int i = 0; i < Math.Min(mapping.AppIds.Count, mapping.AppNames.Count); i++)
@@ -210,6 +197,6 @@ public class DataPersistenceService
             }
         }
 
-        return (depotMappings, appNames, depotOwners, appTypes, depotNames);
+        return (depotMappings, appNames, depotOwners, appTypes);
     }
 }
