@@ -197,7 +197,7 @@ public class DepotMappingService
                 }
             }
 
-            if (depots == KeyValue.Invalid)
+            if (depots == KeyValue.Invalid || depots.Children == null)
             {
                 return dlcAppIdsToScan;
             }
