@@ -12,7 +12,7 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, string> _appTypes = new();
     private readonly HashSet<uint> _scannedApps = new();  // Track scanned apps to avoid rescanning
 
-    private const int AppBatchSize = 200;
+    private const int AppBatchSize = 500;
 
     public IReadOnlyDictionary<uint, HashSet<uint>> DepotMappings => _depotToAppMappings;
     public IReadOnlyDictionary<uint, uint> DepotOwners => _depotOwners;
@@ -59,107 +59,120 @@ public class DepotMappingService
 
     public async Task BuildDepotIndexAsync(List<uint> appIds)
     {
+        var allAppIds = new HashSet<uint>(appIds); // For fast DLC dedup
         var batches = appIds.Chunk(AppBatchSize).ToList();
         int processedBatches = 0;
+        var semaphore = new SemaphoreSlim(3, 3); // Process 3 batches concurrently
 
-        Console.WriteLine($"Processing {batches.Count} batches of apps...");
+        Console.WriteLine($"Processing {batches.Count} batches of apps (concurrency: 3)...");
 
-        foreach (var batch in batches)
+        var tasks = batches.Select(async (batch, index) =>
         {
+            await semaphore.WaitAsync();
             try
             {
-                // Get access tokens
-                var tokensJob = _connectionService.Apps.PICSGetAccessTokens(batch, Enumerable.Empty<uint>());
-                var tokens = await WaitForCallbackAsync(tokensJob);
-
-                // Prepare product info requests
-                var appRequests = new List<SteamApps.PICSRequest>();
-                foreach (var appId in batch)
+                await ProcessBatchAsync(batch, allAppIds, index + 1);
+                var completed = Interlocked.Increment(ref processedBatches);
+                if (completed % 10 == 0)
                 {
-                    var request = new SteamApps.PICSRequest(appId);
-                    if (tokens.AppTokens.TryGetValue(appId, out var token))
-                    {
-                        request.AccessToken = token;
-                    }
-                    appRequests.Add(request);
+                    var percent = (completed * 100.0 / batches.Count);
+                    Console.WriteLine($"Progress: {completed}/{batches.Count} batches ({percent:F1}%) - {_depotToAppMappings.Count} depot mappings found");
                 }
-
-                // Get product info
-                var productJob = _connectionService.Apps.PICSGetProductInfo(appRequests, Enumerable.Empty<SteamApps.PICSRequest>());
-                var productCallbacks = await WaitForAllProductInfoAsync(productJob);
-
-                // Process apps and collect DLC apps to scan
-                var dlcAppsToScan = new List<uint>();
-                foreach (var cb in productCallbacks)
-                {
-                    foreach (var app in cb.Apps.Values)
-                    {
-                        var dlcList = ProcessAppDepots(app);
-                        dlcAppsToScan.AddRange(dlcList);
-                    }
-                }
-
-                // Process DLC apps found in this batch
-                if (dlcAppsToScan.Count > 0)
-                {
-                    Console.WriteLine($"  Found {dlcAppsToScan.Count} DLC apps to scan in batch {processedBatches + 1}");
-
-                    // Process DLC apps in smaller sub-batches
-                    var dlcBatches = dlcAppsToScan.Distinct().Chunk(50).ToList();
-                    foreach (var dlcBatch in dlcBatches)
-                    {
-                        try
-                        {
-                            var dlcTokensJob = _connectionService.Apps.PICSGetAccessTokens(dlcBatch, Enumerable.Empty<uint>());
-                            var dlcTokens = await WaitForCallbackAsync(dlcTokensJob);
-
-                            var dlcAppRequests = new List<SteamApps.PICSRequest>();
-                            foreach (var dlcAppId in dlcBatch)
-                            {
-                                var request = new SteamApps.PICSRequest(dlcAppId);
-                                if (dlcTokens.AppTokens.TryGetValue(dlcAppId, out var token))
-                                {
-                                    request.AccessToken = token;
-                                }
-                                dlcAppRequests.Add(request);
-                            }
-
-                            var dlcProductJob = _connectionService.Apps.PICSGetProductInfo(dlcAppRequests, Enumerable.Empty<SteamApps.PICSRequest>());
-                            var dlcProductCallbacks = await WaitForAllProductInfoAsync(dlcProductJob);
-
-                            foreach (var dlcCb in dlcProductCallbacks)
-                            {
-                                foreach (var dlcApp in dlcCb.Apps.Values)
-                                {
-                                    ProcessAppDepots(dlcApp);  // Don't need to scan DLC's DLCs recursively
-                                }
-                            }
-
-                            await Task.Delay(100);  // Small delay between DLC batches
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"  Warning: Failed to process DLC batch: {ex.Message}");
-                        }
-                    }
-                }
-
-                processedBatches++;
-                if (processedBatches % 10 == 0)
-                {
-                    var percent = (processedBatches * 100.0 / batches.Count);
-                    Console.WriteLine($"Progress: {processedBatches}/{batches.Count} batches ({percent:F1}%) - {_depotToAppMappings.Count} depot mappings found");
-                }
-
-                await Task.Delay(150); // Rate limiting
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Failed to process batch {processedBatches + 1}: {ex.Message}");
+                Console.WriteLine($"Warning: Failed to process batch {index + 1}: {ex.Message}");
+            }
+            finally
+            {
+                semaphore.Release();
+                await Task.Delay(50); // Small rate limit
+            }
+        });
+
+        await Task.WhenAll(tasks);
+
+        Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
+    }
+
+    private async Task ProcessBatchAsync(uint[] batch, HashSet<uint> allAppIds, int batchNumber)
+    {
+        // Get access tokens
+        var tokensJob = _connectionService.Apps.PICSGetAccessTokens(batch, Enumerable.Empty<uint>());
+        var tokens = await WaitForCallbackAsync(tokensJob);
+
+        // Prepare product info requests
+        var appRequests = new List<SteamApps.PICSRequest>();
+        foreach (var appId in batch)
+        {
+            var request = new SteamApps.PICSRequest(appId);
+            if (tokens.AppTokens.TryGetValue(appId, out var token))
+            {
+                request.AccessToken = token;
+            }
+            appRequests.Add(request);
+        }
+
+        // Get product info
+        var productJob = _connectionService.Apps.PICSGetProductInfo(appRequests, Enumerable.Empty<SteamApps.PICSRequest>());
+        var productCallbacks = await WaitForAllProductInfoAsync(productJob);
+
+        // Process apps and collect DLC apps to scan
+        var dlcAppsToScan = new List<uint>();
+        foreach (var cb in productCallbacks)
+        {
+            foreach (var app in cb.Apps.Values)
+            {
+                var dlcList = ProcessAppDepots(app);
+                // Only scan DLC apps that aren't already in the main processing list
+                dlcAppsToScan.AddRange(dlcList.Where(dlcId => !allAppIds.Contains(dlcId)));
             }
         }
 
-        Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
+        // Process DLC apps found in this batch
+        if (dlcAppsToScan.Count > 0)
+        {
+            Console.WriteLine($"  Found {dlcAppsToScan.Count} DLC apps to scan in batch {batchNumber}");
+
+            // Process DLC apps in sub-batches
+            var dlcBatches = dlcAppsToScan.Distinct().Chunk(100).ToList();
+            foreach (var dlcBatch in dlcBatches)
+            {
+                try
+                {
+                    var dlcTokensJob = _connectionService.Apps.PICSGetAccessTokens(dlcBatch, Enumerable.Empty<uint>());
+                    var dlcTokens = await WaitForCallbackAsync(dlcTokensJob);
+
+                    var dlcAppRequests = new List<SteamApps.PICSRequest>();
+                    foreach (var dlcAppId in dlcBatch)
+                    {
+                        var request = new SteamApps.PICSRequest(dlcAppId);
+                        if (dlcTokens.AppTokens.TryGetValue(dlcAppId, out var token))
+                        {
+                            request.AccessToken = token;
+                        }
+                        dlcAppRequests.Add(request);
+                    }
+
+                    var dlcProductJob = _connectionService.Apps.PICSGetProductInfo(dlcAppRequests, Enumerable.Empty<SteamApps.PICSRequest>());
+                    var dlcProductCallbacks = await WaitForAllProductInfoAsync(dlcProductJob);
+
+                    foreach (var dlcCb in dlcProductCallbacks)
+                    {
+                        foreach (var dlcApp in dlcCb.Apps.Values)
+                        {
+                            ProcessAppDepots(dlcApp);
+                        }
+                    }
+
+                    await Task.Delay(25); // Small delay between DLC batches
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"  Warning: Failed to process DLC batch: {ex.Message}");
+                }
+            }
+        }
     }
 
     private List<uint> ProcessAppDepots(SteamApps.PICSProductInfoCallback.PICSProductInfo app)

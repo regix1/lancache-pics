@@ -78,7 +78,7 @@ jobs:
         env:
           STEAM_API_KEY: ${{ secrets.STEAM_KEY }}
         run: dotnet run --project PicsDataCollector/PicsDataCollector.csproj --configuration Release -- --full
-        timeout-minutes: 120
+        timeout-minutes: 240
 
       - name: Check for changes
         id: check_changes
