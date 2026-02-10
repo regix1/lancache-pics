@@ -95,6 +95,104 @@ public class DepotMappingService
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
     }
 
+    public async Task<int> ResolveOrphanDepotsAsync(List<uint> orphanDepotIds, CancellationToken ct)
+    {
+        // Filter out depot IDs that are already resolved
+        var unresolvedDepots = orphanDepotIds
+            .Where(depotId => !_depotOwners.ContainsKey(depotId) && !_depotToAppMappings.ContainsKey(depotId))
+            .Distinct()
+            .ToList();
+
+        if (unresolvedDepots.Count == 0)
+        {
+            Console.WriteLine("No unresolved orphan depots to process.");
+            return 0;
+        }
+
+        Console.WriteLine($"Attempting to resolve {unresolvedDepots.Count} orphan depots...");
+
+        // Generate candidate parent app IDs for each orphan depot
+        var candidateAppIds = new HashSet<uint>();
+        foreach (var depotId in unresolvedDepots)
+        {
+            // Common Steam patterns: depot is often appId+1, same as appId, or appId+2
+            var candidates = new uint[] { depotId - 1, depotId, depotId - 2 };
+            foreach (var candidate in candidates)
+            {
+                if (candidate > 0 && !_scannedApps.Contains(candidate))
+                {
+                    candidateAppIds.Add(candidate);
+                }
+            }
+        }
+
+        if (candidateAppIds.Count == 0)
+        {
+            Console.WriteLine("All candidate apps already scanned, no new apps to query.");
+            return 0;
+        }
+
+        Console.WriteLine($"Querying PICS for {candidateAppIds.Count} candidate parent apps...");
+
+        var resolvedBefore = unresolvedDepots.Count(d => _depotOwners.ContainsKey(d) || _depotToAppMappings.ContainsKey(d));
+        var batches = candidateAppIds.Chunk(AppBatchSize).ToList();
+        int processedBatches = 0;
+
+        foreach (var batch in batches)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            try
+            {
+                // Get access tokens
+                var tokensJob = _connectionService.Apps.PICSGetAccessTokens(batch, Enumerable.Empty<uint>());
+                var tokens = await WaitForCallbackAsync(tokensJob);
+
+                // Prepare product info requests
+                var appRequests = new List<SteamApps.PICSRequest>();
+                foreach (var appId in batch)
+                {
+                    var request = new SteamApps.PICSRequest(appId);
+                    if (tokens.AppTokens.TryGetValue(appId, out var token))
+                    {
+                        request.AccessToken = token;
+                    }
+                    appRequests.Add(request);
+                }
+
+                // Get product info
+                var productJob = _connectionService.Apps.PICSGetProductInfo(appRequests, Enumerable.Empty<SteamApps.PICSRequest>());
+                var productCallbacks = await WaitForAllProductInfoAsync(productJob);
+
+                foreach (var cb in productCallbacks)
+                {
+                    foreach (var app in cb.Apps.Values)
+                    {
+                        ProcessAppDepots(app);
+                    }
+                }
+
+                processedBatches++;
+                Console.WriteLine($"  Orphan resolution batch {processedBatches}/{batches.Count} complete");
+                await Task.Delay(50, ct); // Small rate limit
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"  Warning: Failed to process orphan resolution batch {processedBatches + 1}: {ex.Message}");
+            }
+        }
+
+        var resolvedAfter = unresolvedDepots.Count(d => _depotOwners.ContainsKey(d) || _depotToAppMappings.ContainsKey(d));
+        var newlyResolved = resolvedAfter - resolvedBefore;
+
+        Console.WriteLine($"Orphan resolution complete: {newlyResolved}/{unresolvedDepots.Count} depots resolved");
+        return newlyResolved;
+    }
+
     private async Task ProcessBatchAsync(uint[] batch, HashSet<uint> allAppIds, int batchNumber)
     {
         // Get access tokens
