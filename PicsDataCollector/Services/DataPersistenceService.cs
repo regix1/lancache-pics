@@ -105,7 +105,7 @@ public class DataPersistenceService
             var appHeaderImagesList = appIdsList.Select(appId =>
                 appHeaderImages != null && appHeaderImages.TryGetValue(appId, out var picsUrl)
                     ? picsUrl
-                    : $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/header.jpg"
+                    : $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appId}/header.jpg"
             ).ToList();
 
             // Build source string with API version

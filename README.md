@@ -1,69 +1,30 @@
-# Steam PICS Data Collection
+# Steam PICS Depot Mappings
 
-Automated collection of Steam application data and depot-to-app mappings using Steam Web API and the Product Information and Content System (PICS). Updated every hour via GitHub Actions.
+Automated collection of Steam depot-to-app mappings using the Product Information and Content System (PICS) via SteamKit2. Updated hourly via GitHub Actions and published to [Releases](https://github.com/regix1/lancache-pics/releases/latest).
 
 ## What is this?
 
-Steam organizes game content into "depots" (content packages) and "apps" (games/applications). This project maintains two comprehensive datasets:
+Steam organizes game content into "depots" (content packages) and "apps" (games/applications). This project maintains a comprehensive depot-to-app mapping dataset including app names, types, header images, and ownership data. It's built for lancache management tools, content distribution analysis, and Steam platform research.
 
-1. **Complete Steam App List** - All Steam applications (games, DLC, software, videos, hardware)
-2. **Depot-to-App Mappings** - Detailed depot ownership and relationships
+## Download
 
-These datasets are essential for lancache management tools, content distribution analysis, game update tracking, and Steam platform research.
-
-## Data Files
-
-### 1. Steam Apps (`steam_apps.json`)
-
-Complete list of all Steam applications with metadata.
-
-**Download:**
 ```bash
-curl -LO https://github.com/regix1/lancache-pics/releases/latest/download/steam_apps.json
+curl -LO https://github.com/regix1/lancache-pics/releases/latest/download/pics_depot_mappings.json
 ```
 
-**Format:**
-```json
-{
-  "metadata": {
-    "lastUpdated": "2025-11-14T22:00:00Z",
-    "totalApps": 205101,
-    "version": "1.0",
-    "source": "IStoreService/GetAppList/v1"
-  },
-  "apps": [
-    {
-      "appId": 10,
-      "name": "Counter-Strike",
-      "type": "game"
-    },
-    {
-      "appId": 220,
-      "name": "Half-Life 2",
-      "type": "game"
-    },
-    {
-      "appId": 228980,
-      "name": "Steamworks Common Redistributables",
-      "type": "dlc"
-    }
-  ]
-}
-```
+Or visit the [latest release](https://github.com/regix1/lancache-pics/releases/latest).
 
-**Types:** `game`, `dlc`, `software`, `video`, `hardware`
+## Data Format
 
-### 2. Depot Mappings (`pics_depot_mappings.json`)
-
-Detailed depot-to-app relationships collected via PICS.
+### `pics_depot_mappings.json`
 
 ```json
 {
   "metadata": {
-    "lastUpdated": "2025-10-05T14:47:46.0312519Z",
+    "lastUpdated": "2025-10-05T14:47:46Z",
     "totalMappings": 299599,
     "version": "1.0",
-    "nextUpdateDue": "2025-10-07T14:47:46.0587563Z",
+    "nextUpdateDue": "2025-10-07T14:47:46Z",
     "lastChangeNumber": 31491124
   },
   "depotMappings": {
@@ -71,116 +32,115 @@ Detailed depot-to-app relationships collected via PICS.
       "ownerId": 70,
       "appIds": [70],
       "appNames": ["Half-Life"],
+      "appTypes": ["game"],
+      "appHeaderImages": ["https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/70/header.jpg"],
       "source": "SteamKit2-PICS",
-      "discoveredAt": "2025-10-05T14:47:46.0622456Z"
+      "discoveredAt": "2025-10-05T14:47:46Z"
     }
   }
 }
 ```
 
-**Fields:**
-- `ownerId` - Primary app that owns this depot
-- `appIds` - All apps that use this depot
-- `appNames` - Corresponding app names
-- `lastChangeNumber` - PICS change number for incremental updates
+### Fields
 
-**Download:**
-```bash
-curl -LO https://github.com/regix1/lancache-pics/releases/latest/download/pics_depot_mappings.json
-```
+| Field | Description |
+|-------|-------------|
+| `ownerId` | Primary app that owns this depot (from PICS `depotfromapp`) |
+| `appIds` | All apps that reference this depot |
+| `appNames` | Corresponding app names |
+| `appTypes` | App types: `game`, `dlc`, `demo`, `software`, `video`, `hardware` |
+| `appHeaderImages` | Steam CDN header image URLs for each app |
+| `source` | Data source identifier |
+| `discoveredAt` | Timestamp when the depot mapping was first collected |
 
-## Quick Start
+### Metadata
 
-**Download both datasets:**
-```bash
-# Steam app list
-curl -LO https://github.com/regix1/lancache-pics/releases/latest/download/steam_apps.json
+| Field | Description |
+|-------|-------------|
+| `lastUpdated` | When the dataset was last updated |
+| `totalMappings` | Number of depot mappings in the file |
+| `lastChangeNumber` | PICS change number for incremental tracking |
+| `nextUpdateDue` | Scheduled next update time |
 
-# Depot mappings
-curl -LO https://github.com/regix1/lancache-pics/releases/latest/download/pics_depot_mappings.json
-```
+## How It Works
 
-Or visit [Releases](https://github.com/regix1/lancache-pics/releases/latest)
+The collector connects to Steam anonymously via SteamKit2 and queries the PICS protocol for app and depot data.
 
-**Run locally:**
+### Collection Process
+
+1. **App list retrieval** - Fetches the complete Steam app list via `ISteamApps/GetAppList/v2` (no API key needed), falling back to `IStoreService/GetAppList/v1` (requires API key)
+2. **PICS enumeration** - Queries `PICSGetProductInfo` in batches of 200 apps with 150ms delay between batches
+3. **Data extraction** - For each app, extracts depot IDs, depot ownership (`depotfromapp`), app type, app name, and header image URL from PICS KeyValue data
+4. **DLC discovery** - Reads `listofdlc` from PICS data to discover and include DLC depots
+5. **Output** - Writes `pics_depot_mappings.json` to `output/` and uploads to GitHub Releases
+
+### Update Modes
+
+| Mode | Schedule | Description |
+|------|----------|-------------|
+| **Incremental** | Every hour | Fetches only changes since last `lastChangeNumber` |
+| **Full** | Sundays at 04:00 UTC | Rebuilds the entire dataset from all active apps |
+
+Only creates a new release when the data has actually changed (SHA-256 hash comparison against the latest release).
+
+## Run Locally
+
 ```bash
 git clone https://github.com/regix1/lancache-pics.git
 cd lancache-pics/PicsDataCollector
 
-# Set Steam API key (get one at https://steamcommunity.com/dev/apikey)
+# Optional: set Steam API key for app list fallback
 export STEAM_API_KEY="YOUR_KEY_HERE"
 
-dotnet run              # Incremental update
-dotnet run -- --full    # Full update
+dotnet run                                    # auto-detect mode
+dotnet run -- --incremental                   # incremental update
+dotnet run -- --full                          # full rebuild
+dotnet run -- --resolve-depots 123,456        # re-resolve specific depots
+dotnet run -- --resolve-depots-file depots.txt # re-resolve depots from file
 ```
 
-## How It Works
+### CLI Arguments
 
-The collector runs two parallel operations:
+| Argument | Description |
+|----------|-------------|
+| `--incremental` | Only fetch changes since last PICS change number |
+| `--full` | Full enumeration of all active apps |
+| `--resolve-depots <ids>` | Comma-separated depot IDs to re-resolve |
+| `--resolve-depots-file <path>` | File with one depot ID per line to re-resolve |
 
-**1. Steam App List Collection**
-- Fetches complete app list via `IStoreService/GetAppList/v1`
-- Requires Steam API key
-- Includes games, DLC, software, videos, hardware
-- Paginated: ~50,000 apps per request
-- Fast: ~2-5 minutes for ~205k apps
+No arguments defaults to auto-detection: incremental if existing data is found, full otherwise.
 
-**2. PICS Depot Mapping**
+## GitHub Actions Setup
 
-**Incremental Updates** (Every hour)
-- Queries PICS for changes since last update
-- Updates only modified apps/depots
-- Fast: ~5-10 minutes
+1. Add your Steam API key as a repository secret:
+   - **Settings** > **Secrets and variables** > **Actions**
+   - Add secret: `STEAM_KEY` = your Steam API key (from [steamcommunity.com/dev/apikey](https://steamcommunity.com/dev/apikey))
 
-**Full Updates** (Every Sunday at 4 AM UTC)
-- Rebuilds entire depot mapping dataset
-- Queries all ~170k active apps
-- Slow: ~60-90 minutes
+2. The workflow runs automatically on schedule. To trigger manually:
+   - Go to [Actions](https://github.com/regix1/lancache-pics/actions)
+   - Select **Update PICS Depot Mappings**
+   - Click **Run workflow** and choose `incremental` or `full`
 
-### Manual Updates
+### Workflow Details
 
-1. Go to [Actions](https://github.com/regix1/lancache-pics/actions)
-2. Select **Update PICS Depot Mappings**
-3. Click **Run workflow**
-4. Choose `incremental` or `full`
-
-## Configuration
-
-**GitHub Actions Setup:**
-
-1. Add Steam API key as repository secret:
-   - Go to repository **Settings** → **Secrets and variables** → **Actions**
-   - Add secret: `STEAM_KEY` = Your Steam API key
-
-2. **Change update frequency** in `.github/workflows/update-pics-data.yml`:
-```yaml
-schedule:
-  - cron: '0 * * * *'    # Incremental: Every hour
-  - cron: '0 4 * * 0'    # Full: Every Sunday at 4 AM UTC
-```
+- **Concurrency**: queued (does not cancel in-progress runs)
+- **Timeouts**: 60 minutes (incremental), 240 minutes (full)
+- **Change detection**: SHA-256 hash comparison against latest release asset
+- **Releases**: tagged `v{YYYY.MM.DD-HHmmss}`, only created when data changes
 
 ## Technical Details
 
-**Data Sources:**
-- Steam App List: `IStoreService/GetAppList/v1` (Steam Web API with key)
-- Depot Mappings: SteamKit2 PICS protocol (anonymous connection)
-
-**Features:**
-- Dual-JSON output system
-- API fallback: tries v2 (no key), falls back to v1 (with key)
-- Rate limiting: 150ms between batches, 200 apps per batch
-- Incremental updates: tracks `lastChangeNumber` for efficiency
-- Automatic releases with both datasets
-
-**Dependencies:**
-- SteamKit2 (PICS + WebAPI wrapper)
-- System.Text.Json
+- **Runtime**: .NET 8.0
+- **Steam connection**: Anonymous login via SteamKit2 (no credentials required for PICS data)
+- **Batch size**: 200 apps per PICS request, 150ms between batches
+- **Header images**: Resolves `header_image` from PICS `common` section, supports both legacy (`cdn.akamai.steamstatic.com`) and hash-based (`shared.akamai.steamstatic.com/store_item_assets/`) CDN paths
+- **Dependencies**: [SteamKit2](https://github.com/SteamRE/SteamKit)
 
 ## Related Projects
 
-- [SteamKit2](https://github.com/SteamRE/SteamKit)
-- [SteamDatabase](https://steamdb.info/)
-- [Lancache](https://lancache.net/)
+- [SteamKit2](https://github.com/SteamRE/SteamKit) - .NET library for Valve's Steam network
+- [SteamDatabase](https://steamdb.info/) - Steam database tracking
+- [Lancache](https://lancache.net/) - LAN cache for game downloads
 
 ## License
 

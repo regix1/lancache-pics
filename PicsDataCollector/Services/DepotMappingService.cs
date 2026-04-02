@@ -309,7 +309,7 @@ public class DepotMappingService
                 // or just "header.jpg" for older games. Build the full URL.
                 var imageUrl = headerImage.Contains('/')
                     ? $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appId}/{headerImage}"
-                    : $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/{headerImage}";
+                    : $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appId}/{headerImage}";
                 _appHeaderImages[appId] = imageUrl;
             }
 
