@@ -35,7 +35,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -83,47 +83,37 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          # Add JSON file to staging to check if new or modified
-          git add output/pics_depot_mappings.json
+          # Compare generated file against latest release to detect changes
+          if [ -f output/pics_depot_mappings.json ]; then
+            NEW_HASH=$(sha256sum output/pics_depot_mappings.json | cut -d' ' -f1)
 
-          # Check if there are staged changes
-          if git diff --cached --quiet; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No changes detected in output files"
+            # Try to download the file from the latest release for comparison
+            LATEST_TAG=$(gh release list --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null || echo "")
+            if [ -n "$LATEST_TAG" ]; then
+              gh release download "$LATEST_TAG" -p "pics_depot_mappings.json" -D /tmp/old_release 2>/dev/null || true
+              if [ -f /tmp/old_release/pics_depot_mappings.json ]; then
+                OLD_HASH=$(sha256sum /tmp/old_release/pics_depot_mappings.json | cut -d' ' -f1)
+                if [ "$NEW_HASH" == "$OLD_HASH" ]; then
+                  echo "changed=false" >> $GITHUB_OUTPUT
+                  echo "No changes detected compared to latest release"
+                else
+                  echo "changed=true" >> $GITHUB_OUTPUT
+                  echo "Changes detected compared to latest release"
+                fi
+              else
+                echo "changed=true" >> $GITHUB_OUTPUT
+                echo "No previous release found to compare - treating as changed"
+              fi
+            else
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "No releases exist yet - treating as changed"
+            fi
           else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Changes detected in output files"
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Output file not found"
           fi
-
-      - name: Commit and push changes
-        if: steps.check_changes.outputs.changed == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # File already staged in previous step
-          # Get metadata from JSON for commit message
-          TOTAL_MAPPINGS=$(jq -r '.metadata.totalMappings' output/pics_depot_mappings.json)
-          LAST_UPDATED=$(jq -r '.metadata.lastUpdated' output/pics_depot_mappings.json)
-
-          git commit -m "Update PICS depot mappings - $TOTAL_MAPPINGS mappings" \
-                     -m "Last updated: $LAST_UPDATED" \
-                     -m "" \
-                     -m "Automated update via GitHub Actions"
-
-          # Pull any remote changes and rebase our commit on top
-          # With concurrency control, conflicts should be rare, but handle them gracefully
-          if ! git pull --rebase origin main; then
-            echo "⚠️ Rebase conflict detected - aborting and using latest data"
-            git rebase --abort
-            # Fetch latest and reset to it (our incremental run will catch up next time)
-            git fetch origin main
-            git reset --hard origin/main
-            echo "Skipping push - will retry on next scheduled run"
-            exit 0
-          fi
-
-          git push
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Create release with data file
         if: steps.check_changes.outputs.changed == 'true'
