@@ -15,6 +15,19 @@ public class DepotMappingService
 
     private const int AppBatchSize = 500;
 
+    private static readonly HttpClient HeaderImageHttpClient = new()
+    {
+        Timeout = TimeSpan.FromSeconds(10)
+    };
+
+    private static readonly string[] CdnDomains =
+    [
+        "shared.akamai.steamstatic.com",
+        "shared.fastly.steamstatic.com"
+    ];
+
+    private const string CdnBasePath = "/store_item_assets/steam/apps";
+
     public IReadOnlyDictionary<uint, HashSet<uint>> DepotMappings => _depotToAppMappings;
     public IReadOnlyDictionary<uint, uint> DepotOwners => _depotOwners;
     public IReadOnlyDictionary<uint, string> AppNames => _appNames;
@@ -301,15 +314,12 @@ public class DepotMappingService
             _appNames[appId] = appName;
             _appTypes[appId] = appType;
 
-            // Read header_image from PICS — newer games use hash-based paths on shared.akamai
+            // Read header_image from PICS — newer games use hash-based paths
+            // e.g. "31bac6b2eccf09b368f5e95ce510bae2baf3cfcd/header.jpg" or just "header.jpg"
             var headerImage = common?["header_image"]?.AsString();
             if (!string.IsNullOrEmpty(headerImage))
             {
-                // PICS returns a relative path like "31bac6b2eccf09b368f5e95ce510bae2baf3cfcd/header.jpg"
-                // or just "header.jpg" for older games. Build the full URL.
-                var imageUrl = headerImage.Contains('/')
-                    ? $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appId}/{headerImage}"
-                    : $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appId}/{headerImage}";
+                var imageUrl = $"https://{CdnDomains[0]}{CdnBasePath}/{appId}/{headerImage}";
                 _appHeaderImages[appId] = imageUrl;
             }
 
@@ -444,5 +454,120 @@ public class DepotMappingService
         }
 
         return callbacks.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Tests header image URLs against all CDN domains and picks the first that responds.
+    /// For apps without PICS header_image data, tries hashless URLs on each domain.
+    /// </summary>
+    public async Task ValidateHeaderImagesAsync()
+    {
+        var preferredDomain = await DeterminePreferredCdnDomainAsync();
+        Console.WriteLine($"Preferred CDN domain: {preferredDomain}");
+
+        // Update all existing URLs to use the preferred domain
+        var keysToUpdate = _appHeaderImages.Keys.ToList();
+        foreach (var appId in keysToUpdate)
+        {
+            if (_appHeaderImages.TryGetValue(appId, out var url))
+            {
+                _appHeaderImages[appId] = ReplaceCdnDomain(url, preferredDomain);
+            }
+        }
+
+        // For apps without header images, try to find a working URL
+        var appsWithoutImages = _appNames.Keys.Except(_appHeaderImages.Keys).ToList();
+        if (appsWithoutImages.Count == 0)
+        {
+            Console.WriteLine("All apps have PICS header image data — no fallback testing needed.");
+            return;
+        }
+
+        Console.WriteLine($"Testing header images for {appsWithoutImages.Count} apps without PICS data...");
+        var semaphore = new SemaphoreSlim(50);
+        int found = 0;
+
+        var tasks = appsWithoutImages.Select(appId => Task.Run(async () =>
+        {
+            await semaphore.WaitAsync();
+            try
+            {
+                var resolvedUrl = await TestHeaderImageOnAllDomainsAsync(appId);
+                if (resolvedUrl != null)
+                {
+                    _appHeaderImages[appId] = resolvedUrl;
+                    Interlocked.Increment(ref found);
+                }
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        })).ToList();
+
+        await Task.WhenAll(tasks);
+        Console.WriteLine($"Header image validation: {found} found out of {appsWithoutImages.Count} tested");
+    }
+
+    private async Task<string> DeterminePreferredCdnDomainAsync()
+    {
+        // Test a sample of existing URLs on each domain to pick the best one
+        var sampleApps = _appHeaderImages.Take(10).ToList();
+        if (sampleApps.Count == 0)
+            return CdnDomains[0];
+
+        var domainScores = new ConcurrentDictionary<string, int>();
+        foreach (var domain in CdnDomains)
+            domainScores[domain] = 0;
+
+        var tasks = sampleApps.SelectMany(kvp =>
+            CdnDomains.Select(domain => Task.Run(async () =>
+            {
+                var testUrl = ReplaceCdnDomain(kvp.Value, domain);
+                if (await TestUrlAsync(testUrl))
+                    domainScores.AddOrUpdate(domain, 1, (_, count) => count + 1);
+            }))
+        ).ToList();
+
+        await Task.WhenAll(tasks);
+
+        var best = domainScores.OrderByDescending(kvp => kvp.Value).First();
+        Console.WriteLine($"CDN domain test results: {string.Join(", ", domainScores.Select(d => $"{d.Key}={d.Value}/{sampleApps.Count}"))}");
+        return best.Key;
+    }
+
+    private async Task<string?> TestHeaderImageOnAllDomainsAsync(uint appId)
+    {
+        foreach (var domain in CdnDomains)
+        {
+            var url = $"https://{domain}{CdnBasePath}/{appId}/header.jpg";
+            if (await TestUrlAsync(url))
+                return url;
+        }
+        return null;
+    }
+
+    private static async Task<bool> TestUrlAsync(string url)
+    {
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Head, url);
+            using var response = await HeaderImageHttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static string ReplaceCdnDomain(string url, string newDomain)
+    {
+        foreach (var domain in CdnDomains)
+        {
+            if (url.Contains(domain))
+                return url.Replace(domain, newDomain);
+        }
+        return url;
     }
 }

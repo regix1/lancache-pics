@@ -183,6 +183,11 @@ class Program
                 Console.WriteLine();
             }
 
+            // Validate header image URLs against CDN domains
+            Console.WriteLine();
+            Console.WriteLine("Validating header image URLs...");
+            await mappingService.ValidateHeaderImagesAsync();
+
             // Save depot mappings to JSON (now includes app types and header images)
             var depotMappingsDict = mappingService.DepotMappings.ToDictionary(
                 kvp => kvp.Key,

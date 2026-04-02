@@ -33,7 +33,7 @@ Or visit the [latest release](https://github.com/regix1/lancache-pics/releases/l
       "appIds": [70],
       "appNames": ["Half-Life"],
       "appTypes": ["game"],
-      "appHeaderImages": ["https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/70/header.jpg"],
+      "appHeaderImages": ["https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/70/header.jpg"],
       "source": "SteamKit2-PICS",
       "discoveredAt": "2025-10-05T14:47:46Z"
     }
@@ -133,7 +133,7 @@ No arguments defaults to auto-detection: incremental if existing data is found, 
 - **Runtime**: .NET 8.0
 - **Steam connection**: Anonymous login via SteamKit2 (no credentials required for PICS data)
 - **Batch size**: 200 apps per PICS request, 150ms between batches
-- **Header images**: Resolves `header_image` from PICS `common` section, supports both legacy (`cdn.akamai.steamstatic.com`) and hash-based (`shared.akamai.steamstatic.com/store_item_assets/`) CDN paths
+- **Header images**: Resolves `header_image` from PICS `common` section, validates URLs against multiple Steam CDN domains (`shared.akamai.steamstatic.com`, `shared.fastly.steamstatic.com`) and picks the first that responds
 - **Dependencies**: [SteamKit2](https://github.com/SteamRE/SteamKit)
 
 ## Related Projects
