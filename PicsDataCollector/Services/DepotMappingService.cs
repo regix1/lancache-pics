@@ -10,6 +10,7 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, uint> _depotOwners = new();
     private readonly ConcurrentDictionary<uint, string> _appNames = new();
     private readonly ConcurrentDictionary<uint, string> _appTypes = new();
+    private readonly ConcurrentDictionary<uint, string> _appHeaderImages = new();
     private readonly HashSet<uint> _scannedApps = new();  // Track scanned apps to avoid rescanning
 
     private const int AppBatchSize = 500;
@@ -18,13 +19,14 @@ public class DepotMappingService
     public IReadOnlyDictionary<uint, uint> DepotOwners => _depotOwners;
     public IReadOnlyDictionary<uint, string> AppNames => _appNames;
     public IReadOnlyDictionary<uint, string> AppTypes => _appTypes;
+    public IReadOnlyDictionary<uint, string> AppHeaderImages => _appHeaderImages;
 
     public DepotMappingService(SteamConnectionService connectionService)
     {
         _connectionService = connectionService;
     }
 
-    public void LoadExistingMappings(Dictionary<uint, HashSet<uint>> mappings, Dictionary<uint, string> names, Dictionary<uint, uint>? depotOwners = null, Dictionary<uint, string>? types = null)
+    public void LoadExistingMappings(Dictionary<uint, HashSet<uint>> mappings, Dictionary<uint, string> names, Dictionary<uint, uint>? depotOwners = null, Dictionary<uint, string>? types = null, Dictionary<uint, string>? headerImages = null)
     {
         foreach (var (depotId, appIds) in mappings)
         {
@@ -53,6 +55,14 @@ public class DepotMappingService
             foreach (var (appId, type) in types)
             {
                 _appTypes.TryAdd(appId, type);
+            }
+        }
+
+        if (headerImages != null)
+        {
+            foreach (var (appId, url) in headerImages)
+            {
+                _appHeaderImages.TryAdd(appId, url);
             }
         }
     }
@@ -290,6 +300,18 @@ public class DepotMappingService
             var appType = common?["type"]?.AsString()?.ToLower() ?? "unknown";
             _appNames[appId] = appName;
             _appTypes[appId] = appType;
+
+            // Read header_image from PICS — newer games use hash-based paths on shared.akamai
+            var headerImage = common?["header_image"]?.AsString();
+            if (!string.IsNullOrEmpty(headerImage))
+            {
+                // PICS returns a relative path like "31bac6b2eccf09b368f5e95ce510bae2baf3cfcd/header.jpg"
+                // or just "header.jpg" for older games. Build the full URL.
+                var imageUrl = headerImage.Contains('/')
+                    ? $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appId}/{headerImage}"
+                    : $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/{headerImage}";
+                _appHeaderImages[appId] = imageUrl;
+            }
 
             // Extract DLC list for DLC depot discovery
             var listofdlc = common?["listofdlc"];

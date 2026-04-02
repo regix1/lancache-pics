@@ -90,8 +90,8 @@ class Program
 
                 if (data != null)
                 {
-                    var (depotMappings, appNames, depotOwners, appTypes) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes);
+                    var (depotMappings, appNames, depotOwners, appTypes, headerImages) = persistenceService.ExtractMappingsFromData(data);
+                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes, headerImages);
                 }
             }
             else if (fullUpdate)
@@ -106,8 +106,8 @@ class Program
                 {
                     Console.WriteLine("Mode: Incremental update (auto-detected)");
                     lastChangeNumber = changeNumber;
-                    var (depotMappings, appNames, depotOwners, appTypes) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes);
+                    var (depotMappings, appNames, depotOwners, appTypes, headerImages) = persistenceService.ExtractMappingsFromData(data);
+                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes, headerImages);
                     incrementalOnly = true;
                 }
                 else
@@ -206,11 +206,16 @@ class Program
                 kvp => kvp.Value
             );
 
+            var appHeaderImagesDict = mappingService.AppHeaderImages.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value
+            );
+
             // Get the API version used for enumeration
             var apiVersion = enumerationService.LastApiVersionUsed;
             Console.WriteLine($"API Version Used: {apiVersion}");
 
-            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber, depotOwnersDict, appTypesDict, apiVersion);
+            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber, depotOwnersDict, appTypesDict, appHeaderImagesDict, apiVersion);
 
             Console.WriteLine();
             Console.WriteLine("Collection complete!");

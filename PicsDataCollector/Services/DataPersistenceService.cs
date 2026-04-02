@@ -55,6 +55,7 @@ public class DataPersistenceService
         uint lastChangeNumber,
         Dictionary<uint, uint>? depotOwners = null,
         Dictionary<uint, string>? appTypes = null,
+        Dictionary<uint, string>? appHeaderImages = null,
         string apiVersion = "PICS")
     {
         Console.WriteLine();
@@ -102,7 +103,9 @@ public class DataPersistenceService
             ).ToList();
 
             var appHeaderImagesList = appIdsList.Select(appId =>
-                $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/header.jpg"
+                appHeaderImages != null && appHeaderImages.TryGetValue(appId, out var picsUrl)
+                    ? picsUrl
+                    : $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/header.jpg"
             ).ToList();
 
             // Build source string with API version
@@ -141,16 +144,17 @@ public class DataPersistenceService
         Console.WriteLine($"Total mappings: {picsData.Metadata.TotalMappings}");
     }
 
-    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners, Dictionary<uint, string> appTypes) ExtractMappingsFromData(PicsJsonData? data)
+    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners, Dictionary<uint, string> appTypes, Dictionary<uint, string> appHeaderImages) ExtractMappingsFromData(PicsJsonData? data)
     {
         var depotMappings = new Dictionary<uint, HashSet<uint>>();
         var appNames = new Dictionary<uint, string>();
         var depotOwners = new Dictionary<uint, uint>();
         var appTypes = new Dictionary<uint, string>();
+        var appHeaderImages = new Dictionary<uint, string>();
 
         if (data?.DepotMappings == null)
         {
-            return (depotMappings, appNames, depotOwners, appTypes);
+            return (depotMappings, appNames, depotOwners, appTypes, appHeaderImages);
         }
 
         foreach (var (depotIdStr, mapping) in data.DepotMappings)
@@ -195,8 +199,17 @@ public class DataPersistenceService
                     appTypes.TryAdd(mapping.AppIds[i], mapping.AppTypes[i]);
                 }
             }
+
+            // Extract header images if available
+            if (mapping.AppHeaderImages != null && mapping.AppIds != null)
+            {
+                for (int i = 0; i < Math.Min(mapping.AppIds.Count, mapping.AppHeaderImages.Count); i++)
+                {
+                    appHeaderImages.TryAdd(mapping.AppIds[i], mapping.AppHeaderImages[i]);
+                }
+            }
         }
 
-        return (depotMappings, appNames, depotOwners, appTypes);
+        return (depotMappings, appNames, depotOwners, appTypes, appHeaderImages);
     }
 }
