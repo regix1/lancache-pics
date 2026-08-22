@@ -79,6 +79,8 @@ Schema 1.1 is backward compatible: v1 consumers can ignore `relationships` and k
 Reading is not version gated. `metadata.version` records the schema that wrote the file and nothing checks it on load;
 a v1 file loads because every field 1.1 added is optional.
 Public manifests whose explicit size and download size are both zero are omitted because they contain no cacheable data.
+Incremental and full runs recompute `manifestAppId` and `licenseAppId` from the stored source fields, so older files
+heal on the next update without a `--full` rebuild.
 
 ### Metadata
 
@@ -98,7 +100,7 @@ The collector connects to Steam anonymously via SteamKit2 and queries the PICS p
 1. **App list retrieval** - Fetches the complete Steam app list via `ISteamApps/GetAppList/v2` (no API key needed), falling back to `IStoreService/GetAppList/v1` (requires API key)
 2. **PICS enumeration** - Queries `PICSGetProductInfo` in batches of 200 apps with 150ms delay between batches
 3. **Data extraction** - For each app, extracts depot IDs, depot ownership (`depotfromapp`), app type, app name, and header image URL from PICS KeyValue data
-4. **DLC discovery** - Reads `listofdlc` from PICS data to discover and include DLC depots
+4. **DLC discovery** - Reads `listofdlc` from both `common` and `extended` so DLC is found whichever section Steam used
 5. **Output** - Writes `pics_depot_mappings.json` to `output/` and uploads to GitHub Releases
 
 ### Update Modes
