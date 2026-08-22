@@ -4,6 +4,8 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PicsDataCollector", "PicsDataCollector\PicsDataCollector.csproj", "{B122D8A8-03C2-FC23-DD30-29DF11037442}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PicsDataCollector.Tests", "PicsDataCollector.Tests\PicsDataCollector.Tests.csproj", "{C8D41E07-6A1B-4F2E-9D33-0B7A2E5C91F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +16,10 @@ Global
 		{B122D8A8-03C2-FC23-DD30-29DF11037442}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B122D8A8-03C2-FC23-DD30-29DF11037442}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B122D8A8-03C2-FC23-DD30-29DF11037442}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8D41E07-6A1B-4F2E-9D33-0B7A2E5C91F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8D41E07-6A1B-4F2E-9D33-0B7A2E5C91F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8D41E07-6A1B-4F2E-9D33-0B7A2E5C91F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8D41E07-6A1B-4F2E-9D33-0B7A2E5C91F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

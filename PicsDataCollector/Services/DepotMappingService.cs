@@ -1,3 +1,4 @@
+using PicsDataCollector.Models;
 using SteamKit2;
 using System.Collections.Concurrent;
 
@@ -8,10 +9,11 @@ public class DepotMappingService
     private readonly SteamConnectionService _connectionService;
     private readonly ConcurrentDictionary<uint, HashSet<uint>> _depotToAppMappings = new();
     private readonly ConcurrentDictionary<uint, uint> _depotOwners = new();
+    private readonly ConcurrentDictionary<uint, ConcurrentDictionary<uint, PicsDepotRelationship>> _depotRelationships = new();
     private readonly ConcurrentDictionary<uint, string> _appNames = new();
     private readonly ConcurrentDictionary<uint, string> _appTypes = new();
     private readonly ConcurrentDictionary<uint, string> _appHeaderImages = new();
-    private readonly HashSet<uint> _scannedApps = new();  // Track scanned apps to avoid rescanning
+    private readonly ConcurrentDictionary<uint, byte> _scannedApps = new();  // Track scanned apps to avoid rescanning
 
     private const int AppBatchSize = 500;
 
@@ -30,6 +32,10 @@ public class DepotMappingService
 
     public IReadOnlyDictionary<uint, HashSet<uint>> DepotMappings => _depotToAppMappings;
     public IReadOnlyDictionary<uint, uint> DepotOwners => _depotOwners;
+    public IReadOnlyDictionary<uint, Dictionary<uint, PicsDepotRelationship>> DepotRelationships =>
+        _depotRelationships.ToDictionary(
+            kvp => kvp.Key,
+            kvp => kvp.Value.ToDictionary(inner => inner.Key, inner => inner.Value));
     public IReadOnlyDictionary<uint, string> AppNames => _appNames;
     public IReadOnlyDictionary<uint, string> AppTypes => _appTypes;
     public IReadOnlyDictionary<uint, string> AppHeaderImages => _appHeaderImages;
@@ -39,14 +45,19 @@ public class DepotMappingService
         _connectionService = connectionService;
     }
 
-    public void LoadExistingMappings(Dictionary<uint, HashSet<uint>> mappings, Dictionary<uint, string> names, Dictionary<uint, uint>? depotOwners = null, Dictionary<uint, string>? types = null, Dictionary<uint, string>? headerImages = null)
+    public void LoadExistingMappings(
+        Dictionary<uint, HashSet<uint>> mappings,
+        Dictionary<uint, string> names,
+        Dictionary<uint, uint>? depotOwners = null,
+        Dictionary<uint, string>? types = null,
+        Dictionary<uint, string>? headerImages = null,
+        Dictionary<uint, List<PicsDepotRelationship>>? relationships = null)
     {
         foreach (var (depotId, appIds) in mappings)
         {
-            var set = _depotToAppMappings.GetOrAdd(depotId, _ => new HashSet<uint>());
             foreach (var appId in appIds)
             {
-                set.Add(appId);
+                AddAppToDepot(depotId, appId);
             }
         }
 
@@ -78,6 +89,26 @@ public class DepotMappingService
                 _appHeaderImages.TryAdd(appId, url);
             }
         }
+
+        if (relationships != null)
+        {
+            foreach (var (depotId, depotRelationships) in relationships)
+            {
+                var bySource = _depotRelationships.GetOrAdd(depotId, _ => new ConcurrentDictionary<uint, PicsDepotRelationship>());
+                foreach (var relationship in depotRelationships)
+                {
+                    // Recompute derived IDs when loading so files written by older identity rules heal immediately.
+                    bySource[relationship.SourceAppId] = DepotIdentity.CreateRelationship(
+                        relationship.SourceAppId,
+                        depotId,
+                        relationship.DepotFromAppId,
+                        relationship.DlcAppId,
+                        relationship.HasPublicManifest);
+                }
+            }
+        }
+
+        RebuildDerivedOwners();
     }
 
     public async Task BuildDepotIndexAsync(List<uint> appIds)
@@ -115,6 +146,7 @@ public class DepotMappingService
 
         await Task.WhenAll(tasks);
 
+        RebuildDerivedOwners();
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
     }
 
@@ -142,7 +174,7 @@ public class DepotMappingService
             var candidates = new uint[] { depotId - 1, depotId, depotId - 2 };
             foreach (var candidate in candidates)
             {
-                if (candidate > 0 && !_scannedApps.Contains(candidate))
+                if (candidate > 0 && !_scannedApps.ContainsKey(candidate))
                 {
                     candidateAppIds.Add(candidate);
                 }
@@ -191,7 +223,7 @@ public class DepotMappingService
                 {
                     foreach (var app in cb.Apps.Values)
                     {
-                        ProcessAppDepots(app);
+                        ProcessAppDepots(app.ID, app.KeyValues);
                     }
                 }
 
@@ -212,6 +244,7 @@ public class DepotMappingService
         var resolvedAfter = unresolvedDepots.Count(d => _depotOwners.ContainsKey(d) || _depotToAppMappings.ContainsKey(d));
         var newlyResolved = resolvedAfter - resolvedBefore;
 
+        RebuildDerivedOwners();
         Console.WriteLine($"Orphan resolution complete: {newlyResolved}/{unresolvedDepots.Count} depots resolved");
         return newlyResolved;
     }
@@ -244,7 +277,7 @@ public class DepotMappingService
         {
             foreach (var app in cb.Apps.Values)
             {
-                var dlcList = ProcessAppDepots(app);
+                var dlcList = ProcessAppDepots(app.ID, app.KeyValues);
                 // Only scan DLC apps that aren't already in the main processing list
                 dlcAppsToScan.AddRange(dlcList.Where(dlcId => !allAppIds.Contains(dlcId)));
             }
@@ -282,7 +315,7 @@ public class DepotMappingService
                     {
                         foreach (var dlcApp in dlcCb.Apps.Values)
                         {
-                            ProcessAppDepots(dlcApp);
+                            ProcessAppDepots(dlcApp.ID, dlcApp.KeyValues);
                         }
                     }
 
@@ -296,15 +329,12 @@ public class DepotMappingService
         }
     }
 
-    private List<uint> ProcessAppDepots(SteamApps.PICSProductInfoCallback.PICSProductInfo app)
+    internal List<uint> ProcessAppDepots(uint appId, KeyValue kv)
     {
         var dlcAppIdsToScan = new List<uint>();
 
         try
         {
-            var appId = app.ID;
-            var kv = app.KeyValues;
-
             var appinfo = kv["appinfo"];
             var common = appinfo != KeyValue.Invalid ? appinfo["common"] : kv["common"];
             var depots = appinfo != KeyValue.Invalid ? appinfo["depots"] : kv["depots"];
@@ -323,22 +353,9 @@ public class DepotMappingService
                 _appHeaderImages[appId] = imageUrl;
             }
 
-            // Extract DLC list for DLC depot discovery
-            var listofdlc = common?["listofdlc"];
-            if (listofdlc != KeyValue.Invalid && listofdlc?.Children != null)
-            {
-                foreach (var dlcChild in listofdlc.Children)
-                {
-                    if (uint.TryParse(dlcChild.AsString(), out var dlcAppId))
-                    {
-                        // Add DLC to scan list if not already processed
-                        if (!_appNames.ContainsKey(dlcAppId))
-                        {
-                            dlcAppIdsToScan.Add(dlcAppId);
-                        }
-                    }
-                }
-            }
+            QueueDlcApps(common?["listofdlc"], dlcAppIdsToScan);
+            var extended = appinfo != KeyValue.Invalid ? appinfo["extended"] : kv["extended"];
+            QueueDlcApps(extended?["listofdlc"], dlcAppIdsToScan);
 
             if (depots == KeyValue.Invalid || depots.Children == null)
             {
@@ -346,55 +363,157 @@ public class DepotMappingService
             }
 
             foreach (var child in depots.Children)
-            {
+                {
                 if (!uint.TryParse(child.Name, out var depotId))
                     continue;
 
-                var ownerFromPics = AsUInt(child["depotfromapp"]);
-                var ownerAppId = ownerFromPics ?? appId;
-
-                // FIXED: DLC depots use their App ID as Depot ID - this is normal Steam behavior
-                // Only skip if it's a base game/app (not DLC) with self-referencing depot
-                if (depotId == ownerAppId && appType != "dlc" && !ownerFromPics.HasValue)
-                {
-                    continue;
+                var depotFromApp = AsUInt(child["depotfromapp"]);
+                var dlcAppId = AsUInt(child["dlcappid"]);
+                if (dlcAppId == null && appType == "dlc")
+                    {
+                    dlcAppId = appId;
                 }
 
-                // For DLCs, depot ID == app ID is expected and valid
-                if (depotId == ownerAppId && appType == "dlc")
+                var hasPublicManifest = HasPublicManifest(child);
+                if (HasExplicitlyEmptyPublicManifest(child) ||
+                    DepotIdentity.IsInvalidDepot(hasPublicManifest, depotId, depotFromApp))
+                        {
+                    continue;
+                        }
+
+                if (depotId == appId && appType == "dlc")
                 {
                     Console.WriteLine($"  Found DLC depot {depotId} for DLC app {appId} ({appName})");
-                }
+                    }
 
-                var set = _depotToAppMappings.GetOrAdd(depotId, _ => new HashSet<uint>());
-                set.Add(ownerAppId);
+                var relationship = DepotIdentity.CreateRelationship(
+                    appId,
+                    depotId,
+                    depotFromApp,
+                    dlcAppId,
+                    hasPublicManifest);
+                var bySource = _depotRelationships.GetOrAdd(depotId, _ => new ConcurrentDictionary<uint, PicsDepotRelationship>());
+                bySource[appId] = relationship;
 
-                // Store the owner app for this depot
-                _depotOwners.TryAdd(depotId, ownerAppId);
+                AddAppToDepot(depotId, appId);
 
-                // Queue owner app for scanning if we don't have its name yet
-                // This handles redistributables/launchers (e.g., EA App, Ubisoft Connect, Rockstar Launcher)
-                if (ownerFromPics.HasValue && !_appNames.ContainsKey(ownerAppId) && !_scannedApps.Contains(ownerAppId))
+                if (depotFromApp.HasValue && !_appNames.ContainsKey(depotFromApp.Value) && !_scannedApps.ContainsKey(depotFromApp.Value))
                 {
-                    dlcAppIdsToScan.Add(ownerAppId);
-                    _appNames[ownerAppId] = $"App {ownerAppId}"; // Temporary placeholder until scanned
+                    dlcAppIdsToScan.Add(depotFromApp.Value);
+                    _appNames[depotFromApp.Value] = $"App {depotFromApp.Value}";
                 }
             }
 
-            _scannedApps.Add(appId);
+            _scannedApps.TryAdd(appId, 0);
         }
         catch (Exception ex)
-        {
-            Console.WriteLine($"Warning: Error processing app {app.ID}: {ex.Message}");
+            {
+            Console.WriteLine($"Warning: Error processing app {appId}: {ex.Message}");
         }
 
-        return dlcAppIdsToScan;
+                return dlcAppIdsToScan;
+            }
+
+    public void RebuildDerivedOwners()
+    {
+        foreach (var (depotId, bySource) in _depotRelationships)
+        {
+            if (bySource.IsEmpty)
+            {
+                    continue;
+            }
+
+            var ownerId = DepotIdentity.SelectOwnerId(bySource.Values.ToList(), _appTypes);
+            _depotOwners[depotId] = ownerId;
+            AddAppToDepot(depotId, ownerId);
+        }
+    }
+
+    private void AddAppToDepot(uint depotId, uint appId)
+                {
+        var set = _depotToAppMappings.GetOrAdd(depotId, _ => new HashSet<uint>());
+        // App batches are scanned in parallel and unrelated apps share depots, so the set behind the key needs the lock.
+        lock (set)
+        {
+            set.Add(appId);
+        }
+                }
+
+    private void QueueDlcApps(KeyValue? listOfDlc, List<uint> dlcAppIdsToScan)
+                {
+        if (listOfDlc == null || listOfDlc == KeyValue.Invalid)
+        {
+            return;
+                }
+
+        if (listOfDlc.Children != null)
+        {
+            foreach (var dlcChild in listOfDlc.Children)
+            {
+                QueueDlcAppId(dlcChild.AsString(), dlcAppIdsToScan);
+            }
+        }
+
+        var raw = listOfDlc.AsString();
+        if (!string.IsNullOrWhiteSpace(raw))
+        {
+            foreach (var part in raw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                QueueDlcAppId(part, dlcAppIdsToScan);
+            }
+        }
+    }
+
+    private void QueueDlcAppId(string? value, List<uint> dlcAppIdsToScan)
+    {
+        if (!uint.TryParse(value, out var dlcAppId))
+        {
+            return;
+        }
+
+        if (!_appNames.ContainsKey(dlcAppId))
+                {
+            dlcAppIdsToScan.Add(dlcAppId);
+                }
+            }
+
+    public static bool HasPublicManifest(KeyValue depotKey)
+    {
+        var manifests = depotKey["manifests"];
+        if (manifests == KeyValue.Invalid)
+        {
+            return false;
+        }
+
+        var publicManifest = manifests["public"];
+        if (publicManifest == KeyValue.Invalid)
+        {
+            return false;
+        }
+
+        return AsUInt64(publicManifest["gid"]) != null || AsUInt64(publicManifest) != null;
+    }
+
+    public static bool HasExplicitlyEmptyPublicManifest(KeyValue depotKey)
+    {
+        var publicManifest = depotKey["manifests"]["public"];
+        return publicManifest != KeyValue.Invalid &&
+               AsUInt64(publicManifest["gid"]) != null &&
+               AsUInt64(publicManifest["size"]) == 0 &&
+               AsUInt64(publicManifest["download"]) == 0;
     }
 
     private static uint? AsUInt(KeyValue kv)
     {
         if (kv == KeyValue.Invalid || kv.Value == null) return null;
         if (uint.TryParse(kv.AsString() ?? string.Empty, out var v)) return v;
+        return null;
+    }
+
+    private static ulong? AsUInt64(KeyValue kv)
+    {
+        if (kv == KeyValue.Invalid || kv.Value == null) return null;
+        if (ulong.TryParse(kv.AsString() ?? string.Empty, out var v)) return v;
         return null;
     }
 

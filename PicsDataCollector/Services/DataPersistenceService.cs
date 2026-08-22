@@ -7,8 +7,14 @@ public class DataPersistenceService
 {
     private readonly string _outputFilePath;
 
-    public DataPersistenceService()
+    public DataPersistenceService(string? outputFilePath = null)
     {
+        if (!string.IsNullOrWhiteSpace(outputFilePath))
+        {
+            _outputFilePath = outputFilePath;
+            return;
+        }
+
         // Save to output directory in repository root
         var baseDir = AppContext.BaseDirectory;
         var projectDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", ".."));
@@ -56,72 +62,21 @@ public class DataPersistenceService
         Dictionary<uint, uint>? depotOwners = null,
         Dictionary<uint, string>? appTypes = null,
         Dictionary<uint, string>? appHeaderImages = null,
-        string apiVersion = "PICS")
+        string apiVersion = "PICS",
+        Dictionary<uint, List<PicsDepotRelationship>>? depotRelationships = null)
     {
         Console.WriteLine();
         Console.WriteLine("Saving to JSON...");
 
-        var picsData = new PicsJsonData
-        {
-            Metadata = new PicsMetadata
-            {
-                LastUpdated = DateTime.UtcNow,
-                TotalMappings = depotMappings.Sum(kvp => kvp.Value.Count),
-                Version = "1.0",
-                NextUpdateDue = DateTime.UtcNow.AddDays(2),
-                LastChangeNumber = lastChangeNumber
-            },
-            DepotMappings = new Dictionary<string, PicsDepotMapping>()
-        };
-
-        foreach (var (depotId, appIds) in depotMappings)
-        {
-            // Ensure owner app is first in the list
-            var appIdsList = new List<uint>();
-            uint? ownerId = null;
-
-            if (depotOwners != null && depotOwners.TryGetValue(depotId, out var ownerAppId) && appIds.Contains(ownerAppId))
-            {
-                ownerId = ownerAppId;
-                // Add owner first
-                appIdsList.Add(ownerAppId);
-                // Add remaining apps
-                appIdsList.AddRange(appIds.Where(id => id != ownerAppId));
-            }
-            else
-            {
-                // No owner tracked, just convert as-is
-                appIdsList = appIds.ToList();
-            }
-
-            var appNamesList = appIdsList.Select(appId =>
-                appNames.TryGetValue(appId, out var name) ? name : $"App {appId}"
-            ).ToList();
-
-            var appTypesList = appIdsList.Select(appId =>
-                appTypes != null && appTypes.TryGetValue(appId, out var type) ? type : "unknown"
-            ).ToList();
-
-            var appHeaderImagesList = appIdsList.Select(appId =>
-                appHeaderImages != null && appHeaderImages.TryGetValue(appId, out var picsUrl)
-                    ? picsUrl
-                    : $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appId}/header.jpg"
-            ).ToList();
-
-            // Build source string with API version
-            var source = apiVersion == "PICS" ? "SteamKit2-PICS" : $"SteamKit2-PICS-{apiVersion}";
-
-            picsData.DepotMappings[depotId.ToString()] = new PicsDepotMapping
-            {
-                OwnerId = ownerId,
-                AppIds = appIdsList,
-                AppNames = appNamesList,
-                AppTypes = appTypesList,
-                AppHeaderImages = appHeaderImagesList,
-                Source = source,
-                DiscoveredAt = DateTime.UtcNow
-            };
-        }
+        var picsData = BuildPicsData(
+            depotMappings,
+            appNames,
+            lastChangeNumber,
+            depotOwners,
+            appTypes,
+            appHeaderImages,
+            apiVersion,
+            depotRelationships);
 
         var jsonOptions = new JsonSerializerOptions
         {
@@ -141,20 +96,96 @@ public class DataPersistenceService
         await File.WriteAllTextAsync(_outputFilePath, jsonContent);
 
         Console.WriteLine($"Saved to {_outputFilePath}");
-        Console.WriteLine($"Total mappings: {picsData.Metadata.TotalMappings}");
+        Console.WriteLine($"Total mappings: {picsData.Metadata!.TotalMappings}");
     }
 
-    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners, Dictionary<uint, string> appTypes, Dictionary<uint, string> appHeaderImages) ExtractMappingsFromData(PicsJsonData? data)
+    public PicsJsonData BuildPicsData(
+        Dictionary<uint, HashSet<uint>> depotMappings,
+        Dictionary<uint, string> appNames,
+        uint lastChangeNumber,
+        Dictionary<uint, uint>? depotOwners = null,
+        Dictionary<uint, string>? appTypes = null,
+        Dictionary<uint, string>? appHeaderImages = null,
+        string apiVersion = "PICS",
+        Dictionary<uint, List<PicsDepotRelationship>>? depotRelationships = null)
+    {
+        var picsData = new PicsJsonData
+        {
+            Metadata = new PicsMetadata
+            {
+                LastUpdated = DateTime.UtcNow,
+                TotalMappings = depotMappings.Sum(kvp => kvp.Value.Count),
+                Version = "1.1",
+                NextUpdateDue = DateTime.UtcNow.AddDays(2),
+                LastChangeNumber = lastChangeNumber
+            },
+            DepotMappings = new Dictionary<string, PicsDepotMapping>()
+        };
+
+        foreach (var (depotId, appIds) in depotMappings)
+        {
+            var appIdsList = new List<uint>();
+            uint? ownerId = null;
+
+            // A loaded file can carry an ownerId that is absent from its own appIds, and listing an app the depot
+            // does not map to would invent a name, a type and a header image for it.
+            if (depotOwners != null && depotOwners.TryGetValue(depotId, out var ownerAppId) && appIds.Contains(ownerAppId))
+            {
+                ownerId = ownerAppId;
+                appIdsList.Add(ownerAppId);
+                appIdsList.AddRange(appIds.Where(id => id != ownerAppId));
+            }
+            else
+            {
+                appIdsList = appIds.ToList();
+            }
+
+            var appNamesList = appIdsList.Select(appId =>
+                appNames.TryGetValue(appId, out var name) ? name : $"App {appId}"
+            ).ToList();
+
+            var appTypesList = appIdsList.Select(appId =>
+                appTypes != null && appTypes.TryGetValue(appId, out var type) ? type : "unknown"
+            ).ToList();
+
+            var appHeaderImagesList = appIdsList.Select(appId =>
+                appHeaderImages != null && appHeaderImages.TryGetValue(appId, out var picsUrl)
+                    ? picsUrl
+                    : $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/{appId}/header.jpg"
+            ).ToList();
+
+            var source = apiVersion == "PICS" ? "SteamKit2-PICS" : $"SteamKit2-PICS-{apiVersion}";
+            List<PicsDepotRelationship>? relationships = null;
+            depotRelationships?.TryGetValue(depotId, out relationships);
+
+            picsData.DepotMappings[depotId.ToString()] = new PicsDepotMapping
+            {
+                OwnerId = ownerId,
+                AppIds = appIdsList,
+                AppNames = appNamesList,
+                AppTypes = appTypesList,
+                AppHeaderImages = appHeaderImagesList,
+                Relationships = relationships,
+                Source = source,
+                DiscoveredAt = DateTime.UtcNow
+            };
+        }
+
+        return picsData;
+        }
+
+    public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners, Dictionary<uint, string> appTypes, Dictionary<uint, string> appHeaderImages, Dictionary<uint, List<PicsDepotRelationship>> relationships) ExtractMappingsFromData(PicsJsonData? data)
     {
         var depotMappings = new Dictionary<uint, HashSet<uint>>();
         var appNames = new Dictionary<uint, string>();
         var depotOwners = new Dictionary<uint, uint>();
         var appTypes = new Dictionary<uint, string>();
         var appHeaderImages = new Dictionary<uint, string>();
+        var relationships = new Dictionary<uint, List<PicsDepotRelationship>>();
 
         if (data?.DepotMappings == null)
         {
-            return (depotMappings, appNames, depotOwners, appTypes, appHeaderImages);
+            return (depotMappings, appNames, depotOwners, appTypes, appHeaderImages, relationships);
         }
 
         foreach (var (depotIdStr, mapping) in data.DepotMappings)
@@ -172,15 +203,11 @@ public class DataPersistenceService
             }
             depotMappings[depotId] = set;
 
-            // Extract owner ID if available
+            // Extract owner ID if available. A file with no ownerId keeps none, so the next scan derives it
+            // from the relationships instead of inheriting whatever app happened to be first in the list.
             if (mapping.OwnerId.HasValue)
             {
                 depotOwners[depotId] = mapping.OwnerId.Value;
-            }
-            else if (mapping.AppIds != null && mapping.AppIds.Count > 0)
-            {
-                // Fallback: Use first app ID as owner if not explicitly set
-                depotOwners[depotId] = mapping.AppIds[0];
             }
 
             if (mapping.AppNames != null && mapping.AppIds != null)
@@ -208,8 +235,13 @@ public class DataPersistenceService
                     appHeaderImages.TryAdd(mapping.AppIds[i], mapping.AppHeaderImages[i]);
                 }
             }
+
+            if (mapping.Relationships is { Count: > 0 })
+            {
+                relationships[depotId] = mapping.Relationships;
+            }
         }
 
-        return (depotMappings, appNames, depotOwners, appTypes, appHeaderImages);
+        return (depotMappings, appNames, depotOwners, appTypes, appHeaderImages, relationships);
     }
 }

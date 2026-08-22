@@ -23,7 +23,7 @@ Or visit the [latest release](https://github.com/regix1/lancache-pics/releases/l
   "metadata": {
     "lastUpdated": "2025-10-05T14:47:46Z",
     "totalMappings": 299599,
-    "version": "1.0",
+    "version": "1.1",
     "nextUpdateDue": "2025-10-07T14:47:46Z",
     "lastChangeNumber": 31491124
   },
@@ -34,6 +34,16 @@ Or visit the [latest release](https://github.com/regix1/lancache-pics/releases/l
       "appNames": ["Half-Life"],
       "appTypes": ["game"],
       "appHeaderImages": ["https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/70/header.jpg"],
+      "relationships": [
+        {
+          "sourceAppId": 70,
+          "depotFromAppId": null,
+          "dlcAppId": null,
+          "hasPublicManifest": true,
+          "manifestAppId": 70,
+          "licenseAppId": 70
+        }
+      ],
       "source": "SteamKit2-PICS",
       "discoveredAt": "2025-10-05T14:47:46Z"
     }
@@ -45,13 +55,30 @@ Or visit the [latest release](https://github.com/regix1/lancache-pics/releases/l
 
 | Field | Description |
 |-------|-------------|
-| `ownerId` | Primary app that owns this depot (from PICS `depotfromapp`) |
-| `appIds` | All apps that reference this depot |
+| `ownerId` | Deterministic owner: explicit `depotfromapp`, else a game source, else a stable AppID |
+| `appIds` | All apps that reference this depot. The owner is listed first |
 | `appNames` | Corresponding app names |
 | `appTypes` | App types: `game`, `dlc`, `demo`, `software`, `video`, `hardware` |
 | `appHeaderImages` | Steam CDN header image URLs for each app |
+| `relationships` | Schema 1.1 per-source identities. Absent on v1 files |
 | `source` | Data source identifier |
 | `discoveredAt` | Timestamp when the depot mapping was first collected |
+
+`relationships[]` fields:
+
+| Field | Description |
+|-------|-------------|
+| `sourceAppId` | App whose PICS record contained the depot |
+| `depotFromAppId` | Shared/proxy app from `depotfromapp`, if present |
+| `dlcAppId` | Entitlement marker from `dlcappid` |
+| `hasPublicManifest` | Whether a public branch manifest exists |
+| `manifestAppId` | AppID to request the manifest under: a usable `depotfromapp`, otherwise `sourceAppId` (including DLC apps) |
+| `licenseAppId` | App the account must own (`dlcappid` if present) |
+
+Schema 1.1 is backward compatible: v1 consumers can ignore `relationships` and keep using `ownerId` / `appIds`.
+Reading is not version gated. `metadata.version` records the schema that wrote the file and nothing checks it on load;
+a v1 file loads because every field 1.1 added is optional.
+Public manifests whose explicit size and download size are both zero are omitted because they contain no cacheable data.
 
 ### Metadata
 
