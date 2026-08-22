@@ -172,7 +172,7 @@ public class DataPersistenceService
         }
 
         return picsData;
-        }
+    }
 
     public (Dictionary<uint, HashSet<uint>> depotMappings, Dictionary<uint, string> appNames, Dictionary<uint, uint> depotOwners, Dictionary<uint, string> appTypes, Dictionary<uint, string> appHeaderImages, Dictionary<uint, List<PicsDepotRelationship>> relationships) ExtractMappingsFromData(PicsJsonData? data)
     {

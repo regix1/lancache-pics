@@ -363,28 +363,28 @@ public class DepotMappingService
             }
 
             foreach (var child in depots.Children)
-                {
+            {
                 if (!uint.TryParse(child.Name, out var depotId))
                     continue;
 
                 var depotFromApp = AsUInt(child["depotfromapp"]);
                 var dlcAppId = AsUInt(child["dlcappid"]);
                 if (dlcAppId == null && appType == "dlc")
-                    {
+                {
                     dlcAppId = appId;
                 }
 
                 var hasPublicManifest = HasPublicManifest(child);
                 if (HasExplicitlyEmptyPublicManifest(child) ||
                     DepotIdentity.IsInvalidDepot(hasPublicManifest, depotId, depotFromApp))
-                        {
+                {
                     continue;
-                        }
+                }
 
                 if (depotId == appId && appType == "dlc")
                 {
                     Console.WriteLine($"  Found DLC depot {depotId} for DLC app {appId} ({appName})");
-                    }
+                }
 
                 var relationship = DepotIdentity.CreateRelationship(
                     appId,
@@ -407,12 +407,12 @@ public class DepotMappingService
             _scannedApps.TryAdd(appId, 0);
         }
         catch (Exception ex)
-            {
+        {
             Console.WriteLine($"Warning: Error processing app {appId}: {ex.Message}");
         }
 
-                return dlcAppIdsToScan;
-            }
+        return dlcAppIdsToScan;
+    }
 
     public void RebuildDerivedOwners()
     {
@@ -420,7 +420,7 @@ public class DepotMappingService
         {
             if (bySource.IsEmpty)
             {
-                    continue;
+                continue;
             }
 
             var ownerId = DepotIdentity.SelectOwnerId(bySource.Values.ToList(), _appTypes);
@@ -430,21 +430,21 @@ public class DepotMappingService
     }
 
     private void AddAppToDepot(uint depotId, uint appId)
-                {
+    {
         var set = _depotToAppMappings.GetOrAdd(depotId, _ => new HashSet<uint>());
         // App batches are scanned in parallel and unrelated apps share depots, so the set behind the key needs the lock.
         lock (set)
         {
             set.Add(appId);
         }
-                }
+    }
 
     private void QueueDlcApps(KeyValue? listOfDlc, List<uint> dlcAppIdsToScan)
-                {
+    {
         if (listOfDlc == null || listOfDlc == KeyValue.Invalid)
         {
             return;
-                }
+        }
 
         if (listOfDlc.Children != null)
         {
@@ -472,10 +472,10 @@ public class DepotMappingService
         }
 
         if (!_appNames.ContainsKey(dlcAppId))
-                {
+        {
             dlcAppIdsToScan.Add(dlcAppId);
-                }
-            }
+        }
+    }
 
     public static bool HasPublicManifest(KeyValue depotKey)
     {
