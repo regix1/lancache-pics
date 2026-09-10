@@ -63,6 +63,86 @@ public sealed class DepotIdentityTests
     }
 
     [Fact]
+    public void StoredZeroIds_AreRemovedAndTheOwnerIsRebuilt()
+    {
+        var service = new DepotMappingService(new SteamConnectionService());
+        service.LoadExistingMappings(
+            new Dictionary<uint, HashSet<uint>> { [228988] = [0, 22300, 228980] },
+            new Dictionary<uint, string>(),
+            new Dictionary<uint, uint> { [228988] = 0 },
+            relationships: new Dictionary<uint, List<PicsDepotRelationship>>
+            {
+                [228988] =
+                [
+                    new PicsDepotRelationship
+                    {
+                        SourceAppId = 1666260,
+                        DepotFromAppId = 0,
+                        ManifestAppId = 0,
+                        LicenseAppId = 0
+                    },
+                    new PicsDepotRelationship
+                    {
+                        SourceAppId = 1175730,
+                        DepotFromAppId = 228980,
+                        ManifestAppId = 228980,
+                        LicenseAppId = 228980
+                    }
+                ]
+            });
+
+        Assert.DoesNotContain(0u, service.DepotMappings[228988]);
+        Assert.Equal(228980u, service.DepotOwners[228988]);
+        var healed = service.DepotRelationships[228988][1666260];
+        Assert.Null(healed.DepotFromAppId);
+        Assert.Equal(1666260u, healed.ManifestAppId);
+        Assert.Equal(1666260u, healed.LicenseAppId);
+    }
+
+    [Fact]
+    public void ZeroDepotFromApp_IsTreatedAsMissing()
+    {
+        var app = new KeyValue("1666260")
+        {
+            Children =
+            {
+                new KeyValue("common")
+                {
+                    Children =
+                    {
+                        new KeyValue("name", "Test game"),
+                        new KeyValue("type", "game")
+                    }
+                },
+                new KeyValue("depots")
+                {
+                    Children =
+                    {
+                        new KeyValue("228988")
+                        {
+                            Children =
+                            {
+                                new KeyValue("depotfromapp", "0"),
+                                PublicManifest()
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        var service = new DepotMappingService(new SteamConnectionService());
+
+        service.ProcessAppDepots(1666260, app);
+        service.RebuildDerivedOwners();
+
+        var relationship = service.DepotRelationships[228988][1666260];
+        Assert.Null(relationship.DepotFromAppId);
+        Assert.Equal(1666260u, relationship.ManifestAppId);
+        Assert.Equal(1666260u, service.DepotOwners[228988]);
+        Assert.DoesNotContain(0u, service.DepotMappings[228988]);
+    }
+
+    [Fact]
     public void DlcScanOrderDoesNotChangeManifestIdentity()
     {
         var service = new DepotMappingService(new SteamConnectionService());

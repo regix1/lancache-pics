@@ -68,6 +68,8 @@ public static class DepotIdentity
         uint? dlcAppId,
         bool hasPublicManifest)
     {
+        if (depotFromAppId == 0) depotFromAppId = null;
+        if (dlcAppId == 0) dlcAppId = null;
         var manifestAppId = GetManifestAppId(sourceAppId, depotId, depotFromAppId, dlcAppId);
         return new PicsDepotRelationship
         {

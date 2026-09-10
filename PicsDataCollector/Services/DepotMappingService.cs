@@ -431,6 +431,7 @@ public class DepotMappingService
 
     private void AddAppToDepot(uint depotId, uint appId)
     {
+        if (appId == 0) return;
         var set = _depotToAppMappings.GetOrAdd(depotId, _ => new HashSet<uint>());
         // App batches are scanned in parallel and unrelated apps share depots, so the set behind the key needs the lock.
         lock (set)
@@ -506,7 +507,7 @@ public class DepotMappingService
     private static uint? AsUInt(KeyValue kv)
     {
         if (kv == KeyValue.Invalid || kv.Value == null) return null;
-        if (uint.TryParse(kv.AsString() ?? string.Empty, out var v)) return v;
+        if (uint.TryParse(kv.AsString() ?? string.Empty, out var v) && v != 0) return v;
         return null;
     }
 
