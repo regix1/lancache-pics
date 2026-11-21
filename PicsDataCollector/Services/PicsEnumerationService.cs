@@ -200,6 +200,11 @@ public class PicsEnumerationService
             await Task.Delay(10);
         }
 
+        if (!tcs.Task.IsCompleted)
+        {
+            throw new TimeoutException($"No PICS reply for {typeof(T).Name} job {jobId}");
+        }
+
         return await tcs.Task;
     }
 }

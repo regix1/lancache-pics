@@ -15,7 +15,7 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, string> _appHeaderImages = new();
     private readonly ConcurrentDictionary<uint, byte> _scannedApps = new();  // Track scanned apps to avoid rescanning
     private readonly ConcurrentDictionary<(uint DepotId, uint SourceAppId), byte> _refreshedRelationships = new();
-    private readonly ConcurrentBag<uint> _failedDlcAppIds = [];
+    private readonly ConcurrentBag<uint> _failedAppIds = [];
 
     private const int AppBatchSize = 500;
 
@@ -152,7 +152,7 @@ public class DepotMappingService
         await Task.WhenAll(tasks);
         var failedAppIds = await RetryFailedBatchesAsync(failedBatches.OrderBy(f => f.Number).ToList(), allAppIds);
         var pendingAppIds = failedAppIds
-            .Concat(_failedDlcAppIds.Where(id => !_scannedApps.ContainsKey(id)))
+            .Concat(_failedAppIds.Where(id => !_scannedApps.ContainsKey(id)))
             .Distinct()
             .Order()
             .ToList();
@@ -160,6 +160,14 @@ public class DepotMappingService
         RebuildDerivedOwners();
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
         return pendingAppIds;
+    }
+
+    public List<uint> KnownAppIds()
+    {
+        var known = new HashSet<uint>();
+        foreach (var apps in _depotToAppMappings.Values) known.UnionWith(apps);
+        foreach (var bySource in _depotRelationships.Values) known.UnionWith(bySource.Keys);
+        return known.Order().ToList();
     }
 
     public int PruneUnrefreshed(IReadOnlySet<uint> pendingAppIds)
@@ -215,6 +223,13 @@ public class DepotMappingService
 
         foreach (var (batch, number) in failedBatches)
         {
+            if (!_connectionService.IsLoggedOn)
+            {
+                Console.WriteLine($"Warning: Lost the Steam connection, saving batch {number}'s {batch.Length} apps for the next run");
+                pendingAppIds.AddRange(batch);
+                continue;
+            }
+
             await Task.Delay(TimeSpan.FromSeconds(5));
             try
             {
@@ -332,6 +347,11 @@ public class DepotMappingService
 
     private async Task ProcessBatchAsync(uint[] batch, HashSet<uint> allAppIds, int batchNumber)
     {
+        if (!_connectionService.IsLoggedOn)
+        {
+            throw new InvalidOperationException("Not logged on to Steam");
+        }
+
         // Get access tokens
         var tokensJob = _connectionService.Apps.PICSGetAccessTokens(batch, Enumerable.Empty<uint>());
         var tokens = await WaitForCallbackAsync(tokensJob);
@@ -409,7 +429,7 @@ public class DepotMappingService
                     Console.WriteLine($"  Warning: Failed to process DLC batch, saving its {dlcBatch.Length} apps for the next run: {ex.Message}");
                     foreach (var dlcAppId in dlcBatch)
                     {
-                        _failedDlcAppIds.Add(dlcAppId);
+                        _failedAppIds.Add(dlcAppId);
                     }
                 }
             }
@@ -443,6 +463,8 @@ public class DepotMappingService
             QueueDlcApps(common?["listofdlc"], dlcAppIdsToScan);
             var extended = appinfo != KeyValue.Invalid ? appinfo["extended"] : kv["extended"];
             QueueDlcApps(extended?["listofdlc"], dlcAppIdsToScan);
+
+            _scannedApps.TryAdd(appId, 0);
 
             if (depots == KeyValue.Invalid || depots.Children == null)
             {
@@ -491,12 +513,12 @@ public class DepotMappingService
                     _appNames[depotFromApp.Value] = $"App {depotFromApp.Value}";
                 }
             }
-
-            _scannedApps.TryAdd(appId, 0);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Warning: Error processing app {appId}: {ex.Message}");
+            Console.WriteLine($"Warning: Error processing app {appId}, saving it for the next run: {ex.Message}");
+            _scannedApps.TryRemove(appId, out _);
+            _failedAppIds.Add(appId);
         }
 
         return dlcAppIdsToScan;
@@ -643,7 +665,7 @@ public class DepotMappingService
         if (callbacks.Sum(cb => cb.Apps.Count) > 0) return;
 
         var unknown = callbacks.Sum(cb => cb.UnknownApps.Count);
-        if (unknown > 0 && requestedApps < 100) return;
+        if (unknown > 0 && (requestedApps <= 100 || unknown >= requestedApps)) return;
 
         throw new InvalidOperationException(
             $"PICS returned no apps for {requestedApps} requested ({callbacks.Count} replies, {unknown} unknown)");

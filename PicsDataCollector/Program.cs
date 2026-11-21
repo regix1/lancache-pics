@@ -168,7 +168,10 @@ class Program
 
             // Enumerate app IDs
             Console.WriteLine("Enumerating app IDs via PICS...");
-            var appIds = MergeAppIds(carriedOverAppIds, await enumerationService.EnumerateAllAppIdsAsync(incrementalOnly, lastChangeNumber));
+            var enumeratedAppIds = await enumerationService.EnumerateAllAppIdsAsync(incrementalOnly, lastChangeNumber);
+            // A full run refetches every app the old file knows, so prune judges each depot on a fresh answer, not on whether the app list happened to include its app.
+            var knownAppIds = fullUpdate ? mappingService.KnownAppIds() : [];
+            var appIds = MergeAppIds(carriedOverAppIds, enumeratedAppIds.Concat(knownAppIds));
             Console.WriteLine($"Found {appIds.Count} app IDs to process");
             Console.WriteLine();
 
@@ -304,6 +307,7 @@ class Program
                 await Task.Delay(10);
             }
 
+            if (!tcs.Task.IsCompleted) return 0;
             return await tcs.Task;
         }
         catch

@@ -82,6 +82,33 @@ public sealed class PicsReplyTests
         Assert.False(rescan.DepotMappings.ContainsKey(12));
     }
 
+    [Fact]
+    public void KnownAppIds_IncludesEveryAppTheOldFileHolds()
+    {
+        var service = new DepotMappingService(new SteamConnectionService());
+        service.LoadExistingMappings(
+            new Dictionary<uint, HashSet<uint>> { [11] = [10], [21] = [20, 22] },
+            new Dictionary<uint, string> { [10] = "Listed", [20] = "Unlisted DLC" });
+
+        Assert.Equal([10u, 20u, 22u], service.KnownAppIds());
+    }
+
+    [Fact]
+    public void Prune_DropsDepotsOfAnAppThatNowHasNone()
+    {
+        var service = new DepotMappingService(new SteamConnectionService());
+        service.ProcessAppDepots(10, App("Game", 11));
+
+        var rescan = new DepotMappingService(new SteamConnectionService());
+        rescan.LoadExistingMappings(
+            service.DepotMappings.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+            new Dictionary<uint, string> { [10] = "Game" },
+            relationships: service.DepotRelationships.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Values.ToList()));
+        rescan.ProcessAppDepots(10, App("Game"));
+
+        Assert.Equal(1, rescan.PruneUnrefreshed(new HashSet<uint>()));
+    }
+
     private static KeyValue App(string name, params uint[] depotIds)
     {
         var depots = new KeyValue("depots");

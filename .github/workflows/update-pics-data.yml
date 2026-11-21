@@ -57,8 +57,7 @@ jobs:
         id: mode
         run: |
           if [ "${{ github.event_name }}" == "schedule" ]; then
-            # Check if it's Sunday (day 0) for full update
-            if [ "$(date -u +%u)" == "7" ]; then
+            if [ "${{ github.event.schedule }}" == "0 4 * * 0" ]; then
               echo "mode=full" >> $GITHUB_OUTPUT
               echo "Running scheduled FULL update (weekly Sunday)"
             else
@@ -81,7 +80,10 @@ jobs:
             exit 0
           fi
           mkdir -p output
-          gh release download "$LATEST_TAG" -p "pics_depot_mappings.json" -D output --clobber
+          if ! gh release download "$LATEST_TAG" -p "pics_depot_mappings.json" -D output --clobber; then
+            echo "::warning::Could not download pics_depot_mappings.json from $LATEST_TAG - collector will do a full scan"
+            exit 0
+          fi
           echo "Seeded from $LATEST_TAG ($(jq '.depotMappings | length' output/pics_depot_mappings.json) depots, change #$(jq '.metadata.lastChangeNumber' output/pics_depot_mappings.json), $(jq '.metadata.pendingAppIds // [] | length' output/pics_depot_mappings.json) pending apps)"
 
       - name: Run PICS data collector (Incremental)
