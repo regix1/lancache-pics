@@ -66,6 +66,20 @@ jobs:
             echo "Running manual ${{ github.event.inputs.mode }} update"
           fi
 
+      - name: Seed incremental run from latest release
+        if: steps.mode.outputs.mode == 'incremental'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LATEST_TAG=$(gh release list --limit 1 --json tagName -q '.[0].tagName' 2>/dev/null || echo "")
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No release to seed from - collector will do a full scan"
+            exit 0
+          fi
+          mkdir -p output
+          gh release download "$LATEST_TAG" -p "pics_depot_mappings.json" -D output --clobber
+          echo "Seeded from $LATEST_TAG ($(jq '.depotMappings | length' output/pics_depot_mappings.json) depots, change #$(jq '.metadata.lastChangeNumber' output/pics_depot_mappings.json))"
+
       - name: Run PICS data collector (Incremental)
         if: steps.mode.outputs.mode == 'incremental'
         env:
@@ -114,6 +128,24 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ github.token }}
+
+      - name: Refuse a sharp drop in depot count
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          if [ ! -f /tmp/old_release/pics_depot_mappings.json ]; then
+            echo "No previous release to compare against"
+            exit 0
+          fi
+
+          OLD_COUNT=$(jq '.depotMappings | length' /tmp/old_release/pics_depot_mappings.json)
+          NEW_COUNT=$(jq '.depotMappings | length' output/pics_depot_mappings.json)
+          MIN_COUNT=$(( OLD_COUNT * 80 / 100 ))
+          echo "Depot mappings: latest release $OLD_COUNT, this run $NEW_COUNT (minimum $MIN_COUNT)"
+
+          if [ "$NEW_COUNT" -lt "$MIN_COUNT" ]; then
+            echo "::error::Depot count fell more than 20% ($OLD_COUNT -> $NEW_COUNT). Not publishing."
+            exit 1
+          fi
 
       - name: Create release with data file
         if: steps.check_changes.outputs.changed == 'true'

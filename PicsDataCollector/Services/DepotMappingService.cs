@@ -120,34 +120,66 @@ public class DepotMappingService
 
         Console.WriteLine($"Processing {batches.Count} batches of apps (concurrency: 3)...");
 
+        var failedBatches = new ConcurrentBag<(uint[] Batch, int Number)>();
+
         var tasks = batches.Select(async (batch, index) =>
         {
             await semaphore.WaitAsync();
             try
             {
                 await ProcessBatchAsync(batch, allAppIds, index + 1);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Failed to process batch {index + 1}: {ex.Message}");
+                failedBatches.Add((batch, index + 1));
+            }
+            finally
+            {
                 var completed = Interlocked.Increment(ref processedBatches);
                 if (completed % 10 == 0)
                 {
                     var percent = (completed * 100.0 / batches.Count);
                     Console.WriteLine($"Progress: {completed}/{batches.Count} batches ({percent:F1}%) - {_depotToAppMappings.Count} depot mappings found");
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Warning: Failed to process batch {index + 1}: {ex.Message}");
-            }
-            finally
-            {
                 semaphore.Release();
                 await Task.Delay(50); // Small rate limit
             }
         });
 
         await Task.WhenAll(tasks);
+        await RetryFailedBatchesAsync(failedBatches.OrderBy(f => f.Number).ToList(), allAppIds);
 
         RebuildDerivedOwners();
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
+    }
+
+    private async Task RetryFailedBatchesAsync(List<(uint[] Batch, int Number)> failedBatches, HashSet<uint> allAppIds)
+    {
+        if (failedBatches.Count == 0) return;
+
+        Console.WriteLine($"Retrying {failedBatches.Count} failed batches one at a time...");
+        var stillFailed = new List<int>();
+
+        foreach (var (batch, number) in failedBatches)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(5));
+            try
+            {
+                await ProcessBatchAsync(batch, allAppIds, number);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Batch {number} failed again: {ex.Message}");
+                stillFailed.Add(number);
+            }
+        }
+
+        if (stillFailed.Count == 0) return;
+
+        throw new InvalidOperationException(
+            $"{stillFailed.Count} of {failedBatches.Count} retried batches still failed ({string.Join(", ", stillFailed)}). " +
+            "Refusing to save a partial depot map.");
     }
 
     public async Task<int> ResolveOrphanDepotsAsync(List<uint> orphanDepotIds, CancellationToken ct)
@@ -270,6 +302,7 @@ public class DepotMappingService
         // Get product info
         var productJob = _connectionService.Apps.PICSGetProductInfo(appRequests, Enumerable.Empty<SteamApps.PICSRequest>());
         var productCallbacks = await WaitForAllProductInfoAsync(productJob);
+        EnsureProductInfoReturnedApps(productCallbacks, batch.Length);
 
         // Process apps and collect DLC apps to scan
         var dlcAppsToScan = new List<uint>();
@@ -541,7 +574,24 @@ public class DepotMappingService
             await Task.Delay(10);
         }
 
+        if (!tcs.Task.IsCompleted)
+        {
+            throw new TimeoutException($"No PICS reply for {typeof(T).Name} job {jobId}");
+        }
+
         return await tcs.Task;
+    }
+
+    public static void EnsureProductInfoReturnedApps(IReadOnlyList<SteamApps.PICSProductInfoCallback> callbacks, int requestedApps)
+    {
+        if (requestedApps == 0) return;
+        if (callbacks.Sum(cb => cb.Apps.Count) > 0) return;
+
+        var unknown = callbacks.Sum(cb => cb.UnknownApps.Count);
+        if (unknown > 0 && requestedApps < 100) return;
+
+        throw new InvalidOperationException(
+            $"PICS returned no apps for {requestedApps} requested ({callbacks.Count} replies, {unknown} unknown)");
     }
 
     private async Task<IReadOnlyList<SteamApps.PICSProductInfoCallback>> WaitForAllProductInfoAsync(
@@ -571,6 +621,11 @@ public class DepotMappingService
         {
             _connectionService.CallbackManager.RunWaitCallbacks(TimeSpan.FromMilliseconds(100));
             await Task.Delay(10);
+        }
+
+        if (!isCompleted)
+        {
+            throw new TimeoutException($"PICS product info job {jobId} timed out after {callbacks.Count} partial replies");
         }
 
         return callbacks.AsReadOnly();
