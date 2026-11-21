@@ -14,6 +14,8 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, string> _appTypes = new();
     private readonly ConcurrentDictionary<uint, string> _appHeaderImages = new();
     private readonly ConcurrentDictionary<uint, byte> _scannedApps = new();  // Track scanned apps to avoid rescanning
+    private readonly ConcurrentDictionary<(uint DepotId, uint SourceAppId), byte> _refreshedRelationships = new();
+    private readonly ConcurrentBag<uint> _failedDlcAppIds = [];
 
     private const int AppBatchSize = 500;
 
@@ -148,11 +150,60 @@ public class DepotMappingService
         });
 
         await Task.WhenAll(tasks);
-        var pendingAppIds = await RetryFailedBatchesAsync(failedBatches.OrderBy(f => f.Number).ToList(), allAppIds);
+        var failedAppIds = await RetryFailedBatchesAsync(failedBatches.OrderBy(f => f.Number).ToList(), allAppIds);
+        var pendingAppIds = failedAppIds
+            .Concat(_failedDlcAppIds.Where(id => !_scannedApps.ContainsKey(id)))
+            .Distinct()
+            .Order()
+            .ToList();
 
         RebuildDerivedOwners();
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
         return pendingAppIds;
+    }
+
+    public int PruneUnrefreshed(IReadOnlySet<uint> pendingAppIds)
+    {
+        var removedDepots = 0;
+
+        foreach (var depotId in _depotToAppMappings.Keys.ToList())
+        {
+            var keptSources = KeepRefreshedRelationships(depotId, pendingAppIds);
+            var keptApps = new HashSet<uint>(keptSources);
+            keptApps.UnionWith(_depotToAppMappings[depotId].Where(pendingAppIds.Contains));
+
+            if (keptApps.Count == 0)
+            {
+                _depotToAppMappings.TryRemove(depotId, out _);
+                _depotRelationships.TryRemove(depotId, out _);
+                _depotOwners.TryRemove(depotId, out _);
+                removedDepots++;
+                continue;
+            }
+
+            _depotToAppMappings[depotId] = keptApps;
+            if (_depotOwners.TryGetValue(depotId, out var ownerId) && !keptApps.Contains(ownerId))
+            {
+                _depotOwners.TryRemove(depotId, out _);
+            }
+        }
+
+        RebuildDerivedOwners();
+        return removedDepots;
+    }
+
+    private List<uint> KeepRefreshedRelationships(uint depotId, IReadOnlySet<uint> pendingAppIds)
+    {
+        if (!_depotRelationships.TryGetValue(depotId, out var bySource)) return [];
+
+        foreach (var sourceAppId in bySource.Keys.ToList())
+        {
+            if (_refreshedRelationships.ContainsKey((depotId, sourceAppId))) continue;
+            if (pendingAppIds.Contains(sourceAppId)) continue;
+            bySource.TryRemove(sourceAppId, out _);
+        }
+
+        return bySource.Keys.ToList();
     }
 
     private async Task<List<uint>> RetryFailedBatchesAsync(List<(uint[] Batch, int Number)> failedBatches, HashSet<uint> allAppIds)
@@ -341,6 +392,7 @@ public class DepotMappingService
 
                     var dlcProductJob = _connectionService.Apps.PICSGetProductInfo(dlcAppRequests, Enumerable.Empty<SteamApps.PICSRequest>());
                     var dlcProductCallbacks = await WaitForAllProductInfoAsync(dlcProductJob);
+                    EnsureProductInfoReturnedApps(dlcProductCallbacks, dlcBatch.Length);
 
                     foreach (var dlcCb in dlcProductCallbacks)
                     {
@@ -354,7 +406,11 @@ public class DepotMappingService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"  Warning: Failed to process DLC batch: {ex.Message}");
+                    Console.WriteLine($"  Warning: Failed to process DLC batch, saving its {dlcBatch.Length} apps for the next run: {ex.Message}");
+                    foreach (var dlcAppId in dlcBatch)
+                    {
+                        _failedDlcAppIds.Add(dlcAppId);
+                    }
                 }
             }
         }
@@ -425,6 +481,7 @@ public class DepotMappingService
                     hasPublicManifest);
                 var bySource = _depotRelationships.GetOrAdd(depotId, _ => new ConcurrentDictionary<uint, PicsDepotRelationship>());
                 bySource[appId] = relationship;
+                _refreshedRelationships.TryAdd((depotId, appId), 0);
 
                 AddAppToDepot(depotId, appId);
 

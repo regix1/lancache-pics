@@ -16,9 +16,17 @@ class Program
         string? resolveDepotsArg = GetArgValue(args, "--resolve-depots");
         string? resolveDepotsFileArg = GetArgValue(args, "--resolve-depots-file");
 
+        bool prune = args.Contains("--prune");
+
         if (incrementalOnly && fullUpdate)
         {
             Console.WriteLine("Error: Cannot specify both --incremental and --full");
+            return 1;
+        }
+
+        if (prune && !fullUpdate)
+        {
+            Console.WriteLine("Error: --prune only works with --full, since only a full scan sees every app");
             return 1;
         }
 
@@ -166,6 +174,12 @@ class Program
 
             // Build depot mappings (this collects app types from PICS)
             var pendingAppIds = await mappingService.BuildDepotIndexAsync(appIds);
+
+            if (prune)
+            {
+                var removed = mappingService.PruneUnrefreshed(pendingAppIds.ToHashSet());
+                Console.WriteLine($"Pruned {removed} depots that no current app lists");
+            }
 
             // Resolve orphan depots if requested
             if (orphanDepotIds.Count > 0)

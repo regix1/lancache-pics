@@ -18,6 +18,11 @@ on:
         options:
           - incremental
           - full
+      prune:
+        description: 'Full mode only: drop depots that no current app lists'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -90,7 +95,8 @@ jobs:
         if: steps.mode.outputs.mode == 'full'
         env:
           STEAM_API_KEY: ${{ secrets.STEAM_KEY }}
-        run: dotnet run --project PicsDataCollector/PicsDataCollector.csproj --configuration Release -- --full
+          PRUNE: ${{ github.event_name == 'schedule' || github.event.inputs.prune == 'true' }}
+        run: dotnet run --project PicsDataCollector/PicsDataCollector.csproj --configuration Release -- --full $([ "$PRUNE" == "true" ] && echo --prune)
         timeout-minutes: 240
 
       - name: Check for changes

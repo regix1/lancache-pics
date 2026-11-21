@@ -48,6 +48,68 @@ public sealed class PicsReplyTests
     }
 
     [Fact]
+    public void Prune_DropsOnlyDepotsNotSeenThisRun()
+    {
+        var service = new DepotMappingService(new SteamConnectionService());
+        service.LoadExistingMappings(
+            new Dictionary<uint, HashSet<uint>> { [11] = [10], [21] = [20], [31] = [30] },
+            new Dictionary<uint, string> { [10] = "Still listed", [20] = "Delisted", [30] = "Pending" });
+
+        service.ProcessAppDepots(10, App("Still listed", 11));
+        var removed = service.PruneUnrefreshed(new HashSet<uint> { 30 });
+
+        Assert.Equal(1, removed);
+        Assert.True(service.DepotMappings.ContainsKey(11));
+        Assert.False(service.DepotMappings.ContainsKey(21));
+        Assert.True(service.DepotMappings.ContainsKey(31));
+    }
+
+    [Fact]
+    public void Prune_DropsDepotAnAppNoLongerLists()
+    {
+        var service = new DepotMappingService(new SteamConnectionService());
+        service.ProcessAppDepots(10, App("Game", 11, 12));
+
+        var rescan = new DepotMappingService(new SteamConnectionService());
+        rescan.LoadExistingMappings(
+            service.DepotMappings.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+            new Dictionary<uint, string> { [10] = "Game" },
+            relationships: service.DepotRelationships.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Values.ToList()));
+        rescan.ProcessAppDepots(10, App("Game", 11));
+        rescan.PruneUnrefreshed(new HashSet<uint>());
+
+        Assert.True(rescan.DepotMappings.ContainsKey(11));
+        Assert.False(rescan.DepotMappings.ContainsKey(12));
+    }
+
+    private static KeyValue App(string name, params uint[] depotIds)
+    {
+        var depots = new KeyValue("depots");
+        foreach (var depotId in depotIds)
+        {
+            depots.Children.Add(new KeyValue(depotId.ToString())
+            {
+                Children =
+                {
+                    new KeyValue("manifests")
+                    {
+                        Children = { new KeyValue("public") { Children = { new KeyValue("gid", "1") } } }
+                    }
+                }
+            });
+        }
+
+        return new KeyValue("app")
+        {
+            Children =
+            {
+                new KeyValue("common") { Children = { new KeyValue("name", name), new KeyValue("type", "game") } },
+                depots
+            }
+        };
+    }
+
+    [Fact]
     public void NothingRequested_DoesNotThrow()
     {
         DepotMappingService.EnsureProductInfoReturnedApps(Array.Empty<SteamApps.PICSProductInfoCallback>(), 0);
