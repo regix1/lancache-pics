@@ -88,7 +88,6 @@ class Program
             var enumerationService = new PicsEnumerationService(connectionService);
             var mappingService = new DepotMappingService(connectionService);
 
-            // Every mode builds on the existing file so a run that gets cut off never drops data it already had.
             uint lastChangeNumber = 0;
             var (data, changeNumber) = await persistenceService.LoadExistingDataAsync();
             var carriedOverAppIds = data?.Metadata?.PendingAppIds ?? [];
@@ -167,9 +166,15 @@ class Program
             Console.WriteLine();
 
             // Enumerate app IDs
+            var finalChangeNumber = await GetCurrentChangeNumberAsync(connectionService);
+            if (finalChangeNumber == 0)
+            {
+                Console.WriteLine($"Warning: Could not read the current change number, keeping #{changeNumber}");
+                finalChangeNumber = changeNumber;
+            }
+
             Console.WriteLine("Enumerating app IDs via PICS...");
             var enumeratedAppIds = await enumerationService.EnumerateAllAppIdsAsync(incrementalOnly, lastChangeNumber);
-            // A full run refetches every app the old file knows, so prune judges each depot on a fresh answer, not on whether the app list happened to include its app.
             var knownAppIds = fullUpdate ? mappingService.KnownAppIds() : [];
             var appIds = MergeAppIds(carriedOverAppIds, enumeratedAppIds.Concat(knownAppIds));
             Console.WriteLine($"Found {appIds.Count} app IDs to process");
@@ -177,6 +182,11 @@ class Program
 
             // Build depot mappings (this collects app types from PICS)
             var pendingAppIds = await mappingService.BuildDepotIndexAsync(appIds);
+            if (pendingAppIds.Count > MaxPendingApps)
+            {
+                Console.WriteLine($"::error::{pendingAppIds.Count} apps could not be fetched, more than the {MaxPendingApps} a later run can catch up on. Not saving.");
+                return 1;
+            }
 
             if (prune)
             {
@@ -213,9 +223,6 @@ class Program
                 kvp => kvp.Key,
                 kvp => kvp.Value
             );
-
-            // Get the final change number from enumeration service
-            var finalChangeNumber = await GetCurrentChangeNumberAsync(connectionService);
 
             // Convert AppTypes to Dictionary for persistence
             var appTypesDict = mappingService.AppTypes.ToDictionary(
@@ -259,6 +266,8 @@ class Program
             return 1;
         }
     }
+
+    private const int MaxPendingApps = 10_000;
 
     private static List<uint> MergeAppIds(IEnumerable<uint> carriedOver, IEnumerable<uint> enumerated)
     {

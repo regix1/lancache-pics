@@ -14,6 +14,9 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, string> _appTypes = new();
     private readonly ConcurrentDictionary<uint, string> _appHeaderImages = new();
     private readonly ConcurrentDictionary<uint, byte> _scannedApps = new();  // Track scanned apps to avoid rescanning
+    private readonly ConcurrentDictionary<uint, byte> _queuedApps = new();
+    private readonly SemaphoreSlim _reconnectLock = new(1, 1);
+    private bool _reconnectFailed;
     private readonly ConcurrentDictionary<(uint DepotId, uint SourceAppId), byte> _refreshedRelationships = new();
     private readonly ConcurrentBag<uint> _failedAppIds = [];
 
@@ -223,9 +226,9 @@ public class DepotMappingService
 
         foreach (var (batch, number) in failedBatches)
         {
-            if (!_connectionService.IsLoggedOn)
+            if (_reconnectFailed)
             {
-                Console.WriteLine($"Warning: Lost the Steam connection, saving batch {number}'s {batch.Length} apps for the next run");
+                Console.WriteLine($"Warning: No Steam connection, saving batch {number}'s {batch.Length} apps for the next run");
                 pendingAppIds.AddRange(batch);
                 continue;
             }
@@ -347,10 +350,7 @@ public class DepotMappingService
 
     private async Task ProcessBatchAsync(uint[] batch, HashSet<uint> allAppIds, int batchNumber)
     {
-        if (!_connectionService.IsLoggedOn)
-        {
-            throw new InvalidOperationException("Not logged on to Steam");
-        }
+        await EnsureLoggedOnAsync();
 
         // Get access tokens
         var tokensJob = _connectionService.Apps.PICSGetAccessTokens(batch, Enumerable.Empty<uint>());
@@ -372,6 +372,7 @@ public class DepotMappingService
         var productJob = _connectionService.Apps.PICSGetProductInfo(appRequests, Enumerable.Empty<SteamApps.PICSRequest>());
         var productCallbacks = await WaitForAllProductInfoAsync(productJob);
         EnsureProductInfoReturnedApps(productCallbacks, batch.Length);
+        MarkMissingAppsFailed(batch, productCallbacks);
 
         // Process apps and collect DLC apps to scan
         var dlcAppsToScan = new List<uint>();
@@ -413,6 +414,7 @@ public class DepotMappingService
                     var dlcProductJob = _connectionService.Apps.PICSGetProductInfo(dlcAppRequests, Enumerable.Empty<SteamApps.PICSRequest>());
                     var dlcProductCallbacks = await WaitForAllProductInfoAsync(dlcProductJob);
                     EnsureProductInfoReturnedApps(dlcProductCallbacks, dlcBatch.Length);
+                    MarkMissingAppsFailed(dlcBatch, dlcProductCallbacks);
 
                     foreach (var dlcCb in dlcProductCallbacks)
                     {
@@ -433,6 +435,42 @@ public class DepotMappingService
                     }
                 }
             }
+        }
+    }
+
+    private async Task EnsureLoggedOnAsync()
+    {
+        if (_connectionService.IsLoggedOn) return;
+
+        await _reconnectLock.WaitAsync();
+        try
+        {
+            if (_connectionService.IsLoggedOn) return;
+            if (_reconnectFailed) throw new InvalidOperationException("Not logged on to Steam");
+
+            Console.WriteLine("Lost the Steam connection, reconnecting...");
+            try
+            {
+                await _connectionService.ConnectAndLoginAsync();
+            }
+            catch
+            {
+                _reconnectFailed = true;
+                throw;
+            }
+        }
+        finally
+        {
+            _reconnectLock.Release();
+        }
+    }
+
+    private void MarkMissingAppsFailed(IEnumerable<uint> requested, IReadOnlyList<SteamApps.PICSProductInfoCallback> callbacks)
+    {
+        foreach (var appId in requested)
+        {
+            if (callbacks.Any(cb => cb.Apps.ContainsKey(appId) || cb.UnknownApps.Contains(appId))) continue;
+            _failedAppIds.Add(appId);
         }
     }
 
@@ -507,10 +545,10 @@ public class DepotMappingService
 
                 AddAppToDepot(depotId, appId);
 
-                if (depotFromApp.HasValue && !_appNames.ContainsKey(depotFromApp.Value) && !_scannedApps.ContainsKey(depotFromApp.Value))
+                if (depotFromApp.HasValue && TryQueueApp(depotFromApp.Value))
                 {
                     dlcAppIdsToScan.Add(depotFromApp.Value);
-                    _appNames[depotFromApp.Value] = $"App {depotFromApp.Value}";
+                    _appNames.TryAdd(depotFromApp.Value, $"App {depotFromApp.Value}");
                 }
             }
         }
@@ -582,10 +620,15 @@ public class DepotMappingService
             return;
         }
 
-        if (!_appNames.ContainsKey(dlcAppId))
+        if (TryQueueApp(dlcAppId))
         {
             dlcAppIdsToScan.Add(dlcAppId);
         }
+    }
+
+    private bool TryQueueApp(uint appId)
+    {
+        return !_scannedApps.ContainsKey(appId) && _queuedApps.TryAdd(appId, 0);
     }
 
     public static bool HasPublicManifest(KeyValue depotKey)

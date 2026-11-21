@@ -109,6 +109,19 @@ public sealed class PicsReplyTests
         Assert.Equal(1, rescan.PruneUnrefreshed(new HashSet<uint>()));
     }
 
+    [Fact]
+    public void DlcKnownOnlyByName_IsQueuedOnce()
+    {
+        var service = new DepotMappingService(new SteamConnectionService());
+        service.LoadExistingMappings([], new Dictionary<uint, string> { [20] = "Old DLC" });
+
+        var app = App("Game");
+        app["common"].Children.Add(new KeyValue("listofdlc", "20"));
+
+        Assert.Equal([20u], service.ProcessAppDepots(10, app));
+        Assert.Empty(service.ProcessAppDepots(11, app));
+    }
+
     private static KeyValue App(string name, params uint[] depotIds)
     {
         var depots = new KeyValue("depots");
