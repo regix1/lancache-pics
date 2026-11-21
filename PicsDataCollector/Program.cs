@@ -16,9 +16,17 @@ class Program
         string? resolveDepotsArg = GetArgValue(args, "--resolve-depots");
         string? resolveDepotsFileArg = GetArgValue(args, "--resolve-depots-file");
 
+        bool prune = args.Contains("--prune");
+
         if (incrementalOnly && fullUpdate)
         {
             Console.WriteLine("Error: Cannot specify both --incremental and --full");
+            return 1;
+        }
+
+        if (prune && !fullUpdate)
+        {
+            Console.WriteLine("Error: --prune only works with --full, since only a full scan sees every app");
             return 1;
         }
 
@@ -80,40 +88,34 @@ class Program
             var enumerationService = new PicsEnumerationService(connectionService);
             var mappingService = new DepotMappingService(connectionService);
 
-            // Load existing data if appropriate
             uint lastChangeNumber = 0;
-            if (incrementalOnly)
+            var (data, changeNumber) = await persistenceService.LoadExistingDataAsync();
+            var carriedOverAppIds = data?.Metadata?.PendingAppIds ?? [];
+
+            if (data != null)
+            {
+                var (depotMappings, appNames, depotOwners, appTypes, headerImages, relationships) = persistenceService.ExtractMappingsFromData(data);
+                mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes, headerImages, relationships);
+            }
+
+            if (fullUpdate)
+            {
+                Console.WriteLine("Mode: Full update (rescanning every app on top of existing data)");
+            }
+            else if (incrementalOnly || data != null)
             {
                 Console.WriteLine("Mode: Incremental update");
-                var (data, changeNumber) = await persistenceService.LoadExistingDataAsync();
                 lastChangeNumber = changeNumber;
-
-                if (data != null)
-                {
-                    var (depotMappings, appNames, depotOwners, appTypes, headerImages, relationships) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes, headerImages, relationships);
-                }
-            }
-            else if (fullUpdate)
-            {
-                Console.WriteLine("Mode: Full update");
+                incrementalOnly = true;
             }
             else
             {
-                // Auto-detect based on existing file
-                var (data, changeNumber) = await persistenceService.LoadExistingDataAsync();
-                if (data != null)
-                {
-                    Console.WriteLine("Mode: Incremental update (auto-detected)");
-                    lastChangeNumber = changeNumber;
-                    var (depotMappings, appNames, depotOwners, appTypes, headerImages, relationships) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes, headerImages, relationships);
-                    incrementalOnly = true;
-                }
-                else
-                {
-                    Console.WriteLine("Mode: Full update (no existing data found)");
-                }
+                Console.WriteLine("Mode: Full update (no existing data found)");
+            }
+
+            if (carriedOverAppIds.Count > 0)
+            {
+                Console.WriteLine($"Picking up {carriedOverAppIds.Count} apps left pending by the last run");
             }
 
             Console.WriteLine();
@@ -164,13 +166,41 @@ class Program
             Console.WriteLine();
 
             // Enumerate app IDs
+            var finalChangeNumber = await ReadChangeNumberAsync(connectionService);
+            if (finalChangeNumber == 0 && changeNumber == 0)
+            {
+                Console.WriteLine("::error::Could not read the current change number and there is no earlier one to keep");
+                return 1;
+            }
+
+            if (finalChangeNumber == 0)
+            {
+                Console.WriteLine($"Warning: Could not read the current change number, keeping #{changeNumber}");
+                finalChangeNumber = changeNumber;
+            }
+
+            mappingService.RefetchKnownDlc = fullUpdate;
+
             Console.WriteLine("Enumerating app IDs via PICS...");
-            var appIds = await enumerationService.EnumerateAllAppIdsAsync(incrementalOnly, lastChangeNumber);
+            var enumeratedAppIds = await enumerationService.EnumerateAllAppIdsAsync(incrementalOnly, lastChangeNumber);
+            var knownAppIds = fullUpdate ? mappingService.KnownAppIds() : [];
+            var appIds = MergeAppIds(carriedOverAppIds, enumeratedAppIds.Concat(knownAppIds));
             Console.WriteLine($"Found {appIds.Count} app IDs to process");
             Console.WriteLine();
 
             // Build depot mappings (this collects app types from PICS)
-            await mappingService.BuildDepotIndexAsync(appIds);
+            var pendingAppIds = await mappingService.BuildDepotIndexAsync(appIds);
+            if (pendingAppIds.Count > MaxPendingApps)
+            {
+                Console.WriteLine($"::error::{pendingAppIds.Count} apps could not be fetched, more than the {MaxPendingApps} a later run can catch up on. Not saving.");
+                return 1;
+            }
+
+            if (prune)
+            {
+                var removed = mappingService.PruneUnrefreshed(pendingAppIds.ToHashSet());
+                Console.WriteLine($"Pruned {removed} depots that no current app lists");
+            }
 
             // Resolve orphan depots if requested
             if (orphanDepotIds.Count > 0)
@@ -202,9 +232,6 @@ class Program
                 kvp => kvp.Value
             );
 
-            // Get the final change number from enumeration service
-            var finalChangeNumber = await GetCurrentChangeNumberAsync(connectionService);
-
             // Convert AppTypes to Dictionary for persistence
             var appTypesDict = mappingService.AppTypes.ToDictionary(
                 kvp => kvp.Key,
@@ -223,12 +250,16 @@ class Program
             var depotRelationshipsDict = mappingService.DepotRelationships.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value.Values.ToList());
-            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber, depotOwnersDict, appTypesDict, appHeaderImagesDict, apiVersion, depotRelationshipsDict);
+            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber, depotOwnersDict, appTypesDict, appHeaderImagesDict, apiVersion, depotRelationshipsDict, pendingAppIds);
 
             Console.WriteLine();
             Console.WriteLine("Collection complete!");
             Console.WriteLine($"Total depot mappings: {depotMappingsDict.Count}");
             Console.WriteLine($"Total unique apps: {appNamesDict.Count}");
+            if (pendingAppIds.Count > 0)
+            {
+                Console.WriteLine($"::warning::{pendingAppIds.Count} apps could not be fetched and will be retried next run");
+            }
 
             // Cleanup
             isRunning = false;
@@ -242,6 +273,13 @@ class Program
             Console.WriteLine(ex.StackTrace);
             return 1;
         }
+    }
+
+    private const int MaxPendingApps = 10_000;
+
+    private static List<uint> MergeAppIds(IEnumerable<uint> carriedOver, IEnumerable<uint> enumerated)
+    {
+        return carriedOver.Concat(enumerated).Distinct().ToList();
     }
 
     private static string? GetArgValue(string[] args, string argName)
@@ -259,6 +297,18 @@ class Program
             }
         }
         return null;
+    }
+
+    private static async Task<uint> ReadChangeNumberAsync(SteamConnectionService connectionService)
+    {
+        for (var attempt = 1; attempt <= 3; attempt++)
+        {
+            var number = await GetCurrentChangeNumberAsync(connectionService);
+            if (number != 0) return number;
+            Console.WriteLine($"Warning: Change number read {attempt} of 3 failed");
+        }
+
+        return 0;
     }
 
     private static async Task<uint> GetCurrentChangeNumberAsync(SteamConnectionService connectionService)
@@ -286,6 +336,7 @@ class Program
                 await Task.Delay(10);
             }
 
+            if (!tcs.Task.IsCompleted) return 0;
             return await tcs.Task;
         }
         catch

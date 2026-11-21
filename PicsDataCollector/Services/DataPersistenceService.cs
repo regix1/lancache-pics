@@ -63,7 +63,8 @@ public class DataPersistenceService
         Dictionary<uint, string>? appTypes = null,
         Dictionary<uint, string>? appHeaderImages = null,
         string apiVersion = "PICS",
-        Dictionary<uint, List<PicsDepotRelationship>>? depotRelationships = null)
+        Dictionary<uint, List<PicsDepotRelationship>>? depotRelationships = null,
+        List<uint>? pendingAppIds = null)
     {
         Console.WriteLine();
         Console.WriteLine("Saving to JSON...");
@@ -76,7 +77,8 @@ public class DataPersistenceService
             appTypes,
             appHeaderImages,
             apiVersion,
-            depotRelationships);
+            depotRelationships,
+            pendingAppIds);
 
         var jsonOptions = new JsonSerializerOptions
         {
@@ -107,7 +109,8 @@ public class DataPersistenceService
         Dictionary<uint, string>? appTypes = null,
         Dictionary<uint, string>? appHeaderImages = null,
         string apiVersion = "PICS",
-        Dictionary<uint, List<PicsDepotRelationship>>? depotRelationships = null)
+        Dictionary<uint, List<PicsDepotRelationship>>? depotRelationships = null,
+        List<uint>? pendingAppIds = null)
     {
         var picsData = new PicsJsonData
         {
@@ -117,7 +120,8 @@ public class DataPersistenceService
                 TotalMappings = depotMappings.Sum(kvp => kvp.Value.Count),
                 Version = "1.1",
                 NextUpdateDue = DateTime.UtcNow.AddDays(2),
-                LastChangeNumber = lastChangeNumber
+                LastChangeNumber = lastChangeNumber,
+                PendingAppIds = pendingAppIds ?? []
             },
             DepotMappings = new Dictionary<string, PicsDepotMapping>()
         };

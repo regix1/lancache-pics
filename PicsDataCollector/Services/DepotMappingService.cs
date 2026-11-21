@@ -14,6 +14,17 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, string> _appTypes = new();
     private readonly ConcurrentDictionary<uint, string> _appHeaderImages = new();
     private readonly ConcurrentDictionary<uint, byte> _scannedApps = new();  // Track scanned apps to avoid rescanning
+    private readonly ConcurrentDictionary<uint, byte> _queuedApps = new();
+    private readonly ConcurrentDictionary<uint, byte> _stubAppIds = new();
+    private readonly SemaphoreSlim _reconnectLock = new(1, 1);
+    private bool _givenUp;
+    private int _failuresInARow;
+
+    private const int MaxFailuresInARow = 5;
+
+    public bool RefetchKnownDlc { get; set; }
+    private readonly ConcurrentDictionary<(uint DepotId, uint SourceAppId), byte> _refreshedRelationships = new();
+    private readonly ConcurrentBag<uint> _failedAppIds = [];
 
     private const int AppBatchSize = 500;
 
@@ -111,7 +122,7 @@ public class DepotMappingService
         RebuildDerivedOwners();
     }
 
-    public async Task BuildDepotIndexAsync(List<uint> appIds)
+    public async Task<List<uint>> BuildDepotIndexAsync(List<uint> appIds)
     {
         var allAppIds = new HashSet<uint>(appIds); // For fast DLC dedup
         var batches = appIds.Chunk(AppBatchSize).ToList();
@@ -120,34 +131,134 @@ public class DepotMappingService
 
         Console.WriteLine($"Processing {batches.Count} batches of apps (concurrency: 3)...");
 
+        var failedBatches = new ConcurrentBag<(uint[] Batch, int Number)>();
+
         var tasks = batches.Select(async (batch, index) =>
         {
             await semaphore.WaitAsync();
             try
             {
                 await ProcessBatchAsync(batch, allAppIds, index + 1);
+                RecordBatchResult(succeeded: true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Failed to process batch {index + 1}: {ex.Message}");
+                failedBatches.Add((batch, index + 1));
+                RecordBatchResult(succeeded: false);
+            }
+            finally
+            {
                 var completed = Interlocked.Increment(ref processedBatches);
                 if (completed % 10 == 0)
                 {
                     var percent = (completed * 100.0 / batches.Count);
                     Console.WriteLine($"Progress: {completed}/{batches.Count} batches ({percent:F1}%) - {_depotToAppMappings.Count} depot mappings found");
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Warning: Failed to process batch {index + 1}: {ex.Message}");
-            }
-            finally
-            {
                 semaphore.Release();
                 await Task.Delay(50); // Small rate limit
             }
         });
 
         await Task.WhenAll(tasks);
+        var failedAppIds = await RetryFailedBatchesAsync(failedBatches.OrderBy(f => f.Number).ToList(), allAppIds);
+        var pendingAppIds = failedAppIds
+            .Concat(_failedAppIds.Where(id => !_scannedApps.ContainsKey(id)))
+            .Distinct()
+            .Order()
+            .ToList();
 
         RebuildDerivedOwners();
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
+        return pendingAppIds;
+    }
+
+    public List<uint> KnownAppIds()
+    {
+        var known = new HashSet<uint>();
+        foreach (var apps in _depotToAppMappings.Values) known.UnionWith(apps);
+        foreach (var bySource in _depotRelationships.Values) known.UnionWith(bySource.Keys);
+        return known.Order().ToList();
+    }
+
+    public int PruneUnrefreshed(IReadOnlySet<uint> pendingAppIds)
+    {
+        var removedDepots = 0;
+
+        foreach (var depotId in _depotToAppMappings.Keys.ToList())
+        {
+            var keptSources = KeepRefreshedRelationships(depotId, pendingAppIds);
+            keptSources.AddRange(_depotToAppMappings[depotId].Where(_stubAppIds.ContainsKey));
+            var keptApps = new HashSet<uint>(keptSources);
+            keptApps.UnionWith(_depotToAppMappings[depotId].Where(pendingAppIds.Contains));
+
+            if (keptApps.Count == 0)
+            {
+                _depotToAppMappings.TryRemove(depotId, out _);
+                _depotRelationships.TryRemove(depotId, out _);
+                _depotOwners.TryRemove(depotId, out _);
+                removedDepots++;
+                continue;
+            }
+
+            _depotToAppMappings[depotId] = keptApps;
+            if (_depotOwners.TryGetValue(depotId, out var ownerId) && !keptApps.Contains(ownerId))
+            {
+                _depotOwners.TryRemove(depotId, out _);
+            }
+        }
+
+        RebuildDerivedOwners();
+        return removedDepots;
+    }
+
+    private List<uint> KeepRefreshedRelationships(uint depotId, IReadOnlySet<uint> pendingAppIds)
+    {
+        if (!_depotRelationships.TryGetValue(depotId, out var bySource)) return [];
+
+        foreach (var sourceAppId in bySource.Keys.ToList())
+        {
+            if (_refreshedRelationships.ContainsKey((depotId, sourceAppId))) continue;
+            if (pendingAppIds.Contains(sourceAppId)) continue;
+            if (_stubAppIds.ContainsKey(sourceAppId)) continue;
+            bySource.TryRemove(sourceAppId, out _);
+        }
+
+        return bySource.Keys.ToList();
+    }
+
+    private async Task<List<uint>> RetryFailedBatchesAsync(List<(uint[] Batch, int Number)> failedBatches, HashSet<uint> allAppIds)
+    {
+        var pendingAppIds = new List<uint>();
+        if (failedBatches.Count == 0) return pendingAppIds;
+
+        Console.WriteLine($"Retrying {failedBatches.Count} failed batches one at a time...");
+
+        foreach (var (batch, number) in failedBatches)
+        {
+            if (_givenUp)
+            {
+                Console.WriteLine($"Warning: Gave up on Steam, saving batch {number}'s {batch.Length} apps for the next run");
+                pendingAppIds.AddRange(batch);
+                continue;
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(5));
+            try
+            {
+                await ProcessBatchAsync(batch, allAppIds, number);
+                RecordBatchResult(succeeded: true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Batch {number} failed again, saving its {batch.Length} apps for the next run: {ex.Message}");
+                pendingAppIds.AddRange(batch);
+                RecordBatchResult(succeeded: false);
+            }
+        }
+
+        pendingAppIds.Sort();
+        return pendingAppIds;
     }
 
     public async Task<int> ResolveOrphanDepotsAsync(List<uint> orphanDepotIds, CancellationToken ct)
@@ -251,6 +362,8 @@ public class DepotMappingService
 
     private async Task ProcessBatchAsync(uint[] batch, HashSet<uint> allAppIds, int batchNumber)
     {
+        await EnsureLoggedOnAsync();
+
         // Get access tokens
         var tokensJob = _connectionService.Apps.PICSGetAccessTokens(batch, Enumerable.Empty<uint>());
         var tokens = await WaitForCallbackAsync(tokensJob);
@@ -270,6 +383,8 @@ public class DepotMappingService
         // Get product info
         var productJob = _connectionService.Apps.PICSGetProductInfo(appRequests, Enumerable.Empty<SteamApps.PICSRequest>());
         var productCallbacks = await WaitForAllProductInfoAsync(productJob);
+        EnsureProductInfoReturnedApps(productCallbacks, batch.Length);
+        MarkMissingAppsFailed(batch, productCallbacks);
 
         // Process apps and collect DLC apps to scan
         var dlcAppsToScan = new List<uint>();
@@ -294,6 +409,7 @@ public class DepotMappingService
             {
                 try
                 {
+                    await EnsureLoggedOnAsync();
                     var dlcTokensJob = _connectionService.Apps.PICSGetAccessTokens(dlcBatch, Enumerable.Empty<uint>());
                     var dlcTokens = await WaitForCallbackAsync(dlcTokensJob);
 
@@ -310,6 +426,8 @@ public class DepotMappingService
 
                     var dlcProductJob = _connectionService.Apps.PICSGetProductInfo(dlcAppRequests, Enumerable.Empty<SteamApps.PICSRequest>());
                     var dlcProductCallbacks = await WaitForAllProductInfoAsync(dlcProductJob);
+                    EnsureProductInfoReturnedApps(dlcProductCallbacks, dlcBatch.Length);
+                    MarkMissingAppsFailed(dlcBatch, dlcProductCallbacks);
 
                     foreach (var dlcCb in dlcProductCallbacks)
                     {
@@ -323,9 +441,63 @@ public class DepotMappingService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"  Warning: Failed to process DLC batch: {ex.Message}");
+                    Console.WriteLine($"  Warning: Failed to process DLC batch, saving its {dlcBatch.Length} apps for the next run: {ex.Message}");
+                    foreach (var dlcAppId in dlcBatch)
+                    {
+                        _failedAppIds.Add(dlcAppId);
+                    }
                 }
             }
+        }
+    }
+
+    private void RecordBatchResult(bool succeeded)
+    {
+        if (succeeded)
+        {
+            Interlocked.Exchange(ref _failuresInARow, 0);
+            return;
+        }
+
+        if (Interlocked.Increment(ref _failuresInARow) < MaxFailuresInARow || _givenUp) return;
+        _givenUp = true;
+        Console.WriteLine($"Warning: {MaxFailuresInARow} batches failed in a row, giving up on Steam for this run");
+    }
+
+    private async Task EnsureLoggedOnAsync()
+    {
+        if (_givenUp) throw new InvalidOperationException("Gave up on Steam for this run");
+        if (_connectionService.IsLoggedOn) return;
+
+        await _reconnectLock.WaitAsync();
+        try
+        {
+            if (_connectionService.IsLoggedOn) return;
+            if (_givenUp) throw new InvalidOperationException("Gave up on Steam for this run");
+
+            Console.WriteLine("Lost the Steam connection, reconnecting...");
+            try
+            {
+                await _connectionService.ConnectAndLoginAsync();
+            }
+            catch
+            {
+                _givenUp = true;
+                throw;
+            }
+        }
+        finally
+        {
+            _reconnectLock.Release();
+        }
+    }
+
+    private void MarkMissingAppsFailed(IEnumerable<uint> requested, IReadOnlyList<SteamApps.PICSProductInfoCallback> callbacks)
+    {
+        foreach (var appId in requested)
+        {
+            if (callbacks.Any(cb => cb.Apps.ContainsKey(appId) || cb.UnknownApps.Contains(appId))) continue;
+            _failedAppIds.Add(appId);
         }
     }
 
@@ -338,6 +510,13 @@ public class DepotMappingService
             var appinfo = kv["appinfo"];
             var common = appinfo != KeyValue.Invalid ? appinfo["common"] : kv["common"];
             var depots = appinfo != KeyValue.Invalid ? appinfo["depots"] : kv["depots"];
+
+            if (common == KeyValue.Invalid || common.Children.Count == 0)
+            {
+                Console.WriteLine($"  App {appId} came back empty, keeping what the last run had");
+                _stubAppIds.TryAdd(appId, 0);
+                return dlcAppIdsToScan;
+            }
 
             var appName = common?["name"]?.AsString() ?? $"App {appId}";
             var appType = common?["type"]?.AsString()?.ToLower() ?? "unknown";
@@ -356,6 +535,8 @@ public class DepotMappingService
             QueueDlcApps(common?["listofdlc"], dlcAppIdsToScan);
             var extended = appinfo != KeyValue.Invalid ? appinfo["extended"] : kv["extended"];
             QueueDlcApps(extended?["listofdlc"], dlcAppIdsToScan);
+
+            _scannedApps.TryAdd(appId, 0);
 
             if (depots == KeyValue.Invalid || depots.Children == null)
             {
@@ -394,21 +575,22 @@ public class DepotMappingService
                     hasPublicManifest);
                 var bySource = _depotRelationships.GetOrAdd(depotId, _ => new ConcurrentDictionary<uint, PicsDepotRelationship>());
                 bySource[appId] = relationship;
+                _refreshedRelationships.TryAdd((depotId, appId), 0);
 
                 AddAppToDepot(depotId, appId);
 
-                if (depotFromApp.HasValue && !_appNames.ContainsKey(depotFromApp.Value) && !_scannedApps.ContainsKey(depotFromApp.Value))
+                if (depotFromApp.HasValue && TryQueueApp(depotFromApp.Value))
                 {
                     dlcAppIdsToScan.Add(depotFromApp.Value);
-                    _appNames[depotFromApp.Value] = $"App {depotFromApp.Value}";
+                    _appNames.TryAdd(depotFromApp.Value, $"App {depotFromApp.Value}");
                 }
             }
-
-            _scannedApps.TryAdd(appId, 0);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Warning: Error processing app {appId}: {ex.Message}");
+            Console.WriteLine($"Warning: Error processing app {appId}, saving it for the next run: {ex.Message}");
+            _scannedApps.TryRemove(appId, out _);
+            _failedAppIds.Add(appId);
         }
 
         return dlcAppIdsToScan;
@@ -472,10 +654,24 @@ public class DepotMappingService
             return;
         }
 
-        if (!_appNames.ContainsKey(dlcAppId))
+        if (TryQueueApp(dlcAppId))
         {
             dlcAppIdsToScan.Add(dlcAppId);
         }
+    }
+
+    private bool TryQueueApp(uint appId)
+    {
+        if (_scannedApps.ContainsKey(appId)) return false;
+        if (!RefetchKnownDlc && IsFullyKnown(appId)) return false;
+        return _queuedApps.TryAdd(appId, 0);
+    }
+
+    private bool IsFullyKnown(uint appId)
+    {
+        return _appNames.TryGetValue(appId, out var name) &&
+               name != $"App {appId}" &&
+               _appTypes.ContainsKey(appId);
     }
 
     public static bool HasPublicManifest(KeyValue depotKey)
@@ -541,7 +737,24 @@ public class DepotMappingService
             await Task.Delay(10);
         }
 
+        if (!tcs.Task.IsCompleted)
+        {
+            throw new TimeoutException($"No PICS reply for {typeof(T).Name} job {jobId}");
+        }
+
         return await tcs.Task;
+    }
+
+    public static void EnsureProductInfoReturnedApps(IReadOnlyList<SteamApps.PICSProductInfoCallback> callbacks, int requestedApps)
+    {
+        if (requestedApps == 0) return;
+        if (callbacks.Sum(cb => cb.Apps.Count) > 0) return;
+
+        var unknown = callbacks.Sum(cb => cb.UnknownApps.Count);
+        if (unknown > 0 && (requestedApps <= 100 || unknown >= requestedApps)) return;
+
+        throw new InvalidOperationException(
+            $"PICS returned no apps for {requestedApps} requested ({callbacks.Count} replies, {unknown} unknown)");
     }
 
     private async Task<IReadOnlyList<SteamApps.PICSProductInfoCallback>> WaitForAllProductInfoAsync(
@@ -571,6 +784,11 @@ public class DepotMappingService
         {
             _connectionService.CallbackManager.RunWaitCallbacks(TimeSpan.FromMilliseconds(100));
             await Task.Delay(10);
+        }
+
+        if (!isCompleted)
+        {
+            throw new TimeoutException($"PICS product info job {jobId} timed out after {callbacks.Count} partial replies");
         }
 
         return callbacks.AsReadOnly();

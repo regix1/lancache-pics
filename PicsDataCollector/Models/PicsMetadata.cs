@@ -7,4 +7,5 @@ public class PicsMetadata
     public string Version { get; set; } = "1.1";
     public DateTime NextUpdateDue { get; set; }
     public uint LastChangeNumber { get; set; }
+    public List<uint> PendingAppIds { get; set; } = [];
 }

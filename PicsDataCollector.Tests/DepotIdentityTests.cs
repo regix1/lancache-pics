@@ -23,17 +23,16 @@ public sealed class DepotIdentityTests
     }
 
     [Fact]
-    public void DlcAlreadyNamed_IsNotQueuedAndKeepsItsSourceIdentity()
+    public void DlcAlreadyNamed_KeepsItsSourceIdentity()
     {
         var service = new DepotMappingService(new SteamConnectionService());
         service.LoadExistingMappings(
             new Dictionary<uint, HashSet<uint>>(),
             new Dictionary<uint, string> { [1770480] = "AH-94" });
 
-        var queued = service.ProcessAppDepots(667970, VtolGame(listsDlcDepot: false));
+        service.ProcessAppDepots(667970, VtolGame(listsDlcDepot: false));
         service.ProcessAppDepots(1770480, VtolDlc());
 
-        Assert.DoesNotContain(1770480u, queued);
         Assert.Equal(1770480u, service.DepotRelationships[1770480][1770480].ManifestAppId);
     }
 
