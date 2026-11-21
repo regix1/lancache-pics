@@ -66,8 +66,7 @@ jobs:
             echo "Running manual ${{ github.event.inputs.mode }} update"
           fi
 
-      - name: Seed incremental run from latest release
-        if: steps.mode.outputs.mode == 'incremental'
+      - name: Seed run from latest release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -78,7 +77,7 @@ jobs:
           fi
           mkdir -p output
           gh release download "$LATEST_TAG" -p "pics_depot_mappings.json" -D output --clobber
-          echo "Seeded from $LATEST_TAG ($(jq '.depotMappings | length' output/pics_depot_mappings.json) depots, change #$(jq '.metadata.lastChangeNumber' output/pics_depot_mappings.json))"
+          echo "Seeded from $LATEST_TAG ($(jq '.depotMappings | length' output/pics_depot_mappings.json) depots, change #$(jq '.metadata.lastChangeNumber' output/pics_depot_mappings.json), $(jq '.metadata.pendingAppIds // [] | length' output/pics_depot_mappings.json) pending apps)"
 
       - name: Run PICS data collector (Incremental)
         if: steps.mode.outputs.mode == 'incremental'

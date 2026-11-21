@@ -111,7 +111,7 @@ public class DepotMappingService
         RebuildDerivedOwners();
     }
 
-    public async Task BuildDepotIndexAsync(List<uint> appIds)
+    public async Task<List<uint>> BuildDepotIndexAsync(List<uint> appIds)
     {
         var allAppIds = new HashSet<uint>(appIds); // For fast DLC dedup
         var batches = appIds.Chunk(AppBatchSize).ToList();
@@ -148,18 +148,19 @@ public class DepotMappingService
         });
 
         await Task.WhenAll(tasks);
-        await RetryFailedBatchesAsync(failedBatches.OrderBy(f => f.Number).ToList(), allAppIds);
+        var pendingAppIds = await RetryFailedBatchesAsync(failedBatches.OrderBy(f => f.Number).ToList(), allAppIds);
 
         RebuildDerivedOwners();
         Console.WriteLine($"Completed! Found {_depotToAppMappings.Count} depot mappings");
+        return pendingAppIds;
     }
 
-    private async Task RetryFailedBatchesAsync(List<(uint[] Batch, int Number)> failedBatches, HashSet<uint> allAppIds)
+    private async Task<List<uint>> RetryFailedBatchesAsync(List<(uint[] Batch, int Number)> failedBatches, HashSet<uint> allAppIds)
     {
-        if (failedBatches.Count == 0) return;
+        var pendingAppIds = new List<uint>();
+        if (failedBatches.Count == 0) return pendingAppIds;
 
         Console.WriteLine($"Retrying {failedBatches.Count} failed batches one at a time...");
-        var stillFailed = new List<int>();
 
         foreach (var (batch, number) in failedBatches)
         {
@@ -170,16 +171,13 @@ public class DepotMappingService
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Warning: Batch {number} failed again: {ex.Message}");
-                stillFailed.Add(number);
+                Console.WriteLine($"Warning: Batch {number} failed again, saving its {batch.Length} apps for the next run: {ex.Message}");
+                pendingAppIds.AddRange(batch);
             }
         }
 
-        if (stillFailed.Count == 0) return;
-
-        throw new InvalidOperationException(
-            $"{stillFailed.Count} of {failedBatches.Count} retried batches still failed ({string.Join(", ", stillFailed)}). " +
-            "Refusing to save a partial depot map.");
+        pendingAppIds.Sort();
+        return pendingAppIds;
     }
 
     public async Task<int> ResolveOrphanDepotsAsync(List<uint> orphanDepotIds, CancellationToken ct)

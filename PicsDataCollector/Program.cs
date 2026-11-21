@@ -80,40 +80,35 @@ class Program
             var enumerationService = new PicsEnumerationService(connectionService);
             var mappingService = new DepotMappingService(connectionService);
 
-            // Load existing data if appropriate
+            // Every mode builds on the existing file so a run that gets cut off never drops data it already had.
             uint lastChangeNumber = 0;
-            if (incrementalOnly)
+            var (data, changeNumber) = await persistenceService.LoadExistingDataAsync();
+            var carriedOverAppIds = data?.Metadata?.PendingAppIds ?? [];
+
+            if (data != null)
+            {
+                var (depotMappings, appNames, depotOwners, appTypes, headerImages, relationships) = persistenceService.ExtractMappingsFromData(data);
+                mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes, headerImages, relationships);
+            }
+
+            if (fullUpdate)
+            {
+                Console.WriteLine("Mode: Full update (rescanning every app on top of existing data)");
+            }
+            else if (incrementalOnly || data != null)
             {
                 Console.WriteLine("Mode: Incremental update");
-                var (data, changeNumber) = await persistenceService.LoadExistingDataAsync();
                 lastChangeNumber = changeNumber;
-
-                if (data != null)
-                {
-                    var (depotMappings, appNames, depotOwners, appTypes, headerImages, relationships) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes, headerImages, relationships);
-                }
-            }
-            else if (fullUpdate)
-            {
-                Console.WriteLine("Mode: Full update");
+                incrementalOnly = true;
             }
             else
             {
-                // Auto-detect based on existing file
-                var (data, changeNumber) = await persistenceService.LoadExistingDataAsync();
-                if (data != null)
-                {
-                    Console.WriteLine("Mode: Incremental update (auto-detected)");
-                    lastChangeNumber = changeNumber;
-                    var (depotMappings, appNames, depotOwners, appTypes, headerImages, relationships) = persistenceService.ExtractMappingsFromData(data);
-                    mappingService.LoadExistingMappings(depotMappings, appNames, depotOwners, appTypes, headerImages, relationships);
-                    incrementalOnly = true;
-                }
-                else
-                {
-                    Console.WriteLine("Mode: Full update (no existing data found)");
-                }
+                Console.WriteLine("Mode: Full update (no existing data found)");
+            }
+
+            if (carriedOverAppIds.Count > 0)
+            {
+                Console.WriteLine($"Picking up {carriedOverAppIds.Count} apps left pending by the last run");
             }
 
             Console.WriteLine();
@@ -165,12 +160,12 @@ class Program
 
             // Enumerate app IDs
             Console.WriteLine("Enumerating app IDs via PICS...");
-            var appIds = await enumerationService.EnumerateAllAppIdsAsync(incrementalOnly, lastChangeNumber);
+            var appIds = MergeAppIds(carriedOverAppIds, await enumerationService.EnumerateAllAppIdsAsync(incrementalOnly, lastChangeNumber));
             Console.WriteLine($"Found {appIds.Count} app IDs to process");
             Console.WriteLine();
 
             // Build depot mappings (this collects app types from PICS)
-            await mappingService.BuildDepotIndexAsync(appIds);
+            var pendingAppIds = await mappingService.BuildDepotIndexAsync(appIds);
 
             // Resolve orphan depots if requested
             if (orphanDepotIds.Count > 0)
@@ -223,12 +218,16 @@ class Program
             var depotRelationshipsDict = mappingService.DepotRelationships.ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value.Values.ToList());
-            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber, depotOwnersDict, appTypesDict, appHeaderImagesDict, apiVersion, depotRelationshipsDict);
+            await persistenceService.SaveToJsonAsync(depotMappingsDict, appNamesDict, finalChangeNumber, depotOwnersDict, appTypesDict, appHeaderImagesDict, apiVersion, depotRelationshipsDict, pendingAppIds);
 
             Console.WriteLine();
             Console.WriteLine("Collection complete!");
             Console.WriteLine($"Total depot mappings: {depotMappingsDict.Count}");
             Console.WriteLine($"Total unique apps: {appNamesDict.Count}");
+            if (pendingAppIds.Count > 0)
+            {
+                Console.WriteLine($"::warning::{pendingAppIds.Count} apps could not be fetched and will be retried next run");
+            }
 
             // Cleanup
             isRunning = false;
@@ -242,6 +241,11 @@ class Program
             Console.WriteLine(ex.StackTrace);
             return 1;
         }
+    }
+
+    private static List<uint> MergeAppIds(IEnumerable<uint> carriedOver, IEnumerable<uint> enumerated)
+    {
+        return carriedOver.Concat(enumerated).Distinct().ToList();
     }
 
     private static string? GetArgValue(string[] args, string argName)
