@@ -15,8 +15,14 @@ public class DepotMappingService
     private readonly ConcurrentDictionary<uint, string> _appHeaderImages = new();
     private readonly ConcurrentDictionary<uint, byte> _scannedApps = new();  // Track scanned apps to avoid rescanning
     private readonly ConcurrentDictionary<uint, byte> _queuedApps = new();
+    private readonly ConcurrentDictionary<uint, byte> _stubAppIds = new();
     private readonly SemaphoreSlim _reconnectLock = new(1, 1);
-    private bool _reconnectFailed;
+    private bool _givenUp;
+    private int _failuresInARow;
+
+    private const int MaxFailuresInARow = 5;
+
+    public bool RefetchKnownDlc { get; set; }
     private readonly ConcurrentDictionary<(uint DepotId, uint SourceAppId), byte> _refreshedRelationships = new();
     private readonly ConcurrentBag<uint> _failedAppIds = [];
 
@@ -133,11 +139,13 @@ public class DepotMappingService
             try
             {
                 await ProcessBatchAsync(batch, allAppIds, index + 1);
+                RecordBatchResult(succeeded: true);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Warning: Failed to process batch {index + 1}: {ex.Message}");
                 failedBatches.Add((batch, index + 1));
+                RecordBatchResult(succeeded: false);
             }
             finally
             {
@@ -180,6 +188,7 @@ public class DepotMappingService
         foreach (var depotId in _depotToAppMappings.Keys.ToList())
         {
             var keptSources = KeepRefreshedRelationships(depotId, pendingAppIds);
+            keptSources.AddRange(_depotToAppMappings[depotId].Where(_stubAppIds.ContainsKey));
             var keptApps = new HashSet<uint>(keptSources);
             keptApps.UnionWith(_depotToAppMappings[depotId].Where(pendingAppIds.Contains));
 
@@ -211,6 +220,7 @@ public class DepotMappingService
         {
             if (_refreshedRelationships.ContainsKey((depotId, sourceAppId))) continue;
             if (pendingAppIds.Contains(sourceAppId)) continue;
+            if (_stubAppIds.ContainsKey(sourceAppId)) continue;
             bySource.TryRemove(sourceAppId, out _);
         }
 
@@ -226,9 +236,9 @@ public class DepotMappingService
 
         foreach (var (batch, number) in failedBatches)
         {
-            if (_reconnectFailed)
+            if (_givenUp)
             {
-                Console.WriteLine($"Warning: No Steam connection, saving batch {number}'s {batch.Length} apps for the next run");
+                Console.WriteLine($"Warning: Gave up on Steam, saving batch {number}'s {batch.Length} apps for the next run");
                 pendingAppIds.AddRange(batch);
                 continue;
             }
@@ -237,11 +247,13 @@ public class DepotMappingService
             try
             {
                 await ProcessBatchAsync(batch, allAppIds, number);
+                RecordBatchResult(succeeded: true);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Warning: Batch {number} failed again, saving its {batch.Length} apps for the next run: {ex.Message}");
                 pendingAppIds.AddRange(batch);
+                RecordBatchResult(succeeded: false);
             }
         }
 
@@ -397,6 +409,7 @@ public class DepotMappingService
             {
                 try
                 {
+                    await EnsureLoggedOnAsync();
                     var dlcTokensJob = _connectionService.Apps.PICSGetAccessTokens(dlcBatch, Enumerable.Empty<uint>());
                     var dlcTokens = await WaitForCallbackAsync(dlcTokensJob);
 
@@ -438,15 +451,29 @@ public class DepotMappingService
         }
     }
 
+    private void RecordBatchResult(bool succeeded)
+    {
+        if (succeeded)
+        {
+            Interlocked.Exchange(ref _failuresInARow, 0);
+            return;
+        }
+
+        if (Interlocked.Increment(ref _failuresInARow) < MaxFailuresInARow || _givenUp) return;
+        _givenUp = true;
+        Console.WriteLine($"Warning: {MaxFailuresInARow} batches failed in a row, giving up on Steam for this run");
+    }
+
     private async Task EnsureLoggedOnAsync()
     {
+        if (_givenUp) throw new InvalidOperationException("Gave up on Steam for this run");
         if (_connectionService.IsLoggedOn) return;
 
         await _reconnectLock.WaitAsync();
         try
         {
             if (_connectionService.IsLoggedOn) return;
-            if (_reconnectFailed) throw new InvalidOperationException("Not logged on to Steam");
+            if (_givenUp) throw new InvalidOperationException("Gave up on Steam for this run");
 
             Console.WriteLine("Lost the Steam connection, reconnecting...");
             try
@@ -455,7 +482,7 @@ public class DepotMappingService
             }
             catch
             {
-                _reconnectFailed = true;
+                _givenUp = true;
                 throw;
             }
         }
@@ -483,6 +510,13 @@ public class DepotMappingService
             var appinfo = kv["appinfo"];
             var common = appinfo != KeyValue.Invalid ? appinfo["common"] : kv["common"];
             var depots = appinfo != KeyValue.Invalid ? appinfo["depots"] : kv["depots"];
+
+            if (common == KeyValue.Invalid || common.Children.Count == 0)
+            {
+                Console.WriteLine($"  App {appId} came back empty, keeping what the last run had");
+                _stubAppIds.TryAdd(appId, 0);
+                return dlcAppIdsToScan;
+            }
 
             var appName = common?["name"]?.AsString() ?? $"App {appId}";
             var appType = common?["type"]?.AsString()?.ToLower() ?? "unknown";
@@ -628,7 +662,16 @@ public class DepotMappingService
 
     private bool TryQueueApp(uint appId)
     {
-        return !_scannedApps.ContainsKey(appId) && _queuedApps.TryAdd(appId, 0);
+        if (_scannedApps.ContainsKey(appId)) return false;
+        if (!RefetchKnownDlc && IsFullyKnown(appId)) return false;
+        return _queuedApps.TryAdd(appId, 0);
+    }
+
+    private bool IsFullyKnown(uint appId)
+    {
+        return _appNames.TryGetValue(appId, out var name) &&
+               name != $"App {appId}" &&
+               _appTypes.ContainsKey(appId);
     }
 
     public static bool HasPublicManifest(KeyValue depotKey)

@@ -166,12 +166,20 @@ class Program
             Console.WriteLine();
 
             // Enumerate app IDs
-            var finalChangeNumber = await GetCurrentChangeNumberAsync(connectionService);
+            var finalChangeNumber = await ReadChangeNumberAsync(connectionService);
+            if (finalChangeNumber == 0 && changeNumber == 0)
+            {
+                Console.WriteLine("::error::Could not read the current change number and there is no earlier one to keep");
+                return 1;
+            }
+
             if (finalChangeNumber == 0)
             {
                 Console.WriteLine($"Warning: Could not read the current change number, keeping #{changeNumber}");
                 finalChangeNumber = changeNumber;
             }
+
+            mappingService.RefetchKnownDlc = fullUpdate;
 
             Console.WriteLine("Enumerating app IDs via PICS...");
             var enumeratedAppIds = await enumerationService.EnumerateAllAppIdsAsync(incrementalOnly, lastChangeNumber);
@@ -289,6 +297,18 @@ class Program
             }
         }
         return null;
+    }
+
+    private static async Task<uint> ReadChangeNumberAsync(SteamConnectionService connectionService)
+    {
+        for (var attempt = 1; attempt <= 3; attempt++)
+        {
+            var number = await GetCurrentChangeNumberAsync(connectionService);
+            if (number != 0) return number;
+            Console.WriteLine($"Warning: Change number read {attempt} of 3 failed");
+        }
+
+        return 0;
     }
 
     private static async Task<uint> GetCurrentChangeNumberAsync(SteamConnectionService connectionService)

@@ -122,6 +122,37 @@ public sealed class PicsReplyTests
         Assert.Empty(service.ProcessAppDepots(11, app));
     }
 
+    [Fact]
+    public void EmptyReply_KeepsNameAndDepotsThroughPrune()
+    {
+        var service = new DepotMappingService(new SteamConnectionService());
+        service.LoadExistingMappings(
+            new Dictionary<uint, HashSet<uint>> { [11] = [10] },
+            new Dictionary<uint, string> { [10] = "Locked Game" });
+
+        service.ProcessAppDepots(10, new KeyValue("app"));
+
+        Assert.Equal(0, service.PruneUnrefreshed(new HashSet<uint>()));
+        Assert.Equal("Locked Game", service.AppNames[10]);
+    }
+
+    [Theory]
+    [InlineData(false, 0)]
+    [InlineData(true, 1)]
+    public void FullyKnownDlc_IsOnlyRefetchedOnFullRuns(bool refetchKnownDlc, int expectedQueued)
+    {
+        var service = new DepotMappingService(new SteamConnectionService()) { RefetchKnownDlc = refetchKnownDlc };
+        service.LoadExistingMappings(
+            [],
+            new Dictionary<uint, string> { [20] = "Known DLC" },
+            types: new Dictionary<uint, string> { [20] = "dlc" });
+
+        var app = App("Game");
+        app["common"].Children.Add(new KeyValue("listofdlc", "20"));
+
+        Assert.Equal(expectedQueued, service.ProcessAppDepots(10, app).Count);
+    }
+
     private static KeyValue App(string name, params uint[] depotIds)
     {
         var depots = new KeyValue("depots");
